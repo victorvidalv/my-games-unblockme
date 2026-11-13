@@ -3,6 +3,7 @@ import { SHOP_ITEMS, availability, buy, itemById, priceOf } from '../game/shop.j
 import { saveRun, skipLevel } from '../game/session.js';
 import { S } from '../state.js';
 import { layout, recLine, updateHud } from './board.js';
+import { updateHeroHud } from './heroes.js';
 import { ask } from './menu.js';
 import { icon } from './icons.js';
 import { playBuyEffect, playRewindEffect } from './turns.js';
@@ -14,13 +15,15 @@ function applyEffects(id) {
   $('score').textContent = fmt(S.run.score);
   recLine();
   if (id === 'hint') {
-    $('hintN').textContent = S.run.hints;
-    $('bHint').disabled = false;
+    updateHeroHud();
   } else if (id === 'moves') {
     $('lim').textContent = S.G.limit;
     updateHud();
     playBuyEffect();
     $('msg').textContent = `${itemById('moves').name}: ahora el límite es ${S.G.limit}.`;
+  } else if (id === 'revive') {
+    updateHeroHud();
+    $('msg').textContent = `Revivir guardado (${S.run.revive}): si pierdes, repites este tablero.`;
   } else if (id === 'redo') {
     playRewindEffect();
     layout();
@@ -34,7 +37,7 @@ function applyEffects(id) {
 /** Compra con confirmación (los precios son altos). Devuelve true si se compró. */
 export async function confirmBuy(id) {
   const item = itemById(id);
-  const price = priceOf(id, S.G.rate);
+  const price = priceOf(id, S.G.rate, S.run.score);
   const ok = await ask({
     ico: item.icon, title: `${item.name} · ${fmt(price)} pts`,
     text: `${item.detail}<br><br>Tienes <b>${fmt(S.run.score)}</b> puntos y te quedarían <b>${fmt(S.run.score - price)}</b>.`,
@@ -53,13 +56,14 @@ const SAY = {
   hint: 'Una pista: el mejor movimiento, susurrado por mí. Barato… para lo que vale.',
   moves: '¿Sin turnos? Cinco más. Eso no se regala, amigo.',
   redo: 'Rebobino el tablero. Mi tiempo vale oro.',
+  revive: 'Volver de entre los caídos… cuesta la mitad de tu fortuna. Es lo justo.',
   skip: '¿Saltar un nivel? Es un lujo. Y los lujos se pagan.',
   poor: ['¿Eso es todo lo que tienes? Vuelve con más monedas.', 'Sin monedas no hay milagros.', 'Mi bolsa está llena; la tuya… no tanto.'],
   bought: ['¡Un placer hacer negocios!', '¡Excelente compra! No hay devoluciones.', '¡Cling, cling! Eso suena bien.'],
   decline: ['Piénsalo… los precios no bajan.', 'Tú decides. El oro no huye.'],
   nothing: ['Aún no has movido nada. ¿Qué voy a rebobinar?'],
 };
-const SHORT = { hint: 'Te enseña el mejor movimiento', moves: '+5 al límite de este tablero', redo: 'Empieza de cero con 0 movimientos', skip: 'Pasa de nivel sin puntos ni racha' };
+const SHORT = { revive: 'Si pierdes, repites el tablero · 50 % de tus puntos', hint: 'Te enseña el mejor movimiento', moves: '+5 al límite de este tablero', redo: 'Empieza de cero con 0 movimientos', skip: 'Pasa de nivel sin puntos ni racha' };
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 function say(text, mood) {
@@ -81,8 +85,8 @@ function render() {
   $('shopList').innerHTML = SHOP_ITEMS.map((i) => {
     const a = availability(i.id, { run: S.run, G: S.G });
     return `<button class="shop-item${a.ok ? '' : ' off'}" data-id="${i.id}" aria-disabled="${!a.ok}">
-      <span class="ico">${icon(i.icon)}</span><span><b>${i.name}</b><small>${a.ok || !a.reason ? `${SHORT[i.id]} · ${i.levels} niveles` : a.reason}</small></span>
-      <span class="price">${fmt(priceOf(i.id, S.G.rate))}</span></button>`;
+      <span class="ico">${icon(i.icon)}</span><span><b>${i.name}</b><small>${a.ok || !a.reason ? SHORT[i.id] : a.reason}</small></span>
+      <span class="price">${fmt(priceOf(i.id, S.G.rate, S.run.score))}</span></button>`;
   }).join('');
 }
 

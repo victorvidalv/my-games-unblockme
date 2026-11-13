@@ -6,13 +6,13 @@
 export const HEROES = [
   { id: 'lia', name: 'Lía', role: 'Exploradora', icon: 'heart', color: '#68d8bd', power: 'Una segunda oportunidad', short: '1 vida extra por partida', detail: 'Repite un tablero al caer. Una vez por aventura, sin perder tus puntos.', quote: '«Si la puerta no abre, buscamos otra.»' },
   { id: 'jean', name: 'Jean', role: 'Relojero', icon: 'clock', color: '#8fb9ff', power: 'Tres pasos atrás', short: '3 deshacer gratis por tablero', detail: 'Recupera tus tres últimos movimientos sin penalización, uno a uno.', quote: '«Voy tarde. El tiempo, también.»' },
-  { id: 'van', name: 'Juth', role: 'Cronista', icon: 'stars', color: '#c5a2ff', power: 'Dos luces en el camino', short: '+2 pistas cada 10 niveles', detail: 'Dos pistas extra al completar cada ciudad.', quote: '«Primero observo. Luego abro.»' },
+  { id: 'van', name: 'Juth', role: 'Cronista', icon: 'stars', color: '#c5a2ff', power: 'Una luz en cada tablero', short: '1 pista gratis por tablero', detail: 'En cada tablero tienes una pista gratis que no gasta tu reserva. Úsala cuando dudes.', quote: '«Primero observo. Luego abro.»' },
 ];
 
 export const heroById = (id) => HEROES.find((h) => h.id === id) || HEROES[0];
 
 export const FREE_UNDOS = 3; // Jean: deshacer gratis por tablero
-export const JUTH_HINTS = 2; // Juth: pistas extra por ciudad
+export const JUTH_FREE_HINTS = 1; // Juth: pistas gratis por tablero (equilibrado con simulaciones: ver src/game/balance.js)
 export const CITY_EVERY = 10; // niveles por ciudad
 export const HINT_EVERY = 5; // todos los héroes: +1 pista cada 5 niveles
 
@@ -23,10 +23,9 @@ const isPractice = (mode) => mode === 'p';
 /** ¿Puede Lía salvarte al caer? (una vez por aventura; no aplica en Práctica, donde no se pierde) */
 export const canRescue = (heroId, run, mode) => heroId === 'lia' && !isPractice(mode) && !run.lifeUsed;
 
-/** Gasta la vida extra y guarda el tablero para repetirlo desde el principio con 0 movimientos. */
-export function useRescue(run, G) {
-  run.lifeUsed = true;
-  run.rescue = {
+/** Foto del tablero para repetirlo desde el principio con 0 movimientos (la usan Lía y el revivir comprado). */
+export function snapshotRescue(G) {
+  return {
     level: G.n,
     rate: G.rate,
     pieces: G.pieces.map((p) => ({ ...p })),
@@ -34,6 +33,12 @@ export function useRescue(run, G) {
     start: G.start.slice(),
     opt: G.opt,
   };
+}
+
+/** Gasta la vida extra de Lía y guarda el tablero para repetirlo. */
+export function useRescue(run, G) {
+  run.lifeUsed = true;
+  run.rescue = { ...snapshotRescue(G), kind: 'lia' };
 }
 
 /* ───────────── Jean: tres pasos atrás gratis por tablero ───────────── */
@@ -65,19 +70,42 @@ export function applyUndo({ heroId, run, mode, level, moves }) {
   return { free, moves: free ? Math.max(0, moves - 1) : moves + 1 };
 }
 
-/* ───────────── Pistas: base para todos + Juth ───────────── */
+/* ───────────── Pistas: base para todos + pista gratis de Juth ───────────── */
+
+/** Pistas gratis que le quedan a Juth en `level` (0 para los demás héroes). No gastan tu reserva de pistas. */
+export function freeHintsLeft(heroId, run, level) {
+  if (!run || heroId !== 'van') return 0;
+  const used = run.freeHintLevel === level ? Math.max(0, Math.min(JUTH_FREE_HINTS, run.freeHintCount || 0)) : 0;
+  return JUTH_FREE_HINTS - used;
+}
+
+/**
+ * Gasta una pista: la gratis de Juth si le queda en este tablero; si no, una de la reserva.
+ * Devuelve {ok, free}. (ok=false si no hay ninguna.) En Práctica no gasta nada.
+ */
+export function spendHint({ heroId, run, mode, level }) {
+  if (isPractice(mode)) return { ok: true, free: true };
+  if (freeHintsLeft(heroId, run, level) > 0) {
+    run.freeHintCount = (run.freeHintLevel === level ? run.freeHintCount || 0 : 0) + 1;
+    run.freeHintLevel = level;
+    return { ok: true, free: true };
+  }
+  if ((run.hints || 0) > 0) {
+    run.hints--;
+    return { ok: true, free: false };
+  }
+  return { ok: false, free: false };
+}
+
+/** ¿Se puede pedir una pista ahora? (gratis o de la reserva) */
+export const canHint = (heroId, run, mode, level) => isPractice(mode) || freeHintsLeft(heroId, run, level) > 0 || (run.hints || 0) > 0;
 
 /**
  * Pistas ganadas al completar `level`; suma a run.hints y devuelve cuántas.
- * Todos: +1 cada 5 niveles. Juth: +2 al completar cada ciudad (10, 20, …), una sola vez por ciudad.
+ * Todos los héroes: +1 cada 5 niveles.
  */
 export function clearRewards(heroId, run, level) {
-  let gained = 0;
-  if (level % HINT_EVERY === 0) gained += 1;
-  if (heroId === 'van' && level % CITY_EVERY === 0 && (run.vanAwardedAt || 0) < level) {
-    gained += JUTH_HINTS;
-    run.vanAwardedAt = level;
-  }
+  const gained = level % HINT_EVERY === 0 ? 1 : 0;
   run.hints = (run.hints || 0) + gained;
   return gained;
 }

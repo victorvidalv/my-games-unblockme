@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  HEROES, canRescue, useRescue, freeUndosLeft, applyUndo, clearRewards, FREE_UNDOS,
-} from '../src/game/heroes.js';
+  HEROES, canRescue, useRescue, freeUndosLeft, applyUndo, clearRewards, FREE_UNDOS, JUTH_FREE_HINTS, freeHintsLeft, spendHint, canHint } from '../src/game/heroes.js';
 
 const newRun = (extra = {}) => ({ hints: 3, lifeUsed: false, undoUsedAt: 0, undoUsedLevel: 0, undoUsedCount: 0, vanAwardedAt: 0, ...extra });
 
@@ -81,26 +80,47 @@ describe('Jean · tres pasos atrás', () => {
   });
 });
 
-describe('pistas · Juth y recompensas de nivel', () => {
-  it('todos ganan +1 pista cada 5 niveles', () => {
+describe('pistas · recompensas de nivel y la pista gratis de Juth', () => {
+  it('todos ganan +1 pista cada 5 niveles (y nada más: Juth ya no recibe pistas extra por ciudad)', () => {
     for (const hero of ['lia', 'jean', 'van']) {
       const run = newRun({ hints: 0 });
       expect(clearRewards(hero, run, 5)).toBe(1);
       expect(clearRewards(hero, run, 6)).toBe(0);
-      expect(run.hints).toBe(1);
+      expect(clearRewards(hero, run, 10)).toBe(1);
+      expect(run.hints).toBe(2);
     }
   });
-  it('Juth gana +2 más al completar cada ciudad (10, 20, … 100), una sola vez', () => {
-    const run = newRun({ hints: 0 });
-    expect(clearRewards('van', run, 10)).toBe(3); // 1 (cada 5) + 2 (Juth)
-    expect(clearRewards('van', run, 10)).toBe(1); // repetir el nivel 10 no duplica el bono de Juth
-    expect(run.vanAwardedAt).toBe(10);
-    let total = 0;
-    for (let l = 11; l <= 100; l++) total += clearRewards('van', run, l);
-    // niveles 15,25,…,95 (9) + múltiplos de 10 de 20 a 100 (9) × 3 = pistas
-    expect(total).toBe(9 * 1 + 9 * 3);
+  it('Juth tiene 1 pista gratis por tablero; los demás héroes, ninguna', () => {
+    expect(JUTH_FREE_HINTS).toBe(1);
+    expect(freeHintsLeft('van', newRun(), 7)).toBe(1);
+    expect(freeHintsLeft('lia', newRun(), 7)).toBe(0);
+    expect(freeHintsLeft('jean', newRun(), 7)).toBe(0);
   });
-  it('Lía y Jean no reciben el bono de Juth', () => {
-    for (const hero of ['lia', 'jean']) expect(clearRewards(hero, newRun({ hints: 0 }), 10)).toBe(1);
+  it('la pista gratis se gasta primero y no toca la reserva; después se gasta la reserva', () => {
+    const run = newRun({ hints: 2 });
+    expect(spendHint({ heroId: 'van', run, mode: 'c', level: 7 })).toEqual({ ok: true, free: true });
+    expect(run.hints).toBe(2);
+    expect(freeHintsLeft('van', run, 7)).toBe(0);
+    expect(spendHint({ heroId: 'van', run, mode: 'c', level: 7 })).toEqual({ ok: true, free: false });
+    expect(run.hints).toBe(1);
+  });
+  it('la pista gratis se renueva en cada tablero nuevo', () => {
+    const run = newRun({ hints: 0 });
+    spendHint({ heroId: 'van', run, mode: 'c', level: 7 });
+    expect(canHint('van', run, 'c', 7)).toBe(false);
+    expect(canHint('van', run, 'c', 8)).toBe(true);
+    expect(freeHintsLeft('van', run, 8)).toBe(1);
+  });
+  it('sin reserva ni pista gratis no se puede pedir una pista', () => {
+    const run = newRun({ hints: 0 });
+    expect(canHint('lia', run, 'c', 3)).toBe(false);
+    expect(spendHint({ heroId: 'lia', run, mode: 'c', level: 3 })).toEqual({ ok: false, free: false });
+    expect(run.hints).toBe(0);
+  });
+  it('en Práctica las pistas son gratis y no gastan nada', () => {
+    const run = newRun({ hints: 0 });
+    expect(canHint('lia', run, 'p', 3)).toBe(true);
+    expect(spendHint({ heroId: 'lia', run, mode: 'p', level: 3 }).ok).toBe(true);
+    expect(run.hints).toBe(0);
   });
 });

@@ -29,6 +29,9 @@ export const BOSS_NAMES = [
   'El Coloso de Hielo', 'El Dragón de Papel', 'El Señor de la Fragua', 'El Vigía de las Estrellas', 'El Rey Dorado',
 ];
 
+/** Los jefes están DESACTIVADOS de momento (no convencía su implementación). El código se conserva; ponlo en true para volver a verlos. */
+export const BOSSES_ENABLED = false;
+
 const BOSS_STEP = 10;
 export { BOSS_POINTS } from '../engine/scoring.js'; // los jefes dan un 50 % más de puntos
 export const BOSS_HINTS = 2;      // y dos pistas
@@ -46,7 +49,7 @@ export const mechanicsOfFamily = (family) => ({
 export function levelPlan(level) {
   const city = zoneIdx(level);
   const step = ((level - 1) % 10) + 1;
-  const boss = step === BOSS_STEP;
+  const boss = BOSSES_ENABLED && step === BOSS_STEP;
   const schedule = city === 0 ? [6, 8, 9, 10] : [3, 5, 6, 8, 9, 10];
   let family = 'plain';
   if (schedule.includes(step)) family = boss && city >= 3 ? 'mixed' : CITY_FAMILY[city];

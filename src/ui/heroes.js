@@ -2,7 +2,7 @@ import { Music, setTensionFx } from '../audio/music.js';
 import { sfx } from '../audio/sound.js';
 import { $, cssUrl } from '../dom.js';
 import { saveRun } from '../game/session.js';
-import { HEROES } from '../game/heroes.js';
+import { HEROES, canHint, freeHintsLeft } from '../game/heroes.js';
 import { S, undosLeft, heroOf, pathOf, persist, store } from '../state.js';
 import { boardEl, layout, updateHud } from './board.js';
 import { heroArt } from './story.js';
@@ -27,14 +27,23 @@ export function chooseHero(start,mode){
 export function updateHeroHud(){
  if(!S.run||!S.G)return;const h=heroOf(),prac=S.run.mode==='p';
  $('heroHudImg').src=`heroes/${h.id}.webp`;$('heroHudImg').alt=h.name;$('heroHudName').textContent=h.name;
- $('heroHudPower').textContent=prac?'Práctica · ayudas ilimitadas':h.id==='lia'?(S.run.lifeUsed?'Segunda oportunidad usada':'Segunda oportunidad disponible'):h.id==='jean'?`${undosLeft()} deshacer gratis`:`+2 pistas al completar nivel ${Math.min(100,(Math.floor((S.G.n-1)/10)+1)*10)}`;
+ $('heroHudPower').textContent=prac?'Práctica · ayudas ilimitadas':h.id==='lia'?(S.run.lifeUsed?'Segunda oportunidad usada':'Segunda oportunidad disponible'):h.id==='jean'?`${undosLeft()} deshacer gratis`:(freeHintsLeft(h.id,S.run,S.G.n)>0?'Pista gratis disponible':'Pista gratis usada');
+ if(S.run.revive>0&&!prac)$('heroHudPower').textContent+=` · Revivir ×${S.run.revive}`;
+ $('hintN').textContent=prac?'∞':freeHintsLeft(h.id,S.run,S.G.n)>0?'gratis':S.run.hints;$('bHint').disabled=!canHint(h.id,S.run,S.run.mode,S.G.n);
  $('bUndo').querySelector('em').textContent=prac?'gratis':h.id==='jean'&&undosLeft()>0?undosLeft()+' gratis':'+1 mov';
 }
-export function showRescue(){
+/** Pantalla de «otra oportunidad»: la vida gratis de Lía o un revivir comprado (se repite el tablero con 0 movimientos). */
+export function showRescue(kind=S.run?.rescue?.kind||'lia'){
+ const revive=kind==='revive',h=heroOf();
  S.G.done=true;S.busy=true;boardEl.classList.add('board-lock');setTensionFx(0,false);Music.duck(.3);
- $('rescueHero').src=heroArt('lia','defeat');$('rescue').classList.add('show');$('rescueContinue').focus();
+ $('rescueHero').src=heroArt(revive?h.id:'lia','defeat');$('rescueHero').alt=revive?`${h.name} te da otra oportunidad`:'Lía protege la aventura';
+ $('rescueIcon').innerHTML=icon(revive?'flame':'heart');
+ $('rescueTag').textContent=revive?'REVIVIR · COMPRADO CON TUS PUNTOS':'PODER DE LÍA · UNA VEZ POR PARTIDA';
+ $('rescueTitle').textContent=revive?'¡Otra oportunidad!':'La aventura sigue';
+ $('rescueText').textContent=revive?`Pagaste por revivir. Repites este mismo tablero desde cero y conservas tus puntos y tus pistas.${S.run.revive>0?` Te queda ${S.run.revive} revivir guardado.`:''}`:'Lía te da una segunda oportunidad. Repites este mismo tablero desde cero y conservas tus puntos y tus pistas.';
+ $('rescue').classList.add('show');$('rescueContinue').focus();
  $('rescueContinue').onclick=()=>{
   if(!S.run?.rescue)return;S.G.pos=S.G.start.slice();S.G.moves=0;S.G.hist=[];S.G.done=false;delete S.run.rescue;saveRun();
-  $('rescue').classList.remove('show');boardEl.classList.remove('board-lock');S.busy=false;$('bUndo').disabled=true;layout();updateHud();Music.duck(1);sfx.start();$('msg').textContent='Lía te dio otra oportunidad. ¡Este tablero empieza de nuevo!';
+  $('rescue').classList.remove('show');boardEl.classList.remove('board-lock');S.busy=false;$('bUndo').disabled=true;layout();updateHud();Music.duck(1);sfx.start();$('msg').textContent=revive?'Revivir usado. ¡Este tablero empieza de nuevo!':'Lía te dio otra oportunidad. ¡Este tablero empieza de nuevo!';
  };
 }

@@ -16,6 +16,7 @@ import { decodeBoard } from '../engine/board.js';
 import { minMoves } from '../engine/solver.js';
 import { baseScore } from '../engine/scoring.js';
 import { canRescue, clearRewards, useRescue } from './heroes.js';
+import { hasRevive, useRevive } from './shop.js';
 import { S, gainNow, heroOf, persist, rkey, store, undosLeft } from '../state.js';
 import { boardEl, buildPieces, cellPx, fitBoard, recLine, syncRouteStyle, updateHud } from '../ui/board.js';
 import { isBonusLevel, showBonus } from '../ui/bonus.js';
@@ -37,7 +38,7 @@ export async function startRun(start,mode){
   if(S.run) recordBest(true);                         // si abandonas, lo logrado cuenta
   const seed=Math.floor(Math.random()*2**31);
   S.G=null;
-  S.run={seed,level:1,start,mode,hero:chosen,lifeUsed:false,undoUsedAt:0,undoUsedLevel:0,undoUsedCount:0,vanAwardedAt:0,score:0,hints:3+Math.floor(start/25),adj:0,streak:0,recBroken:false};
+  S.run={seed,level:1,start,mode,hero:chosen,lifeUsed:false,revive:0,revivesBought:0,undoUsedAt:0,undoUsedLevel:0,undoUsedCount:0,vanAwardedAt:0,score:0,hints:3+Math.floor(start/25),adj:0,streak:0,recBroken:false};
   syncHero();syncRouteStyle();applyZone(0);saveRun();
   S.run.route='normal';S.run.routeZone=0;S.run.travelFrom=0;saveRun();await resumeAdventure();
 }
@@ -68,7 +69,6 @@ export async function startLevel(){
   const prac=S.run.mode==='p';
   $('score').textContent=prac?'—':S.run.score.toLocaleString('de-DE');recLine();
   $('lim').textContent=prac?'∞':S.G.limit;
-  $('hintN').textContent=prac?'∞':S.run.hints;$('bHint').disabled=!prac&&S.run.hints<=0;
   $('bUndo').disabled=!S.G.hist.length;
   $('msg').textContent=S.G.n===1?'Desliza los bloques y saca la llave roja ➜ Cada movimiento cuenta.':tipFor(S.G);
   buildPieces();updateHud();sfx.start();S.busy=true;
@@ -162,7 +162,8 @@ export function skipLevel(){
 }
 function finalFail(why){
   if(S.G.done)return;
-  if(canRescue(heroOf().id,S.run,S.run.mode)){useRescue(S.run,S.G);saveRun();showRescue();return}
+  if(canRescue(heroOf().id,S.run,S.run.mode)){useRescue(S.run,S.G);saveRun();showRescue('lia');return}      // primero la vida gratis de Lía
+  if(hasRevive(S.run)){useRevive(S.run,S.G);saveRun();showRescue('revive');return}                           // luego el revivir comprado
   S.G.done=true;S.busy=true;boardEl.classList.add('board-lock');Music.stop(.25);setTensionFx(0,false);tone(220,.25,'sine',.045);S.G.els.forEach(el=>el.style.opacity='.5');
   setTimeout(()=>{endRun(false,why);S.busy=false},400);
 }

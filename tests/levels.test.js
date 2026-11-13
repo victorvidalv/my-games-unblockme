@@ -175,17 +175,14 @@ describe('partida completa simulada (3 caminos × 100 niveles, con piezas especi
     }
   }, 60000);
 
-  it('los jefes piden más movimientos mínimos que un nivel normal de la misma dificultad', () => {
-    let harder = 0;
-    let total = 0;
+  it('sin jefes: ningún nivel lleva dificultad extra ni bono de jefe', () => {
     for (const start of [1, 50, 75]) {
       for (let level = 10; level <= 100; level += 10) {
-        const { rating, lvl } = makeLevel(start, level, 5);
-        total++;
-        if (lvl.opt >= curve(rating).target) harder++;
+        const { plan, lvl, rating } = makeLevel(start, level, 5);
+        expect(plan.boss).toBe(false);
+        expect(lvl.opt).toBeLessThanOrEqual(curve(rating).target + 3 + 2);
       }
     }
-    expect(harder / total).toBeGreaterThan(0.6);
   }, 300000);
 
   it('la dificultad percibida real crece a lo largo de cada camino (mínimo medio por tramos de 10 niveles)', () => {

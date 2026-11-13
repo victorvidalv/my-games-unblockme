@@ -138,8 +138,8 @@ salida ni atascos imposibles (las pruebas lo verifican sobre todos los bancos).
 | ⚓ **Pesada** | Avanza solo 1 casilla por movimiento | Remaches de hierro y una insignia «1 ⇄» |
 
 Cada ciudad usa una mecánica (`CITY_FAMILY` en `src/game/mechanics.js`): los niveles 1-2 son normales, la mecánica aparece
-en el 3, 5, 6, 8 y 9 (en el Valle desde el 6, para aprender lo básico) y el **nivel 10 es el jefe**. Los jefes piden 2 movimientos
-mínimos más, dan **+50 % de puntos y 2 pistas**, y los de las ciudades 4-10 mezclan las tres piezas.
+en el 3, 5, 6, 8 y 9 (en el Valle desde el 6, para aprender lo básico) y el nivel 10 también lleva pieza especial. **Los jefes de ciudad están desactivados de momento**
+(`BOSSES_ENABLED` en `src/game/mechanics.js`; el código se conserva).
 La primera vez que aparece cada pieza sale un aviso con una mini animación; después, una leyenda bajo el tablero.
 Mover un candado o una pieza pesada suena distinto (clic metálico / golpe grave), y las rocas y la placa también tienen su sonido.
 
@@ -192,7 +192,7 @@ Elegir héroe es permanente durante la aventura. Las reglas están en [`src/game
 |---|---|---|
 | **Lía** | Una segunda oportunidad: repite un tablero al caer, una vez por aventura, sin perder puntos. | `canRescue`, `useRescue` |
 | **Jean** | Tres pasos atrás: 3 deshacer gratis por tablero (el movimiento se descuenta). | `freeUndosLeft`, `applyUndo` |
-| **Juth** | Dos luces en el camino: +2 pistas al completar cada ciudad (10, 20 … 100). | `clearRewards` |
+| **Juth** | Una luz en cada tablero: 1 pista gratis por tablero (no gasta tu reserva). | `freeHintsLeft`, `spendHint` |
 
 Reglas comunes: sin poder, deshacer cuesta **+1 movimiento**; todos ganan **+1 pista cada 5 niveles**.
 En **Práctica** todo es gratis y no se gasta nada. Los poderes se leen del objeto `run`, así que sobreviven

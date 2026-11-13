@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { curve, rateAt, minReach, moveLimit, MAX_LEVEL, TARGET_KNOTS, targetFor } from '../src/engine/difficulty.js';
-import { levelPlan, BOSS_NAMES, CITY_FAMILY, mechanicsOfFamily } from '../src/game/mechanics.js';
+import { levelPlan, BOSS_NAMES, BOSSES_ENABLED, CITY_FAMILY, mechanicsOfFamily } from '../src/game/mechanics.js';
 import { calcGain, gainFor, BOSS_POINTS } from '../src/engine/scoring.js';
 
 const PATHS = { Normal: 1, Difícil: 50, Experto: 75 };
@@ -61,15 +61,12 @@ describe('calendario de piezas especiales y jefes', () => {
     expect(levelPlan(6).family).toBe('walls');
     expect(levelPlan(6).intro).toBe(true);
   });
-  it('hay un jefe cada 10 niveles con nombre, y nunca es un nivel normal', () => {
+  it('los jefes están desactivados de momento: ningún nivel es jefe, pero siguen definidos para reactivarlos', () => {
+    expect(BOSSES_ENABLED).toBe(false);
     expect(BOSS_NAMES).toHaveLength(10);
-    for (let c = 0; c < 10; c++) {
-      const p = levelPlan(c * 10 + 10);
-      expect(p.boss).toBe(true);
-      expect(p.family).not.toBe('plain');
-      expect(p.city).toBe(c);
-    }
-    for (let l = 1; l <= 100; l++) if (l % 10 !== 0) expect(levelPlan(l).boss).toBe(false);
+    for (let l = 1; l <= 100; l++) expect(levelPlan(l).boss, `nivel ${l}`).toBe(false);
+    // el nivel 10 de cada ciudad es un nivel normal más (con su pieza especial según el calendario)
+    expect(levelPlan(10).family).toBe('walls');
   });
   it('cada ciudad introduce su mecánica una sola vez y la repite en 5-6 niveles', () => {
     for (let c = 0; c < 10; c++) {

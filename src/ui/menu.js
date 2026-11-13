@@ -100,7 +100,7 @@ $('bResume').onclick=()=>{$('menu').classList.remove('show');Music.muffle(false)
 $('bContinue').onclick=()=>{
   $('menu').classList.remove('show');Music.muffle(false);
   if(S.run&&S.G&&!S.G.done) return;
-  S.run={start:1,mode:'c',hero:'lia',lifeUsed:false,undoUsedAt:0,undoUsedLevel:0,undoUsedCount:0,vanAwardedAt:0,recBroken:false,...store.run};syncHero();
+  S.run={start:1,mode:'c',hero:'lia',lifeUsed:false,revive:0,revivesBought:0,undoUsedAt:0,undoUsedLevel:0,undoUsedCount:0,vanAwardedAt:0,recBroken:false,...store.run};syncHero();
   resumeAdventure();
 };
 

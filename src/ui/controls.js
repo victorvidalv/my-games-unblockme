@@ -2,7 +2,8 @@ import { sfx } from '../audio/sound.js';
 import { moveStatus } from '../engine/rules.js';
 import { $ } from '../dom.js';
 import { hintMove } from '../engine/solver.js';
-import { applyUndo } from '../game/heroes.js';
+import { applyUndo, canHint, spendHint } from '../game/heroes.js';
+import { updateHeroHud } from './heroes.js';
 import { fail, saveRun, startRun } from '../game/session.js';
 import { S, heroOf, persist, store, undosLeft } from '../state.js';
 import { layout, updateHud } from './board.js';
@@ -24,10 +25,10 @@ $('bUndo').onclick=()=>{
 };
 $('bShop').onclick=openShop;
 $('bHint').onclick=()=>{
-  if(!S.G||S.G.done||S.busy||(S.run.mode!=='p'&&S.run.hints<=0))return;
+  if(!S.G||S.G.done||S.busy||!canHint(heroOf().id,S.run,S.run.mode,S.G.n))return;
   const h=hintMove(S.G.pieces,S.G.pos,S.G.walls);
   if(!h){$('msg').textContent='No encuentro pista desde aquí.';return}
-  if(S.run.mode!=='p'){S.run.hints--;saveRun();$('hintN').textContent=S.run.hints;$('bHint').disabled=S.run.hints<=0}
+  spendHint({heroId:heroOf().id,run:S.run,mode:S.run.mode,level:S.G.n});saveRun();updateHeroHud();
   const p=S.G.pieces[h.i],n=Math.abs(h.to-h.from);
   const dir=p.o==='h'?(h.to>h.from?'derecha':'izquierda'):(h.to>h.from?'abajo':'arriba');
   $('msg').textContent=`Mueve la pieza brillante ${n} casilla${n>1?'s':''} hacia ${dir}. Quedan ${h.left} movimientos.`;
