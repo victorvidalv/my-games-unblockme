@@ -1,7 +1,7 @@
 /* Service worker: la app funciona sin conexión.
    ACTUALIZAR: al publicar cambios, sube VERSION aquí y APP_VERSION en index.html.
    El navegador detecta el cambio de este archivo y la app muestra el aviso «Nueva versión disponible». */
-const VERSION = 'desbloquea-v35';
+const VERSION = 'desbloquea-v36';
 const SHELL = [
   './', './index.html', './manifest.webmanifest',
   ...Array.from({length:10},(_,i)=>'./backgrounds/zone-'+(i+1)+'.webp'),
@@ -10,7 +10,9 @@ const SHELL = [
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)));   // sin skipWaiting: espera a que el usuario acepte actualizar
+  // Revalidate the illustrated assets: a new app version must not reuse old HTTP-cached art.
+  const resources = SHELL.map(url => new Request(new URL(url, self.location.href), { cache: 'reload' }));
+  e.waitUntil(caches.open(VERSION).then(cache => cache.addAll(resources)));
 });
 
 self.addEventListener('activate', e => {

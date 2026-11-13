@@ -697,6 +697,48 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:li
 
 .book-copy{font-family:Georgia,serif;font-size:20px;line-height:1.65;margin:8px 0 24px}.book-action{font-family:Georgia,serif;font-style:italic;font-size:16px;line-height:1.7;color:#735537;margin-bottom:24px}.book-quote[hidden]{display:none}
 @media(max-width:620px){.book-copy{font-size:19px;line-height:1.65}.book-action{font-size:15px;line-height:1.65}}
+/* One material language: ink, painted wood, paper and worn brass. */
+:root{--ink:#18262f;--paper:#e9ddc3;--brass:#bd9b65;--key:#bd6954}
+body{background:#111e29;color:#e4dfd2}body::before{background:linear-gradient(#10202beb,#10202bf5),var(--scene) center/cover}
+button{border-radius:9px;background:#2b3b46;box-shadow:0 2px 0 #0b1821,inset 0 1px 0 #ffffff12;font-weight:650;transition:background .15s,transform .1s}
+button.primary{background:#b66a53;color:#fff5e3;box-shadow:0 2px 0 #704439,inset 0 1px 0 #ffe2b52b;text-shadow:none}
+button:active,button.primary:active{transform:translateY(1px);box-shadow:none}
+.card{border-radius:17px;background:#1c2c38;border-color:#c8b99538;box-shadow:0 15px 45px #0008;animation:quietIn .2s ease-out}
+@keyframes quietIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.logo{background:none;color:#e6d8b9;filter:none;font-family:Georgia,serif;letter-spacing:.025em;font-size:34px}.tagline{font-size:12px!important;line-height:1.5;color:#bcc6c8}
+.path{background:#ffffff04;border-color:#b6aa8d26;border-radius:11px;box-shadow:none}.path:hover{background:#ffffff09}.pemo{filter:saturate(.35);font-size:26px}.pscore b{font-size:19px}.pach{opacity:.8}.path .pbar{height:3px}
+.top .sc{background:none;border:0;box-shadow:none;border-radius:0;padding:0 9px}.scores{gap:0}.sc b{font-size:27px!important;background:none!important;color:#ebe4d3!important}.sc.max b{color:#acb7b7!important;font-size:20px!important}.sc small{font-size:8px!important;letter-spacing:.08em}.top .lv b{color:#d9c299;text-shadow:none;font-size:30px}.menubtn{background:#293944;box-shadow:none;border:1px solid #d1c2a333;border-radius:10px}.menubtn span{font-size:22px}.menubtn em{font-size:8px}
+.meter{background:#192b36d9;border:1px solid #bdad8e30;border-radius:12px;box-shadow:none;padding:10px 12px}.hero-hud{margin:0 0 7px;padding-bottom:7px;font-size:9px}.hero-hud img{width:25px;height:29px;border-radius:5px;border-color:#b7a68677;filter:saturate(.8)}.hero-hud b{font-size:11px}.hero-hud span{font-size:10px;color:#b8c5c8}
+.route-status{padding:5px 7px;margin-bottom:9px;border-radius:6px;background:#ffffff03;border-color:#ffffff10}.route-status strong{font-size:9px}.route-status small{font-size:8px}.route-reward{font-size:9px;padding:2px 5px;border-radius:4px}.route-status #routeIcon{font-size:11px}
+.mrow{font-size:10px}.mrow b{font-size:22px}.mrow span:last-child{font-size:10px}.bar{height:8px;margin:7px 0 5px;box-shadow:none;background:#071721}.bar i{box-shadow:none}.pot{font-size:10px;justify-content:flex-end}.pot>span:first-child{display:none}.pot b{font-size:11px;color:#d0bc96}.meter.danger .bar{animation:none}
+.frame{border-radius:16px;background:repeating-linear-gradient(91deg,#0000 0 6px,#0000000c 6px 7px),#48473f;box-shadow:0 9px 22px #0005,inset 0 1px 0 #b4a57a44;padding:12px;border:1px solid #0b1821}
+#board{border-radius:9px;background-color:#152731;box-shadow:inset 0 2px 7px #0008}#board::before{background:linear-gradient(#b1c0c00b 1px,transparent 1px) 0 0/var(--cell) var(--cell),linear-gradient(90deg,#b1c0c00b 1px,transparent 1px) 0 0/var(--cell) var(--cell),linear-gradient(#102530ed,#102530f5),var(--scene) center/cover}
+.face{border-radius:8px;background:linear-gradient(165deg,var(--a),var(--b));box-shadow:0 3px 0 var(--d),0 5px 6px #0004,inset 0 1px 0 #ffffff28,inset 0 0 0 1px #17212d33;filter:saturate(.67)}.face::before{background:linear-gradient(#ffffff16,#ffffff00);inset:0 0 82% 0;border-radius:7px}.piece.red{animation:none}.piece.red .face{filter:saturate(.84)}.piece.drag .face{transform:translateY(-2px) scale(1.015);box-shadow:0 5px 0 var(--d),0 10px 12px #0005,inset 0 1px 0 #ffffff38}.piece.enter .face{animation-duration:.22s;animation-timing-function:ease-out}.piece.exit{transition-duration:.35s}
+.adventure-route #board .face{outline:1px solid #dfc28b;outline-offset:-2px}.adventure-route .frame{outline-color:#b89e6677;outline-offset:2px}.adventure-route .route-status{box-shadow:none;background:#b18e4520;border-color:#bda57555}.adventure-route .route-reward{background:#c9ad75;box-shadow:none}.exit-arrow{text-shadow:none;animation:none;color:#cfb985;font-size:20px}.hint-text{font-size:11px;line-height:1.4;color:#bbc7c8;opacity:1;height:31px}.controls{gap:9px}.controls button{border-radius:9px;font-size:13px;padding:11px 8px}.badge{border-radius:8px;background:#c9b98e;box-shadow:none;color:#1c2c36;width:23px;height:23px;min-width:23px;font-size:12px}
+#banner,#perfect{display:none!important}body.panic #bgfx{opacity:.18!important;animation:none!important}.scMax,.sc b.bump{animation:none}.piece.hint{animation:hint .6s ease-in-out 2}
+.hero-selector{background:#1b2c38!important;border:1px solid #c6b28c44!important;box-shadow:0 18px 55px #0008!important;max-width:750px!important;padding:23px!important}.hero-selector h2{font-family:Georgia,serif;font-weight:500;font-size:30px;letter-spacing:0;margin:10px 0}.hero-selector .hero-subtitle{font-size:12px;margin-bottom:16px}.hero-choice{height:245px;border-radius:10px;border-width:1px;box-shadow:none;filter:saturate(.5)}.hero-choice.selected{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);filter:saturate(.85)}.hero-choice img{object-position:center 28%}.hero-choice-name{font-size:27px;left:12px;bottom:12px;color:#f0e5c9}.hero-choice-name small{display:none}.hero-check{border-radius:4px;background:#d4c29c!important;color:#192935}.hero-power{padding:13px;border-radius:10px;background:#ffffff03;margin-top:14px}.hero-power h3{font:19px Georgia,serif;color:#e7d9bd}.hero-power strong{font-size:12px}.hero-power p{font-size:12px!important;color:#bac7ca}.hero-power-icon{border-radius:8px;border:0;width:39px;height:43px;font-size:26px;background:#101e29}.hero-selector-actions{margin-top:12px}.hero-selector-actions #heroCancel{border-radius:8px}.hero-selector #heroQuote{font-family:Georgia,serif;font-size:13px;color:#c9baa0;margin:12px 0}
+#heroSelect{background:linear-gradient(#13232ef0,#13232ef9)}
+#travel{background:linear-gradient(#10202be8,#10202bf5),var(--scene) center/cover}.route-sheet{width:min(94vw,470px);background:#e5d8bb;border:1px solid #796b50;border-radius:13px;padding:0;overflow-y:auto;max-height:94dvh;box-shadow:0 20px 60px #0008;color:#2e3435}
+.route-landscape{position:relative;height:172px;overflow:hidden;isolation:isolate;background:#22343c}.route-landscape>img:first-child{width:100%;height:100%;object-fit:cover;filter:saturate(.35);opacity:.6}.route-landscape::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent,#112632b8)}.route-landscape .route-portrait{position:absolute;right:18px;bottom:-16px;height:172px;width:138px;object-fit:cover;object-position:center top;border-radius:50px 50px 0 0;border:1px solid #c7af7c88;z-index:2}.route-place{position:absolute;left:22px;right:162px;bottom:24px;z-index:3;color:#efe4c7}.route-place .tag{font-size:8px;letter-spacing:.1em;color:#c4b393;line-height:1.6}.route-place h2{font:25px Georgia,serif;line-height:1.15;margin:8px 0 0;letter-spacing:0}
+.route-content{padding:21px 22px 18px;background:repeating-linear-gradient(0deg,#634e3004 0 1px,transparent 1px 5px),#e8ddc3}.route-story{font:17px/1.55 Georgia,serif;margin:0 0 10px;color:#30383b}.route-hero-line{font:italic 14px/1.55 Georgia,serif;color:#725443;margin:0 0 20px}.route-caption{font-size:9px;letter-spacing:.13em;color:#7d7059;margin-bottom:9px}.route-options{display:flex;flex-direction:column;gap:8px}.route-option{display:flex;align-items:center;gap:11px;min-height:67px;padding:12px 13px;border:1px solid #91836a55;border-radius:8px;background:#fff9e72e;color:#28383e;box-shadow:none;white-space:normal;text-align:left}.route-option:hover,.route-option:focus-visible{background:#fffae866;border-color:#665a43}.route-option .choice-icon{font-size:25px;color:#596b64;width:29px;text-align:center}.route-option .choice-copy{flex:1}.route-option strong{display:block;font-size:14px}.route-option small{display:block;color:#6c6d63;font-size:11px;font-weight:400;margin-top:3px;line-height:1.4}.route-option .choice-bonus{color:#876232;font-size:11px;font-weight:800;white-space:nowrap}.route-option.brave{background:#b78d4a0c;border-color:#a3834a66}.route-option.brave .choice-icon{color:#ac6a45}.route-summary{font-size:10px;color:#80745f;text-align:center;margin:13px 0 0}
+#journey{padding-top:20px;gap:7px;background:#142631f5}#journey.show{animation-duration:.12s}#journey.out{animation-duration:.12s}#journey .jskip{display:none}#journey .mtag{border:0;background:none;font-size:9px;color:#ccb78e}#journey .mcap h2{font-family:Georgia,serif;font-size:24px;text-shadow:none}#journey .mcap p{font-size:11px}#journey .mapwrap{filter:none}.atlas-city{filter:none}.atlas-city.current{filter:none}.atlas-traveler{filter:drop-shadow(0 2px 2px #0007)}
+#bonus{background:linear-gradient(#10212be8,#10212bf5)}#bonus .bonuscard{background:#1a2d38;border:1px solid #c2ad7f55;border-radius:14px;padding:20px;max-width:430px;box-shadow:0 15px 50px #0008;animation:quietIn .22s ease-out}#bonus .bonuscard::before{display:none}#bonus .btag{background:none;border:0;padding:0;margin-bottom:12px;color:#aa9b7c;letter-spacing:.13em;font-size:9px}#bonus h2{font:25px Georgia,serif;color:#e7d8b9;line-height:1.15;margin:0 0 6px}.bonus-heading{gap:12px;margin-bottom:12px}#bHero,#bHero .hero-art{width:48px;height:65px;filter:none}#bSpeech{font:italic 12px/1.5 Georgia,serif;color:#b6c2c2}.bonus-wallet{border-radius:7px;padding:8px 11px;background:#101f292e;font-size:9px;border-color:#b8ad8f26}.bonus-wallet b{font-size:14px;color:#d0bb90}#bSub{font-size:12px;line-height:1.5;color:#c9d0cb;margin:10px 0 14px}.bonus-legend{gap:12px;margin:12px 0;color:#aab7b7}.bonus-legend span{background:none;border:0;padding:0;font-size:10px}#bonus .bres b{font:24px Georgia,serif;color:#ddc48c}#bonus .bres span{font-size:11px;color:#adbabd}#bAction{background:#bd9b66;color:#172b34;border-radius:8px;box-shadow:0 2px 0 #65543d;margin-top:7px;font-size:13px}#bGo{border-radius:8px}.bonus-flight{display:none}
+.wheel-shell{width:min(100%,268px);border:2px solid #b69b66;background:#142730;box-shadow:0 0 0 6px #12232b,0 0 0 7px #81745877;margin:21px auto 14px}.wheel-shell::before{inset:5px;border:1px dashed #c5b38450;border-radius:50%;z-index:2}.wheel-shell::after{content:'';position:absolute;inset:-12px;border:1px solid #b5a17433;border-radius:50%;pointer-events:none}.prize-wheel{filter:none}.wheel-pointer{font-size:22px;top:-17px;color:#ce7960;text-shadow:0 1px 0 #442f2a}.wheel-hub{inset:calc(50% - 28px);width:56px;height:56px;border-radius:50%;background:#142832;border:1px solid #b69b6688;box-shadow:0 0 0 4px #142832;color:#c7725d}.wheel-hub .rune-icon{width:32px;height:32px}.rune-icon{display:block;width:38px;height:38px;stroke-linecap:round;stroke-linejoin:round}
+.amulet-machine{border:1px solid #a18a6077;background:#303d40;border-radius:13px;box-shadow:0 3px 0 #10212a;padding:10px 13px 12px}.machine-crown{font-size:9px;letter-spacing:.18em;color:#b7a57f;text-shadow:none;padding:5px 0 10px}.reels{padding:6px;gap:7px;border:1px solid #172b34;border-radius:8px;background:#10242d;box-shadow:none}.reel{border-radius:5px;background:#dbd0b3;box-shadow:inset 0 3px 7px #4f513e33}.reel::after{border:0;background:linear-gradient(#22353e33,transparent 30%,transparent 70%,#22353e33)}.reel-strip span{color:#4d605b;font-size:33px}.reel-strip .rune-icon{width:43px;height:43px}.reel.match{background:#e4c78e;box-shadow:inset 0 0 0 2px #ad8157}.machine-plaque{font-size:8px;background:none;color:#a3afa8;letter-spacing:.1em;padding:4px;margin:9px 0 0}.machine-lights{display:none}
+#bonus .bcard{height:82px;border-radius:8px}#bonus .bb{background:repeating-linear-gradient(35deg,#c2b38807 0 1px,transparent 1px 7px),#233e47;border-radius:8px;border:1px solid #b5a06d88;box-shadow:inset 0 0 0 4px #233e47,inset 0 0 0 5px #a18f5e33}#bonus .bb::before{border:1px solid #ad9a6b44;border-radius:3px;inset:9px}#bonus .bb i{font-size:27px;color:#bd9d6a;text-shadow:none}#bonus .bf{border-radius:8px;background:#dfd3b5;border:1px solid #b99b65;box-shadow:0 2px 0 #132830,inset 0 0 0 3px #b8a78633;gap:5px}#bonus .bf b{color:#526461}#bonus .bf small{font-size:10px;color:#5a695e;letter-spacing:0}.bin{transition-duration:.28s}#bonus .bcard{animation-duration:.2s;animation-delay:0s!important}.bcard:not(.on) .bb,.bcard.pair .bf,.bcard.winc .bf{animation:none!important}.bcard.winc .bf{background:#ead09b;box-shadow:inset 0 0 0 2px #ad8753}.bcard.pair .bf{border-color:#d1ac62}
+.ui-icon{width:17px;height:17px;display:inline-block;vertical-align:-3px;margin-right:3px}.ending-thanks{background:#10212c66;border-color:#ac9a7233}.ending-portrait{border-color:#ad9a6d55}.rescue-card{background:#1d2c37!important;border-color:#bda17866!important}.rescue-heart{animation:none;color:#bf7967;text-shadow:none}.rescue-portrait{border-color:#b49c70;box-shadow:none}
+@media(max-width:600px){.hero-selector{padding:20px 16px!important}.hero-selector h2{font-size:26px}.hero-choice{height:178px;border-radius:8px}.hero-cards{gap:9px}.hero-choice-name{font-size:24px;left:8px;bottom:10px}.hero-power{padding:11px;gap:9px}.hero-power p{font-size:11px!important}.hero-power h3{font-size:18px}.hero-selector-actions{gap:8px}.hero-selector-actions #heroCancel{min-height:33px;padding:7px}.hero-selector-actions #heroConfirm{min-height:45px}.route-sheet{max-width:450px}.route-content{padding:18px 20px}.route-landscape{height:160px}.route-landscape .route-portrait{height:160px;width:128px;right:16px}.route-place{left:20px;right:153px}.route-place h2{font-size:24px}}
+@media(max-height:670px){.route-landscape{height:118px}.route-landscape .route-portrait{height:135px;width:106px}.route-place{bottom:18px;right:132px}.route-place h2{font-size:22px}.route-content{padding:15px 17px}.route-story{font-size:16px;margin-bottom:7px}.route-hero-line{font-size:13px;margin-bottom:14px}.route-option{min-height:59px;padding:9px 11px}.route-summary{margin-top:10px}.hero-choice{height:138px}.hero-selector h2{font-size:24px}.wheel-shell{width:220px}#bonus .bonuscard{padding:16px}}
+@media(prefers-reduced-motion:reduce){.card,.hero-choice.selected img,.piece.enter .face{animation:none!important}}
+
+
+#score,#scoreMax,#lvl,#mv,#mn,#lim,#pot,.badge,.route-reward{font-variant-numeric:tabular-nums;font-feature-settings:"tnum";letter-spacing:0}
+#score{font-size:30px!important;color:#f0e7d4!important}#scoreMax{color:#c5c8bd!important}#mv{font-size:27px;color:#f0e5cb}#mn,#lim{background:#ddd0ac;color:#25383f;padding:1px 5px;border:1px solid #9d8b64;border-radius:4px;font-size:14px!important;font-weight:800}.mrow>span:last-child{opacity:1;color:#c2ccca;font-size:10px}.mrow{letter-spacing:0}.pot{font-size:11px;color:#afbfbd}.pot b{font-size:13px;color:#dfd0a9}.route-status strong{font-size:10px}.route-reward{font-size:10px}.rec{animation:none;background:#c7b382;color:#243640;border-radius:5px;font-size:10px;letter-spacing:.05em}
+
+.sc.max.broken{box-shadow:none!important;background:none!important;border:0!important}.sc.max.broken small{color:#ccb78c;text-shadow:none;animation:none}.route-place .tag{font-size:9px}
+#bHints{background:none!important;color:inherit!important;padding:0!important;border-radius:0!important;box-shadow:none!important}.bonus-wallet b{border:1px solid #ad9a6b66;background:#caba92;color:#22383f;padding:3px 9px;border-radius:5px;font-variant-numeric:tabular-nums}
+
+.brand-key{display:inline-block;width:23px;height:29px;vertical-align:-4px;margin-right:7px;color:#bc715b}.pemo{font-family:Georgia,serif;color:#b9aa89}
 </style>
 </head>
 <body>
@@ -715,9 +757,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:li
   <div class="meter" id="meter">
     <div class="hero-hud"><img id="heroHudImg" alt="" width="30" height="34"><b id="heroHudName"></b><span id="heroHudPower"></span></div>
     <div class="route-status" id="routeStatus"><span id="routeIcon" aria-hidden="true">🌿</span><strong id="routeName">RUTA TRANQUILA</strong><small id="routeScope">NIV. 1–10</small><span class="route-reward" id="routeReward">Normal</span></div>
-    <div class="mrow"><span>MOVIMIENTOS <b id="mv">0</b></span><span>Mín <b id="mn" style="font-size:14px">–</b> · Límite <b id="lim" style="font-size:14px">–</b></span></div>
+    <div class="mrow"><span>Movimientos <b id="mv">0</b></span><span>Mínimo <b id="mn" style="font-size:14px">–</b> · Límite <b id="lim" style="font-size:14px">–</b></span></div>
     <div class="bar"><i id="fill"></i><u></u></div>
-    <div class="pot"><span>Base <b id="base">0</b></span><span>Ganarías ahora <b id="pot">+0</b></span></div>
+    <div class="pot"><span>Base <b id="base">0</b></span><span>Premio posible <b id="pot">+0</b></span></div>
   </div>
 
   <div class="frame">
@@ -729,14 +771,19 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:li
 
   <div class="controls">
     <button id="bUndo">↶ Deshacer <em>+1 mov</em></button>
-    <button id="bHint">💡 Pista <span class="badge" id="hintN">3</span></button>
+    <button id="bHint">Pista <span class="badge" id="hintN">3</span></button>
   </div>
 </div>
 
-<div class="modal" id="travel" role="dialog" aria-modal="true" aria-labelledby="travelTitle"><div class="card travel-card"><div class="traveler"><svg class="hero-art" viewBox="0 0 100 145" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Lía, exploradora de cabello violeta y capa turquesa"><path d="M24 53Q9 1 48 5Q89 0 82 60L75 93H22Z" fill="#292342" stroke="#14192e" stroke-width="3"/><path d="M35 111L33 139H44L51 111M56 111L59 139H71L67 105" fill="#30334d" stroke="#171c32" stroke-width="3"/><path d="M31 136h15v7H27q-1-6 4-7M58 136h14l6 7H58Z" fill="#ae7859"/><path d="M34 69Q48 61 64 69L77 111Q49 123 23 111Z" fill="#43c9b5" stroke="#183d50" stroke-width="3"/><path d="M35 73L22 96l9 6 16-22M66 74l14 23-8 6-15-24" fill="#e6ae91" stroke="#563f51" stroke-width="2"/><path d="M29 72L47 83l21-14-7 28-15-12-15 11Z" fill="#203c56"/><ellipse cx="50" cy="43" rx="23" ry="27" fill="#f5c5a4"/><path d="M25 42L25 21Q48-4 75 22l4 29-13-22-9 7 2-14-21 20 1-12Z" fill="#635080" stroke="#292342" stroke-width="2"/><path d="M32 45q7-7 14 0M54 45q7-7 14 0" fill="none" stroke="#3a294b" stroke-width="3"/><ellipse cx="40" cy="48" rx="4" ry="6" fill="#32777c"/><ellipse cx="61" cy="48" rx="4" ry="6" fill="#32777c"/><circle cx="41" cy="46" r="1.8" fill="white"/><circle cx="62" cy="46" r="1.8" fill="white"/><path d="M46 60q5 4 10-1" fill="none" stroke="#b26570" stroke-width="2"/><path d="M22 23L53 7l28 16-5 6-54 1Z" fill="#2e716f" stroke="#203c56" stroke-width="3"/><path d="M54 11l4 12" stroke="#ffcf6b" stroke-width="4"/><path d="M47 80v10" stroke="#ffcf6b" stroke-width="2"/><circle cx="47" cy="91" r="4" fill="none" stroke="#ff667c" stroke-width="3"/><path d="M47 95v7h5" fill="none" stroke="#ff667c" stroke-width="3"/><path d="M33 101l36-5" stroke="#775b50" stroke-width="5"/><rect x="60" y="94" width="14" height="17" rx="4" fill="#c89557"/></svg><div><div class="tag" id="travelTag"></div><h2 id="travelTitle"></h2><p id="travelText"></p></div></div><svg class="route-map" id="routeMap" viewBox="0 0 440 160" aria-label="Dos caminos hacia la siguiente ciudad"><path d="M40 80Q120 -10 220 48T400 80" class="route-path" id="upperRoute"/><path d="M40 80Q120 170 220 112T400 80" class="route-path" id="lowerRoute"/><circle cx="40" cy="80" r="13" fill="#43e0c1"/><circle cx="400" cy="80" r="17" fill="#ffcf6b"/><text x="220" y="24" text-anchor="middle" fill="#ffcf6b" font-size="13">AVENTURERO · +10 %</text><text x="220" y="153" text-anchor="middle" fill="#d6f4ec" font-size="13">TRANQUILO</text><g id="routeWalker"></g></svg><div class="route-options" id="routeOptions"><button class="route-option" id="routeNormal" aria-pressed="true"><strong>🌿 Camino tranquilo</strong><small>Dificultad habitual.<br>Puntos habituales.</small></button><button class="route-option" id="routeBrave" aria-pressed="false"><strong>✨ Camino aventurero</strong><small>Un poco más difícil.<br>+10 % de puntos.</small></button></div><p class="route-explain" id="routeExplain"></p><button class="primary travel-go" id="travelGo"></button></div></div>
-
+<div class="modal" id="travel" role="dialog" aria-modal="true" aria-labelledby="travelTitle"><article class="route-sheet">
+ <div class="route-landscape"><img id="travelScene" alt=""><img class="route-portrait" id="travelPortrait" alt=""><div class="route-place"><div class="tag" id="travelTag"></div><h2 id="travelTitle"></h2></div></div>
+ <div class="route-content"><p class="route-story" id="travelText"></p><p class="route-hero-line" id="travelHeroLine"></p><div class="route-caption">ELIGE EL CAMINO DE LOS PRÓXIMOS 10 NIVELES</div><div class="route-options" id="routeOptions">
+  <button class="route-option" id="routeNormal"><span class="choice-icon" aria-hidden="true">⌁</span><span class="choice-copy"><strong>Tranquilo</strong><small>Dificultad y puntos habituales</small></span><span class="choice-bonus">Seguir →</span></button>
+  <button class="route-option brave" id="routeBrave"><span class="choice-icon" aria-hidden="true">△</span><span class="choice-copy"><strong>Aventurero</strong><small>Un poco más difícil</small></span><span class="choice-bonus">+10 % puntos →</span></button>
+ </div><p class="route-summary" id="routeSummary"></p></div>
+</article></div>
 <div class="modal" id="heroSelect" role="dialog" aria-modal="true" aria-labelledby="heroSelectTitle"><div class="card hero-selector">
- <div class="tag" id="heroPath"></div><h2 id="heroSelectTitle">Tu aventura. Tu protagonista.</h2><p class="hero-subtitle">Elige quién te acompañará por las diez ciudades. Cada héroe tiene un poder distinto durante toda la partida.</p>
+ <div class="tag" id="heroPath"></div><h2 id="heroSelectTitle">¿Quién abre el camino?</h2><p class="hero-subtitle">Un compañero. Un poder. Hasta el final.</p>
  <div class="hero-cards" id="heroCards" role="radiogroup" aria-label="Elige un héroe"></div>
  <div class="hero-power"><span class="hero-power-icon" id="heroPowerIcon" aria-hidden="true"></span><div><h3 id="heroPowerTitle"></h3><strong id="heroPowerShort"></strong><p id="heroPowerDetail"></p></div></div>
  <p id="heroQuote"></p>
@@ -770,9 +817,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:li
 <!-- Menú -->
 <div class="modal show" id="menu">
   <div class="card">
-    <div class="tag">ROGUELIKE DE BLOQUES</div>
-    <h1 class="logo">DESBLOQUEA</h1>
-    <p class="tagline">Desliza los bloques y libera la llave roja</p>
+    <div class="tag">LAS CRÓNICAS DE LA LLAVE ROJA</div>
+    <h1 class="logo"><svg class="brand-key" viewBox="0 0 30 38" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><circle cx="15" cy="9" r="6"/><path d="M15 15v19h7m-7-6h5"/></svg>DESBLOQUEA</h1>
+    <p class="tagline">Tri cerró el camino. Tú decides cómo abrirlo.</p>
     <button class="primary cont" id="bContinue" style="display:none"></button>
     <div class="tag" style="margin-top:10px">ELIGE TU CAMINO</div>
     <p class="modeinfo" id="modeInfo"></p>
@@ -781,7 +828,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:li
       <button id="bResume" style="display:none">↩ Volver al juego</button>
       <button class="install optb">📲 Instalar app</button>
     </div>
-    <button class="linkbtn" id="bHowMenu">❓ Cómo se juega</button>
+    <button class="linkbtn" id="bHowMenu">Cómo se juega</button>
   </div>
 </div>
 
@@ -792,13 +839,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:li
     <h2>Opciones</h2>
     <div class="pstat" id="pauseStat"></div>
     <div class="stack">
-      <button class="primary big" id="pResume">▶ Seguir jugando</button>
+      <button class="primary big" id="pResume">Seguir jugando</button>
       <button class="opt" id="pRestart"><span>↻ Reiniciar nivel</span><small id="restartCost"></small></button>
-      <button class="opt" id="pPaths"><span>🗺️ Cambiar de camino</span></button>
-      <button class="opt dangerish" id="pQuit"><span>🏁 Terminar partida</span><small>Guarda tu récord</small></button>
+      <button class="opt" id="pPaths"><span>Cambiar de camino</span></button>
+      <button class="opt dangerish" id="pQuit"><span>Terminar partida</span><small>Guarda tu récord</small></button>
       <button class="opt" id="pSound"><span>🔊 Sonido: activado</span></button>
       <button class="opt" id="pStory"><span>📖 Leer el libro de la aventura</span></button>
-      <button class="opt" id="pHow"><span>❓ Cómo se juega</span></button>
+      <button class="opt" id="pHow"><span>Cómo se juega</span></button>
       <button class="opt install"><span>📲 Instalar app</span></button>
     </div>
     <div class="ver" id="ver"></div>
@@ -832,24 +879,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:li
 </div>
 
 <!-- Nivel superado -->
-<div class="modal" id="win">
-  <div class="card">
-    <div class="tag" id="winTag">NIVEL 1 SUPERADO</div>
-    <div class="ring" id="ring"><b id="ringTxt">0%</b></div>
-    <p id="winTxt"></p><div class="chapter-afterword" id="winStory"></div>
-    <div class="breakdown" id="breakdown"></div>
-    <div class="big" id="gain">+0</div>
-    <p style="margin:2px 0 14px" id="winTotalP">Total: <b id="winTotal">0</b></p>
-    <button class="primary" id="bNext" style="width:100%">Siguiente nivel ➜</button>
-  </div>
-</div>
-
 <!-- Parada sorpresa: uno de tres minijuegos, siempre con Lía. -->
 <div class="modal" id="bonus" role="dialog" aria-modal="true" aria-labelledby="bTitle">
  <div class="card bonuscard">
   <div class="btag" id="bTag"></div>
   <div class="bonus-heading"><div id="bHero" aria-hidden="true"></div><div><h2 id="bTitle"></h2><p id="bSpeech"></p></div></div>
-  <div class="bonus-wallet"><span>TU RESERVA PARA LA AVENTURA</span><b>💡 <span id="bHints">0</span></b></div>
+  <div class="bonus-wallet"><span>PISTAS PARA EL CAMINO</span><b><span id="bHints">0</span></b></div>
   <p id="bSub"></p><div id="bStage" class="bonus-stage"></div>
   <div class="bonus-legend" id="bLegend"></div>
   <button id="bAction">Jugar</button>
@@ -1023,9 +1058,9 @@ if(!store.paths)store.paths={};
 if(store.best&&store.best.score>0&&!store.paths.c1) store.paths.c1={score:store.best.score,level:store.best.level,runs:0};   // migra récords antiguos
 /* Tres caminos de 100 niveles. 's' = dificultad inicial (1-100); sube de forma lineal hasta 100 en el nivel 100 */
 const PATHS=[
-  {s:1, n:'Fácil',   e:'🌱',c:'#43e0c1',d:'Para empezar y aprender'},
-  {s:50,n:'Difícil', e:'⚔️',c:'#ffc65a',d:'Más difícil, más puntos'},
-  {s:75,n:'Extremo', e:'🔥',c:'#ff5f8f',d:'Solo para expertos'},
+  {s:1, n:'Fácil',   e:'Ⅰ',c:'#43e0c1',d:'Para empezar y aprender'},
+  {s:50,n:'Difícil', e:'Ⅱ',c:'#ffc65a',d:'Más difícil, más puntos'},
+  {s:75,n:'Extremo', e:'Ⅲ',c:'#ff5f8f',d:'Solo para expertos'},
 ];
 const rateAt=(start,level)=>Math.round(start+(100-start)*(level-1)/99);   // dificultad del nivel 'level' en un camino
 const pathOf=s=>PATHS.find(p=>p.s===s)||PATHS[0];
@@ -1047,7 +1082,7 @@ const MAXL=100;
 const baseScore=l=>100+20*(l-1);
 /* Puntos: base del nivel × eficiencia (100% en el mínimo, 0% al doble). Perfecto +20%. Racha: ×1.1 por nivel seguido ≥90% (máx ×1.5) */
 function calcGain(n,moves,opt,streak){
-  const base=baseScore(n), eff=Math.max(0,1-(moves-opt)/opt), pts=Math.round(base*eff);
+  const base=baseScore(n), eff=Math.max(0,Math.min(1,1-(moves-opt)/opt)), pts=Math.round(base*eff);
   const perfect=moves<=opt?Math.round(base*.2):0;
   const mult=eff>=.9?1+.1*Math.min(5,streak+1):1;
   const total=Math.round((pts+perfect)*mult);
@@ -1114,7 +1149,7 @@ const Music=(()=>{
     /* 3 Aldea de Otoño – folk cálido, sin percusión */
     {root:45,sc:'dor', prog:[0,3,6,4],tempo:0.97,swing:.15,arpW:'triangle',arpW2:'triangle',arpPat:[0,1,2,1],arpEvery:2,pad1:1,padW:'sine',bassW:'triangle',bassPat:'root',leadW:'sine',hat:'none',motifLow:1,
       motif:[[[0,9,4],[4,8,2],[6,7,2],[8,5,4],[12,7,4]],[[0,7,4],[4,5,2],[6,7,2],[8,9,4],[12,8,4]]]},
-    /* 4 Metrópolis Neón – synthwave, 16avos y bajo sincopado */
+    /* 4 Ciudad del Reloj – synthwave, 16avos y bajo sincopado */
     {root:42,sc:'min', prog:[0,5,3,6],tempo:1.12,swing:0,  arpW:'sawtooth',arpW2:'sawtooth',arpF:3200,arpPat:[0,2,1,2,0,2,1,2],arpEvery:1,arpDur:.08,bassW:'sawtooth',bassPat:'off',bassF:600,leadW:'square',leadV:.03,hat:'s16',
       motif:[[[0,9,2],[3,9,1],[4,11,2],[8,10,2],[11,9,1],[12,7,3]],[[0,7,2],[3,7,1],[4,9,2],[8,11,2],[11,12,1],[12,9,3]]]},
     /* 5 Refugio Glacial – lenta, cristalina, mucho aire */
@@ -1140,7 +1175,7 @@ const Music=(()=>{
    {name:'Vals de las pequeñas velas',bpm:92,sc:'mix',root:50,swing:.23,arpVoice:'piano',leadVoice:'whistle',bassPat:'walk',prog:[0,3,4,0,5,3,1,4]},
    {name:'Gotas sobre la arena',bpm:90,sc:'phd',root:50,swing:.08,arpVoice:'oud',leadVoice:'flute',bassPat:'root',prog:[0,1,3,0,5,3,1,0]},
    {name:'Las hojas recuerdan',bpm:94,sc:'dor',root:48,swing:.16,arpVoice:'guitar',leadVoice:'flute',bassPat:'walk',prog:[0,3,4,0,6,3,1,4]},
-   {name:'El reloj de neón',bpm:104,sc:'maj',root:45,swing:.06,arpVoice:'synth',leadVoice:'bell',bassPat:'off',prog:[0,5,3,4,0,2,3,4]},
+   {name:'Las horas prestadas',bpm:104,sc:'maj',root:45,swing:.06,arpVoice:'synth',leadVoice:'bell',bassPat:'off',prog:[0,5,3,4,0,2,3,4]},
    {name:'Campanas de cristal',bpm:84,sc:'lyd',root:53,swing:.03,arpVoice:'celesta',leadVoice:'bell',bassPat:'root',prog:[0,1,4,0,3,1,4,0]},
    {name:'Pétalos en el viento',bpm:92,sc:'pent',root:48,swing:.1,arpVoice:'koto',leadVoice:'flute',bassPat:'root',prog:[0,2,3,0,1,3,2,0]},
    {name:'La fragua de los sueños',bpm:100,sc:'hmin',root:43,swing:.08,arpVoice:'marimba',leadVoice:'horn',bassPat:'walk',prog:[0,3,5,4,0,5,3,4]},
@@ -1354,7 +1389,7 @@ const ZONES=[
   {n:'Puerto de las Velas',     e:'⚓',s:60,l:54,h:[190,20,205,175,45,220,160,30]},
   {n:'Oasis Dorado',  e:'🏜️',s:68,l:54,h:[38,170,48,22,75,200,30,55]},
   {n:'Aldea de Otoño',  e:'🍂',s:62,l:50,h:[28,95,40,300,110,22,55,150]},
-  {n:'Metrópolis Neón',      e:'🌃',s:88,l:58,h:[300,185,265,215,320,150,60,280]},
+  {n:'Ciudad del Reloj',      e:'🌃',s:88,l:58,h:[300,185,265,215,320,150,60,280]},
   {n:'Refugio Glacial',e:'🏔️',s:60,l:64,h:[200,210,190,225,180,240,170,255]},
   {n:'Villa Sakura',    e:'🌸',s:62,l:72,h:[330,300,280,150,170,45,310,200]},
   {n:'Puerto del Volcán',   e:'🌋',s:55,l:48,h:[25,35,45,200,215,260,22,165]},
@@ -1365,11 +1400,11 @@ ZONES.forEach(z=>{ if(z.h){ z.t1=`hsl(${z.h[0]} ${z.s}% ${Math.max(30,z.l-16)}% 
 const zoneIdx=l=>Math.min(9,Math.floor((l-1)/10)), zoneStep=l=>((l-1)%10)+1, zoneOf=l=>ZONES[zoneIdx(l)];
 let curZone=-1;
 
-let HERO_MARKUP=document.querySelector('#travel .hero-art').outerHTML;
+let HERO_MARKUP='';
 const HEROES=[
- {id:'lia',name:'Lía',role:'Guardiana del corazón',icon:'♥',color:'#68d8bd',power:'Una segunda oportunidad',short:'1 vida extra por partida',detail:'Si superas el límite de movimientos, Lía te permite repetir ese mismo tablero una vez. Conservas tus puntos y tus pistas.',quote:'«Siempre hay un camino para volver a intentarlo.»'},
- {id:'jean',name:'Jean',role:'Viajero del tiempo',icon:'↶',color:'#8fb9ff',power:'Un instante de vuelta',short:'1 deshacer gratis por nivel',detail:'La primera vez que deshaces en cada nivel, recuperas el movimiento anterior sin penalización. Los siguientes deshacer cuestan lo habitual.',quote:'«A veces, avanzar empieza por volver un instante atrás.»'},
- {id:'van',name:'Van',role:'Tejedora de ideas',icon:'✦',color:'#c5a2ff',power:'Dos luces en el camino',short:'+2 pistas cada 10 niveles',detail:'Al completar los niveles 10, 20, 30… recibes dos pistas adicionales. Se suman a los premios normales y a los minijuegos.',quote:'«Toda gran aventura empieza con una pequeña idea.»'}
+ {id:'lia',name:'Lía',role:'Exploradora',icon:'♥',color:'#68d8bd',power:'Una segunda oportunidad',short:'1 vida extra por partida',detail:'Repite un tablero al caer. Una vez por aventura, sin perder tus puntos.',quote:'«Si la puerta no abre, buscamos otra.»'},
+ {id:'jean',name:'Jean',role:'Relojero',icon:'↶',color:'#8fb9ff',power:'Tres pasos atrás',short:'3 deshacer gratis por tablero',detail:'Recupera tus tres últimos movimientos sin penalización, uno a uno.',quote:'«Voy tarde. El tiempo, también.»'},
+ {id:'van',name:'Van',role:'Cronista',icon:'✦',color:'#c5a2ff',power:'Dos luces en el camino',short:'+2 pistas cada 10 niveles',detail:'Dos pistas extra al completar cada ciudad.',quote:'«Primero observo. Luego abro.»'}
 ];
 function heroOf(id=run?.hero){return HEROES.find(h=>h.id===id)||HEROES[0]}
 /* The ten fragments form a complete story. Each city has one brief chapter. */
@@ -1482,8 +1517,8 @@ function chooseHero(start,mode){
 function updateHeroHud(){
  if(!run||!G)return;const h=heroOf(),prac=run.mode==='p';
  $('heroHudImg').src=`heroes/${h.id}.webp`;$('heroHudImg').alt=h.name;$('heroHudName').textContent=h.name;
- $('heroHudPower').textContent=prac?'Práctica · ayudas ilimitadas':h.id==='lia'?(run.lifeUsed?'Segunda oportunidad usada':'♥ Segunda oportunidad disponible'):h.id==='jean'?(run.undoUsedAt===G.n?'↶ Deshacer gratis usado':'↶ Deshacer gratis disponible'):`✦ +2 pistas al completar nivel ${Math.min(100,(Math.floor((G.n-1)/10)+1)*10)}`;
- $('bUndo').querySelector('em').textContent=prac?'gratis':h.id==='jean'&&run.undoUsedAt!==G.n?'1 gratis':'+1 mov';
+ $('heroHudPower').textContent=prac?'Práctica · ayudas ilimitadas':h.id==='lia'?(run.lifeUsed?'Segunda oportunidad usada':'♥ Segunda oportunidad disponible'):h.id==='jean'?`↶ ${freeUndosLeft()} deshacer gratis`:`✦ +2 pistas al completar nivel ${Math.min(100,(Math.floor((G.n-1)/10)+1)*10)}`;
+ $('bUndo').querySelector('em').textContent=prac?'gratis':h.id==='jean'&&freeUndosLeft()>0?freeUndosLeft()+' gratis':'+1 mov';
 }
 function showRescue(){
  G.done=true;busy=true;boardEl.classList.add('board-lock');setTensionFx(0,false);Music.duck(.3);
@@ -1509,39 +1544,6 @@ syncHero(store.run?.hero||store.heroChoice||'lia');
 function paintScenery(i){
  document.documentElement.style.setProperty('--scene',`url("backgrounds/zone-${i+1}.webp")`);
 }
-function travelDialog(intro=false){
- return new Promise(resolve=>{
-  const modal=$('travel'),go=$('travelGo'),options=$('routeOptions');let choice='normal';
-  const next=Math.min(9,Math.floor(run.level/10)),z=ZONES[intro?0:next];
-  $('travelTag').textContent=intro?`${heroOf().name.toUpperCase()} · ${heroOf().role.toUpperCase()}`:'ZONA COMPLETADA · ELIGE TU RUTA';
-  $('travelTitle').textContent=intro?'Una llave, diez destinos':`Rumbo a ${z.n}`;
-  $('travelText').textContent=intro?`Soy ${heroOf().name}. ¿Me ayudas a llegar al Castillo Dorado? Cada puzle nos acerca a la siguiente ciudad.`:'¡Llegamos al cruce! Podemos seguir por abajo, o tomar la subida y ganar un poco más.';
-  options.hidden=intro;options.style.display=intro?'none':'grid';
-  $('routeBrave').querySelector('small').innerHTML=run.mode==='p'?'Un poco más difícil.<br>Sin puntos en Práctica.':'Un poco más difícil.<br>+10 % de puntos.';
-  $('routeMap').querySelector('text').textContent=run.mode==='p'?'AVENTURERO · MÁS RETO':'AVENTURERO · +10 %';$('routeMap').style.display=intro?'none':'block';
-  const select=v=>{choice=v;const brave=v==='brave';
-   $('routeNormal').setAttribute('aria-pressed',String(!brave));$('routeBrave').setAttribute('aria-pressed',String(brave));
-   $('upperRoute').classList.toggle('chosen',brave);$('lowerRoute').classList.toggle('chosen',!brave);
-   $('routeExplain').textContent=intro?'La aventura comienza en Valle Esmeralda. Cada diez niveles elegiremos cómo seguir.':run.mode==='p'?'Durante los próximos 10 niveles: '+(brave?'puzles algo más difíciles.':'dificultad habitual.')+' En Práctica no hay puntos ni eliminación.':`Durante los próximos 10 niveles: ${brave?'puzles algo más difíciles y +10 % de puntos.':'dificultad y puntos habituales.'} Después podrás elegir de nuevo.`;
-   go.textContent=intro?'Comenzar la aventura ➜':`Seguir por el camino ${brave?'aventurero':'tranquilo'} ➜`;
-  };
-  $('routeNormal').onclick=()=>select('normal');$('routeBrave').onclick=()=>select('brave');
-  $('routeWalker').innerHTML=heroMarkup(heroOf(),'map');$('routeWalker').firstElementChild.style.width='30px';$('routeWalker').firstElementChild.style.height='44px';$('routeWalker').firstElementChild.setAttribute('width','30');$('routeWalker').firstElementChild.setAttribute('height','44');
-  $('routeWalker').setAttribute('transform','translate(25 36)');select('normal');modal.classList.add('show');
-  const oldFocus=document.activeElement;go.focus();
-  const trap=e=>{if(e.key!=='Tab')return;const buttons=[...modal.querySelectorAll('button')].filter(b=>b.getClientRects().length&&!b.disabled);const first=buttons[0],last=buttons.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}};
-  modal.addEventListener('keydown',trap);
-  go.onclick=async()=>{
-   go.disabled=true;options.querySelectorAll('button').forEach(b=>b.disabled=true);
-   if(!intro){run.route=choice;run.routeZone=next;saveRun();
-    const path=$(choice==='brave'?'upperRoute':'lowerRoute'),len=path.getTotalLength(),t0=performance.now(),dur=matchMedia('(prefers-reduced-motion: reduce)').matches?0:1200;
-    $('routeWalker').firstElementChild.classList.add('walking');
-    await new Promise(done=>{function step(t){const k=dur?Math.min(1,(t-t0)/dur):1,p=path.getPointAtLength(len*k);$('routeWalker').setAttribute('transform',`translate(${p.x-15} ${p.y-44})`);if(k<1)requestAnimationFrame(step);else done()}requestAnimationFrame(step)});
-   }
-   modal.classList.remove('show');modal.removeEventListener('keydown',trap);go.disabled=false;options.querySelectorAll('button').forEach(b=>b.disabled=false);if(oldFocus)oldFocus.focus();resolve();
-  };
- });
-}
 function gainFor(n,moves,opt,streak){const gain=calcGain(n,moves,opt,streak);gain.routeBonus=run&&run.mode!=='p'&&run.route==='brave'?Math.round(gain.total*.1):0;gain.total+=gain.routeBonus;return gain}
 
 function applyZone(i){
@@ -1559,7 +1561,7 @@ function applyZone(i){
 }
 function renderStage(){                                   // barra de 10 tramos de la zona actual
   const z=zoneOf(G.n),step=zoneStep(G.n);
-  $('sname').textContent=`${z.e} ${z.n}`;
+  $('sname').textContent=z.n;
   const sg=$('segs');sg.innerHTML='';
   for(let k=1;k<=10;k++){const s=document.createElement('span');s.className='sg'+(k<step?' done':k===step?' cur adv':'');sg.appendChild(s)}
 }
@@ -1607,16 +1609,16 @@ function showMap(fromI,toI,{travel=false}={}){
   $('mSub').textContent=travel?CHAPTERS[fromI].end:`Diez puzles, una ciudad y un nuevo capítulo. Nivel ${run.level} de 100.`;
   el.classList.remove('out');el.classList.add('show');Music.duck(.35);
   let finished=false,frame=0,timer=0,ready=!travel;
-  const end=()=>{if(finished||!ready)return;finished=true;clearTimeout(timer);cancelAnimationFrame(frame);el.removeEventListener('pointerdown',end);el.removeEventListener('keydown',key);el.classList.add('out');setTimeout(()=>{el.classList.remove('show','out');Music.duck(1);resolve()},350)};
+  const end=()=>{if(finished||!ready)return;finished=true;clearTimeout(timer);cancelAnimationFrame(frame);el.removeEventListener('pointerdown',end);el.removeEventListener('keydown',key);el.classList.add('out');setTimeout(()=>{el.classList.remove('show','out');Music.duck(1);resolve()},150)};
   const key=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();end()}};
-  el.addEventListener('pointerdown',end);el.addEventListener('keydown',key);el.tabIndex=0;el.focus();
+  el.addEventListener('pointerdown',end);el.addEventListener('keydown',key);el.removeAttribute('tabindex');
   if(travel){
-   sfx.journey();const path=paths[fromI],length=path.getTotalLength(),t0=performance.now(),duration=matchMedia('(prefers-reduced-motion: reduce)').matches?0:1700;
+   sfx.journey();const path=paths[fromI],length=path.getTotalLength(),t0=performance.now(),duration=matchMedia('(prefers-reduced-motion: reduce)').matches?0:550;
    art.classList.add('walking');
    function step(t){const k=duration?Math.min(1,(t-t0)/duration):1,e=k*k*(3-2*k),p=path.getPointAtLength(length*e);place(p.x,p.y);
-    if(k<1)frame=requestAnimationFrame(step);else{art.classList.remove('walking');applyZone(toI);cards[fromI].classList.remove('current');cards[fromI].querySelectorAll('text')[1].textContent='COMPLETADA';cards[fromI].querySelector('rect').setAttribute('stroke','#73bfaa');cards[toI].classList.remove('undiscovered');cards[toI].classList.add('current');const pic=cards[toI].querySelector('image');pic.setAttribute('opacity',1);cards[toI].querySelector('rect').setAttribute('stroke','#ffdb8f');const texts=cards[toI].querySelectorAll('text');texts[1].textContent='ESTÁS AQUÍ';$('mName').textContent=ZONES[toI].n;$('mSub').textContent=`${heroOf().name}: ${HERO_LORE[heroOf().id].quote}`;ready=true;timer=setTimeout(end,2200);sfx.win()}}
+    if(k<1)frame=requestAnimationFrame(step);else{art.classList.remove('walking');applyZone(toI);cards[fromI].classList.remove('current');cards[fromI].querySelectorAll('text')[1].textContent='COMPLETADA';cards[fromI].querySelector('rect').setAttribute('stroke','#73bfaa');cards[toI].classList.remove('undiscovered');cards[toI].classList.add('current');const pic=cards[toI].querySelector('image');pic.setAttribute('opacity',1);cards[toI].querySelector('rect').setAttribute('stroke','#ffdb8f');const texts=cards[toI].querySelectorAll('text');texts[1].textContent='ESTÁS AQUÍ';$('mName').textContent=ZONES[toI].n;$('mSub').textContent=`${heroOf().name}: ${HERO_LORE[heroOf().id].quote}`;ready=true;timer=setTimeout(end,250);sfx.win()}}
    frame=requestAnimationFrame(step);
-  }else{applyZone(toI);sfx.start();timer=setTimeout(end,4200)}
+  }else{applyZone(toI);sfx.start();timer=setTimeout(end,650)}
  });
 }
 
@@ -1626,9 +1628,9 @@ async function startRun(start,mode){
   if(run) recordBest(true);                         // si abandonas, lo logrado cuenta
   const seed=menuSeed; menuSeed=Math.floor(Math.random()*2**31);
   Object.keys(packs).forEach(k=>{if(!k.startsWith(seed+':'))delete packs[k]});
-  run={seed,level:1,start,mode,hero:chosen,lifeUsed:false,undoUsedAt:0,vanAwardedAt:0,score:0,hints:3+Math.floor(start/25),adj:0,streak:0,recBroken:false};
+  run={seed,level:1,start,mode,hero:chosen,lifeUsed:false,undoUsedAt:0,undoUsedLevel:0,undoUsedCount:0,vanAwardedAt:0,score:0,hints:3+Math.floor(start/25),adj:0,streak:0,recBroken:false};
   syncHero();syncRouteStyle();applyZone(0);saveRun();getPack(run.level);                     // se genera el nivel mientras se muestra el mapa
-  showMap(zoneIdx(run.level),zoneIdx(run.level)).then(startLevel);
+  run.enterPending=true;saveRun();await resumeAdventure();
 }
 async function startLevel(){
   busy=true;
@@ -1658,7 +1660,6 @@ async function startLevel(){
   buildPieces();updateHud();sfx.start();busy=true;
   fitBoard();Music.setLevel(G.n,G.rate);setTensionFx(0,false);Music.duck(1);Music.muffle(false);Music.start();
   if(run.rescue){showRescue();return}
-  const storySession=run;if(zoneStep(G.n)===1&&run.storyChapterSeen!==zoneIdx(G.n)&&run.storySeen!==G.n){boardEl.classList.add('board-lock');await showStoryPage(G.n);if(run!==storySession)return;run.storySeen=G.n;run.storyChapterSeen=zoneIdx(G.n);saveRun()}
   busy=false;boardEl.classList.remove('board-lock');banner();
   if(!store.tutorial&&G.n===1){                      // primera vez: señala el primer movimiento
     store.tutorial=true;persist();const g0=G;
@@ -1670,7 +1671,7 @@ async function startLevel(){
   }
 }
 function tipFor(g){
-  if(heroOf().id==='jean'&&run.undoUsedAt!==g.n)return '↶ Jean puede deshacer una vez gratis en este nivel.';
+  if(heroOf().id==='jean'&&freeUndosLeft()>0)return `↶ Jean puede deshacer ${freeUndosLeft()} veces gratis en este tablero.`;
   const t=['Piensa antes de mover: cada movimiento de más resta puntos.','Los bloques largos bloquean más: libéralos primero.','Un solo arrastre largo cuenta como 1 movimiento.','Deshacer cuesta 1 movimiento. Úsalo con cabeza.','La pista no cuesta movimientos, pero es limitada.'];
   return t[(g.n*7)%t.length];
 }
@@ -1713,7 +1714,7 @@ function buildPieces(){
   G.els=G.pieces.map((p,i)=>{
     const el=document.createElement('div');
     el.className='piece enter '+p.o+' '+(i===0?'red':'c'+G.colors[i%8]);
-    el.style.setProperty('--dl',(i*70+120)+'ms');
+    el.style.setProperty('--dl',(i*18)+'ms');
     el.innerHTML='<div class="face"></div>';
     el.addEventListener('animationend',e=>{if(e.animationName==='enter')el.classList.remove('enter')});
     boardEl.appendChild(el);attach(el,i);return el;
@@ -1778,8 +1779,8 @@ function recLine(){            // refresca camino, puntaje actual y máximo del 
     $('maxLbl').textContent='NIVEL MÁX.';$('scoreMax').textContent=Math.max(rec.level,run.level);
     $('scMax').classList.remove('broken');return;
   }
-  $('scoreLbl').textContent='ACTUAL';
-  $('maxLbl').textContent=run.recBroken?'★ MÁXIMO':'MÁXIMO';
+  $('scoreLbl').textContent='PUNTOS';
+  $('maxLbl').textContent=run.recBroken?'NUEVO RÉCORD':'RÉCORD';
   $('scoreMax').textContent=Math.max(rec.score,run.score).toLocaleString('de-DE');
   $('scMax').classList.toggle('broken',!!run.recBroken);
   fitScores();
@@ -1787,7 +1788,7 @@ function recLine(){            // refresca camino, puntaje actual y máximo del 
 function syncRouteStyle(){
  const brave=!!run&&run.route==='brave';document.body.classList.toggle('adventure-route',brave);
  const level=run?.level||1,first=Math.floor((level-1)/10)*10+1,last=Math.min(100,first+9),practice=run?.mode==='p';
- $('routeName').textContent=brave?'RUTA AVENTURERA':'RUTA TRANQUILA';$('routeIcon').textContent=brave?'✦':'🌿';
+ $('routeName').textContent=brave?'RUTA AVENTURERA':'RUTA TRANQUILA';$('routeIcon').textContent=brave?'△':'⌁';
  $('routeScope').textContent=`NIV. ${first}–${last}`;$('routeReward').textContent=brave?(practice?'Más reto':'+10 % puntos'):'Normal';
  $('routeStatus').setAttribute('aria-label',brave?`Ruta aventurera, niveles ${first} a ${last}. Puzles algo más difíciles${practice?', sin puntos en Práctica.':' y diez por ciento más de puntos.'}`:`Ruta tranquila, niveles ${first} a ${last}. Dificultad habitual.`);
 }
@@ -1801,82 +1802,90 @@ function updateHud(){
   const over=Math.max(0,G.moves-G.opt)/G.opt,hue=140*(1-Math.min(1,over));
   f.style.background=`hsl(${hue} 85% 52%)`;f.style.color=`hsl(${hue} 85% 52%)`;
   const prac=run.mode==='p',cg=gainFor(G.rate,G.moves,G.opt,run.streak||0);
-  $('pot').textContent=prac?'sin puntaje':'+'+cg.total.toLocaleString('de-DE')+(cg.mult>1?' (×'+cg.mult.toFixed(1)+')':'');
+  $('pot').textContent=prac?'sin puntaje':'+'+cg.total.toLocaleString('de-DE');
   $('meter').classList.toggle('danger',!prac&&G.moves>=G.limit*.8);
   const panic=!prac&&!G.done&&G.moves>=G.limit&&G.pos[0]!==4, tn=(prac||G.done)?0:Math.max(0,Math.min(1,(G.moves/G.limit-.5)/.5));
   setTensionFx(tn,panic);
 }
 
 /* ---------- Victoria de nivel ---------- */
-function win(){
-  G.done=true;boardEl.classList.add('board-lock');
-  const red=G.els[0],s=cellPx();red.classList.add('exit');red.style.left=7*s+'px';
-  const prac=run.mode==='p',cgw=gainFor(G.rate,G.moves,G.opt,run.streak||0),eff=cgw.eff,gain=prac?0:cgw.total,prev=run.score;
-  run.score+=gain;run.cleared=(run.cleared||0)+1;run.streak=eff>=.9?(run.streak||0)+1:0;
-  run.adj=Math.max(-2,Math.min(run.level<10?1:2,run.adj+(eff>=.9?1:eff<.4?-1:0)));      // adaptación
-  let bonusHint=false;if(!prac&&G.n%5===0){run.hints++;bonusHint=true}
-  const heroHintBonus=!prac&&heroOf().id==='van'&&G.n%10===0&&(run.vanAwardedAt||0)<G.n;
-  if(heroHintBonus){run.hints+=2;run.vanAwardedAt=G.n}
-  const r=boardEl.getBoundingClientRect();
-  setTensionFx(0,false);Music.duck(.35);
-  const perfect=G.moves<=G.opt;
-  if(perfect) setTimeout(()=>perfectFx(cgw.mult),350); else sfx.win();
-  vib([20,30,60]);burst(r.right,r.top+r.height*(2.5/6),50,['#ff6a6a','#ffcf6b','#fff'],8);
-  floatText(prac?'¡Bien!':'+'+gain.toLocaleString('de-DE'),r.left+r.width/2,r.top+r.height/2);
-  if(!prac){countUp($('score'),prev,run.score,900);$('score').classList.remove('bump');void $('score').offsetWidth;$('score').classList.add('bump')}
-  setTimeout(recLine,950);
-  if(G.n<MAXL) saveRun();
-  recordBest();
-  setTimeout(()=>{
-    $('winTag').textContent=G.n>=MAXL?'¡HAS COMPLETADO LOS 100 NIVELES!':`NIVEL ${G.n} SUPERADO`;
-    const ring=$('ring'),pc=Math.round(eff*100);
-    ring.style.setProperty('--c',eff>=.9?'#43e0c1':eff>=.5?'#ffc65a':'#ff6a6a');
-    ring.style.setProperty('--p',0);$('ringTxt').textContent='0%';
-    $('winTxt').textContent=`${G.moves} movimientos de ${G.opt} mínimos`+(G.moves===G.opt?' · ¡PERFECTO!':'')+(bonusHint?' · +1 💡 pista':'')+(heroHintBonus?' · Van: +2 💡 pistas':'');
-    $('winStory').hidden=G.n%10!==0;
-    $('winStory').textContent=G.n%10===0?CHAPTERS[zoneIdx(G.n)].end:`${heroOf().name}: ${HERO_LORE[heroOf().id].quote}`;
-    $('breakdown').innerHTML=prac?`<div><span>Eficiencia ${pc}%</span><b>${G.moves} / ${G.opt}</b></div><div><span>Modo práctica</span><b>sin puntaje</b></div>`:
-      `<div><span>Base del nivel</span><b>${cgw.base.toLocaleString('de-DE')}</b></div>`+
-      `<div><span>Eficiencia ${pc}%</span><b>${cgw.pts.toLocaleString('de-DE')}</b></div>`+
-      (cgw.perfect?`<div class="g"><span>✨ Bonus perfecto</span><b>+${cgw.perfect}</b></div>`:'')+
-      (cgw.mult>1?`<div class="g"><span>🔥 Racha ×${cgw.mult.toFixed(1)}</span><b>${run.streak} seguidos</b></div>`:'')+
-      (heroHintBonus?`<div class="g"><span>✦ Poder de Van</span><b>+2 pistas</b></div>`:'')+
-      (cgw.routeBonus?`<div class="g"><span>✨ Ruta aventurera +10 %</span><b>+${cgw.routeBonus.toLocaleString('de-DE')}</b></div>`:'')+
-      (cgw.lost>0?`<div class="r"><span>Perdiste por movimientos extra</span><b>−${cgw.lost.toLocaleString('de-DE')}</b></div>`:'');
-    $('gain').textContent=prac?'🎯':'+0';$('winTotal').textContent=run.score.toLocaleString('de-DE');$('winTotalP').style.display=prac?'none':'';
-    const zoneDone=G.n%10===0&&G.n<MAXL,bonusNext=isBonusLevel(G.n)&&G.n<MAXL&&!prac;
-    $('bNext').textContent=G.n>=MAXL?'Ver resultado ★':bonusNext?'🎁 ¡Fase bonus! ➜':zoneDone?`Viajar: ${ZONES[zoneIdx(G.n+1)].e} ${ZONES[zoneIdx(G.n+1)].n} ➜`:'Siguiente nivel ➜';
-    if(zoneDone)$('winTag').textContent=`🏁 ¡${ZONES[zoneIdx(G.n)].n.toUpperCase()} COMPLETADA!`;
-    $('win').classList.add('show');
-    const t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/900),v=pc*(1-Math.pow(1-k,3));ring.style.setProperty('--p',v);$('ringTxt').textContent=Math.round(v)+'%';if(k<1)requestAnimationFrame(f)})(t0);
-    if(!prac)countUp($('gain'),0,gain,1000,v=>'+'+Math.round(v).toLocaleString('de-DE'));
-    if(eff>=.9) rain();
-  },perfect?2500:950);
-}
-$('bNext').onclick=async()=>{
-  $('win').classList.remove('show');
-  if(G.n>=MAXL){endRun(true);return}
-  const crossing=G.n%10===0, from=zoneIdx(G.n);
-  if(busy)return;busy=true;
-  if(crossing){await travelDialog();getPack(run.level+1)}
-  if(isBonusLevel(G.n)&&run.mode==='c') run.bonus=1;           // fase bonus pendiente (se conserva si cierras la app)
-  run.level++;saveRun();
-  if(run.bonus){const prize=await showBonus();run.hints+=prize;run.bonus=0;saveRun()}
-  if(crossing) await showMap(from,zoneIdx(run.level),{travel:true});      // la llave viaja por el mapa a la zona siguiente
-  startLevel();
+const HERO_TALK={
+ lia:{win:['Otra puerta menos.','Vamos, queda camino.','Lo sabía. Casi.'],bonus:{cards:'«Esta la abro yo.»',wheel:'«Que gire. Nosotros seguimos.»',slots:'«A ver si esta vez se ponen de acuerdo.»'},prize:'«Para la puerta difícil. La de después.»',empty:'«Bueno. Nadie dijo que fuera fácil.»'},
+ jean:{win:['Justo a tiempo.','Llegamos antes que ayer.','Un problema menos.'],bonus:{cards:'«Las cartas nunca llegan tarde.»',wheel:'«Un reloj sin agujas. Sospechoso.»',slots:'«Tres relojes y ninguno da la hora.»'},prize:'«Nos ahorra unos cuantos errores.»',empty:'«Nos debe una.»'},
+ van:{win:['Encaja. Sigamos.','Lo anoto.','Había una salida.'],bonus:{cards:'«Las marcas se repiten. Observa.»',wheel:'«La aguja también cuenta una historia.»',slots:'«Tres ecos. Escuchemos.»'},prize:'«Lo guardo para cuando haga falta.»',empty:'«También conviene anotar lo que no funciona.»'}
 };
+function freeUndosLeft(level=run?.level){
+ if(!run||heroOf().id!=='jean')return 0;
+ const used=run.undoUsedLevel===level?Math.max(0,Math.min(3,run.undoUsedCount||0)):run.undoUsedAt===level?1:0;
+ return 3-used;
+}
+function travelDialog(intro=false){
+ return new Promise(resolve=>{
+  const session=run,modal=$('travel'),h=heroOf(),city=intro?0:Math.min(9,Math.floor(run.level/10)),story=storyFor(h.id,city*10+1);
+  $('travelScene').src=`backgrounds/zone-${city+1}.webp`;$('travelPortrait').src=heroArt(h.id,'story');$('travelPortrait').alt=h.name;
+  $('travelTag').textContent=`CAPÍTULO ${city+1} / 10 · NIVELES ${city*10+1}–${(city+1)*10}`;
+  $('travelTitle').textContent=ZONES[city].n;$('travelText').textContent=story.body;$('travelHeroLine').textContent=`${h.name}: «${story.action}»`;
+  $('routeSummary').textContent=intro?'Elige cómo empezar.':`Nivel ${run.pendingClear?.level||run.level} completado · +${run.pendingClear?.gain||0} puntos`;
+  let chosen=false;const buttons=[$('routeNormal'),$('routeBrave')];buttons.forEach(b=>b.disabled=false);
+  const key=e=>{if(e.key!=='Tab')return;if(e.shiftKey&&document.activeElement===buttons[0]){e.preventDefault();buttons[1].focus()}else if(!e.shiftKey&&document.activeElement===buttons[1]){e.preventDefault();buttons[0].focus()}};
+  const choose=choice=>{if(chosen||run!==session)return;chosen=true;buttons.forEach(b=>b.disabled=true);run.route=choice;run.routeZone=city;run.storyChapterSeen=city;run.storySeen=city*10+1;
+   if(intro){run.enterPending=false;run.travelFrom=0}else if(run.pendingClear)run.pendingClear.routeChosen=true;
+   saveRun();modal.classList.remove('show');modal.removeEventListener('keydown',key);resolve();
+  };
+  buttons[0].onclick=()=>choose('normal');buttons[1].onclick=()=>choose('brave');modal.classList.add('show');modal.addEventListener('keydown',key);buttons[0].focus();
+ });
+}
+let advancingClear=false;
+async function resumeAdventure(){
+ if(!run)return;busy=true;
+ if(run.pendingClear){await advanceClear();return}
+ if(run.enterPending)await travelDialog(true);
+ if(run.bonus){const prize=await showBonus();run.hints+=prize;run.bonus=0;saveRun()}
+ if(run.travelFrom!==undefined){const from=run.travelFrom,to=zoneIdx(run.level);await showMap(from,to,{travel:from!==to});delete run.travelFrom;saveRun()}
+ await startLevel();
+}
+async function advanceClear(){
+ if(advancingClear||!run?.pendingClear)return;advancingClear=true;busy=true;
+ try{
+  const done=run.pendingClear,n=done.level;
+  if(n>=MAXL){endRun(true);busy=false;return}
+  const crossing=n%10===0;
+  if(crossing&&!done.routeChosen)await travelDialog(false);
+  run.level=n+1;if(crossing)run.travelFrom=zoneIdx(n);if(isBonusLevel(n))run.bonus=1;
+  delete run.pendingClear;saveRun();await resumeAdventure();
+ }finally{advancingClear=false}
+}
+function win(){
+ if(G.done)return;G.done=true;busy=true;boardEl.classList.add('board-lock');
+ const gain=gainFor(G.rate,G.moves,G.opt,run.streak||0),previous=run.score;
+ run.score+=gain.total;run.cleared=(run.cleared||0)+1;run.streak=gain.eff>=.9?(run.streak||0)+1:0;
+ run.adj=Math.max(-2,Math.min(run.level<10?1:2,run.adj+(gain.eff>=.9?1:gain.eff<.4?-1:0)));
+ if(G.n%5===0)run.hints++;
+ if(heroOf().id==='van'&&G.n%10===0&&(run.vanAwardedAt||0)<G.n){run.hints+=2;run.vanAwardedAt=G.n}
+ run.pendingClear={level:G.n,gain:gain.total,moves:G.moves,opt:G.opt,routeChosen:false};recordBest();saveRun();
+ setTensionFx(0,false);Music.duck(.55);tone(523,.13,'sine',.06);tone(784,.18,'sine',.045,.08);
+ G.els[0].classList.add('exit');G.els[0].style.left=7*cellPx()+'px';countUp($('score'),previous,run.score,300);
+ $('msg').textContent=`${G.moves<=G.opt?'Perfecto · ':''}+${gain.total} puntos · ${HERO_TALK[heroOf().id].win[G.n%3]}`;
+ setTimeout(()=>advanceClear(),matchMedia('(prefers-reduced-motion: reduce)').matches?100:650);
+}
+function runeIcon(index){
+ const paths=[
+  '<circle cx="13" cy="12" r="5"/><path d="M17 16l13 13m-4-4 4-4m-9 0 4-4"/>',
+  '<path d="M21 5c2 8-7 9-7 17a7 7 0 0 0 14 0c0-5-2-9-4-11 1 7-3 7-3 7"/>',
+  '<path d="M27 6A15 15 0 1 0 34 28 15 15 0 0 1 27 6Z"/>'
+ ];
+ return `<svg class="rune-icon" viewBox="0 0 42 42" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${paths[index%3]}</svg>`;
+}
+
 
 /* ---------- Derrota ---------- */
 function fail(why){
   if(G.done)return;
   if(run.mode!=='p'&&heroOf().id==='lia'&&!run.lifeUsed){run.lifeUsed=true;run.rescue={level:G.n,rate:G.rate,pieces:G.pieces.map(p=>({...p})),start:G.start.slice(),opt:G.opt};saveRun();showRescue();return}
-  G.done=true;boardEl.classList.add('board-lock');
-  Music.stop(.3);setTensionFx(0,false);document.body.classList.add('shake','flash');sfx.fail();vib([80,40,80,40,160]);
-  const r=boardEl.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,50,['#ff2d4a','#ff7a5a','#7a0f22','#fff'],9);
-  G.els.forEach((e,i)=>{e.style.transition='transform .7s, opacity .7s';e.style.transform=`translateY(${60+Math.random()*60}px) rotate(${(Math.random()-.5)*50}deg)`;e.style.opacity='.0'});
-  setTimeout(()=>document.body.classList.remove('shake','flash'),1100);
-  setTimeout(()=>endRun(false,why),1000);
+  G.done=true;busy=true;boardEl.classList.add('board-lock');Music.stop(.25);setTensionFx(0,false);tone(220,.25,'sine',.045);G.els.forEach(el=>el.style.opacity='.5');
+  setTimeout(()=>{endRun(false,why);busy=false},400);
 }
+
 function recordBest(final){
   const k=rkey(), r=store.paths[k]||(store.paths[k]={score:0,level:0,runs:0});
   if(run.mode==='c'&&run.score>r.score){r.score=run.score;run.recBroken=true}
@@ -1888,9 +1897,9 @@ let lastCfg={start:1,mode:'c'};
 /* ============================ Fase bonus: 9 cartas, 3 premios x 3 copias ============================
    Gana el primer premio que consigas completar con 3 cartas iguales: +1 pista, +3 pistas o enemigo (0). */
 const isBonusLevel=level=>level>=15&&level<100&&level%10===5;
-const BONUS_CARDS=[{e:'💡',n:'+1 pista',v:1,c:'#43e0c1'},{e:'🌟',n:'+3 pistas',v:3,c:'#ffd24a'},{e:'👾',n:'Enemigo',v:0,c:'#ff4a6a'}];
+const BONUS_CARDS=[{e:'💡',n:'+1 pista',v:1,c:'#43e0c1'},{e:'🌟',n:'+3 pistas',v:3,c:'#ffd24a'},{e:'👾',n:'Sin premio',v:0,c:'#ff4a6a'}];
 const WHEEL_PRIZES=[1,0,2,1,3,1,2,1];
-const REEL_SYMBOLS=['💎','🔑','🌟'];
+const REEL_SYMBOLS=['Llave','Llama','Luna'];
 const bonusDelay=ms=>new Promise(r=>setTimeout(r,matchMedia('(prefers-reduced-motion: reduce)').matches?Math.min(ms,100):ms));
 function slotPrize(symbols){const n=Math.max(...REEL_SYMBOLS.map((_,i)=>symbols.filter(v=>v===i).length));return n===3?3:n===2?1:0}
 function createBonusPlan(){
@@ -1900,35 +1909,33 @@ function createBonusPlan(){
 }
 async function showBonus(){
  const pending=run.bonusPlan||(run.bonusPlan=createBonusPlan());saveRun();
- if(!pending.introSeen&&pending.prize===undefined){await bonusEntrance(pending.kind);pending.introSeen=true;saveRun()}
+  pending.introSeen=true;saveRun();
  return new Promise(resolve=>{
   const plan=run.bonusPlan||(run.bonusPlan=createBonusPlan());saveRun();
   const m=$('bonus'),stage=$('bStage'),go=$('bGo'),action=$('bAction'),result=$('bRes');
-  const titles={cards:'El secreto de las cartas',wheel:'La ruleta de las pistas',slots:'La máquina de amuletos'};
-  const lines={cards:'Busca tres símbolos iguales. El primer trío decide tu premio.',wheel:'Gira la rueda. La flecha dorada señala cuántas pistas ganas.',slots:'Tres amuletos iguales: +3 pistas. Dos iguales: +1. Todos distintos: 0.'};
+  const titles={cards:'Las cartas del umbral',wheel:'La rueda de los sellos',slots:'El altar de los ecos'};
+  const lines={cards:'Busca tres símbolos iguales. El primer trío decide tu premio.',wheel:'Gira una vez. La marca roja señala tu premio en pistas.',slots:'Tres amuletos iguales: +3 pistas. Dos iguales: +1. Todos distintos: 0.'};
   const zone=zoneIdx(Math.max(1,run.level-1));m.style.setProperty('--bonus-scene',`url("backgrounds/zone-${zone+1}.webp")`);m.dataset.game=plan.kind;
-  $('bTag').textContent=`PARADA SORPRESA · ${ZONES[zone].n.toUpperCase()}`;
+  $('bTag').textContent=`UN DESCANSO · ${ZONES[zone].n.toUpperCase()}`;
   $('bTitle').textContent=titles[plan.kind];$('bSub').textContent=lines[plan.kind];
-  $('bHero').innerHTML=heroMarkup(heroOf(),'story');$('bSpeech').textContent={cards:'«¿Qué esconden? ¡Vamos a descubrirlo!»',wheel:'«Una vuelta más hacia nuestra próxima aventura.»',slots:'«¡Que suenen los amuletos! A ver qué nos traen.»'}[plan.kind];
+  $('bHero').innerHTML=heroMarkup(heroOf(),'story');$('bSpeech').textContent=HERO_TALK[heroOf().id].bonus[plan.kind];
   $('bHints').textContent=run.hints;result.innerHTML='';result.className='bres';stage.innerHTML='';stage.className='bonus-stage '+plan.kind;
   go.hidden=true;go.style.display='none';go.disabled=false;action.hidden=plan.kind==='cards';action.disabled=false;
-  action.textContent=plan.kind==='wheel'?'Girar la ruleta ✦':'Activar los amuletos ✦';
-  $('bLegend').innerHTML=plan.kind==='cards'?'<span>💡 Trío: +1</span><span>🌟 Trío: +3</span><span>👾 Trío: 0</span>':plan.kind==='wheel'?'<span>💡 Premios: 0, 1, 2 o 3 pistas</span>':'<span>✦ Tres iguales: +3</span><span>✧ Dos iguales: +1</span>';
+  action.textContent=plan.kind==='wheel'?'Girar la rueda':'Escuchar los ecos';
+  $('bLegend').innerHTML=plan.kind==='cards'?'<span>Llaves: +1</span><span>Llamas: +3</span><span>Lunas: 0</span>':plan.kind==='wheel'?'<span>Premios: 0, 1, 2 o 3 pistas</span>':'<span>Tres iguales: +3</span><span>Dos iguales: +1</span>';
   let locked=plan.prize!==undefined;
   async function finish(prize,restore=false){
    locked=true;plan.prize=prize;saveRun();action.disabled=true;action.hidden=true;
-   $('bSpeech').textContent=prize>=3?'«¡Un tesoro de pistas! Nos vendrá genial.»':prize?'«¡Perfecto! Guardémoslas para el camino.»':'«Esta vez no hubo premio. ¡La aventura continúa!»';
-   result.className='bres '+(prize?'good':'neutral');result.innerHTML=`<b>${prize?'¡+'+prize+' pista'+(prize===1?'':'s')+'!':'Sin pistas esta vez'}</b><span>${prize?'Se añaden a tu reserva al continuar.':'Las pistas que ya tienes siguen contigo.'}</span>`;
-   if(!restore){if(prize){(prize>=3?sfx.fanfare:sfx.win)();const rect=stage.getBoundingClientRect();burst(rect.left+rect.width/2,rect.top+rect.height/2,prize>=3?60:28,['#ffcf6b','#43e0c1','#ffffff'],7);if(prize>=3)rain();
-     for(let i=0;i<prize;i++){await bonusDelay(180);const bulb=document.createElement('span');bulb.className='bonus-flight';bulb.textContent='💡';stage.appendChild(bulb);setTimeout(()=>bulb.remove(),1000);$('bHints').textContent=run.hints+i+1;tone(650+i*120,.1,'sine',.08)}
-    }else tone(260,.3,'sine',.05);await bonusDelay(700);
-   }else $('bHints').textContent=run.hints+prize;
-   go.hidden=false;go.style.display='';go.textContent='Guardar pistas y seguir ➜';if(!prize)go.textContent='Seguir la aventura ➜';go.focus();
+   $('bSpeech').textContent=HERO_TALK[heroOf().id][prize?'prize':'empty'];
+   result.className='bres '+(prize?'good':'neutral');result.innerHTML=`<b>${prize?'+'+prize+' pista'+(prize===1?'':'s'):'Sin premio'}</b><span>${prize?'Para las puertas que faltan.':'Tu reserva de pistas se conserva.'}</span>`;
+   $('bHints').textContent=run.hints+prize;
+   if(!restore){if(prize){tone(660,.15,'sine',.045);tone(880,.2,'sine',.035,.1)}else tone(280,.16,'sine',.025);await bonusDelay(250)}
+   go.hidden=false;go.style.display='';go.textContent='Seguir el camino →';go.focus();
   }
   go.onclick=()=>{if(go.disabled||plan.prize===undefined)return;go.disabled=true;m.classList.remove('show');delete run.bonusPlan;resolve(plan.prize)};
   if(plan.kind==='cards'){
    stage.innerHTML='<div class="bgrid" id="bGrid"></div>';const grid=$('bGrid');
-   const cards=plan.deck.map((ty,i)=>{const P=BONUS_CARDS[ty],b=document.createElement('button');b.className='bcard';b.style.setProperty('--i',i);b.style.setProperty('--pc',P.c);b.setAttribute('aria-label',`Carta ${i+1}, oculta`);b.innerHTML=`<span class="bin"><span class="bb"><i>✦</i></span><span class="bf"><b>${P.e}</b><small>${P.n}</small></span></span>`;grid.appendChild(b);
+   const cards=plan.deck.map((ty,i)=>{const P=BONUS_CARDS[ty],b=document.createElement('button');b.className='bcard';b.style.setProperty('--i',i);b.style.setProperty('--pc',P.c);b.setAttribute('aria-label',`Carta ${i+1}, oculta`);b.innerHTML=`<span class="bin"><span class="bb"><i>△</i></span><span class="bf"><b>${runeIcon(ty)}</b><small>${P.n}</small></span></span>`;grid.appendChild(b);
     if(plan.opened.includes(i)){b.classList.add('on');b.setAttribute('aria-label',P.n)}
     b.onclick=()=>{if(locked||plan.opened.includes(i))return;plan.opened.push(i);b.classList.add('on');b.setAttribute('aria-label',P.n);tone(500+plan.opened.length*55,.1,'triangle',.07);saveRun();
      const count=plan.opened.filter(k=>plan.deck[k]===ty).length;
@@ -1936,25 +1943,25 @@ async function showBonus(){
      if(count===3){locked=true;cards.forEach((c,k)=>c.classList.add(plan.deck[k]===ty?'winc':'dim'));finish(P.v)}
     };return b});
   }else if(plan.kind==='wheel'){
-   const colors=['#266b77','#33446b','#70569a','#286c66','#ae7140','#3c577d','#67629b','#36736a'];let sectors='';
+   const colors=['#314b4e','#283f49','#474b50','#29464a','#765545','#33444a','#46544e','#2c424b'];let sectors='';
    const point=(r,a)=>[160+r*Math.cos(a*Math.PI/180),160+r*Math.sin(a*Math.PI/180)];
-   WHEEL_PRIZES.forEach((v,i)=>{const a=-90+i*45,b=a+45,p=point(140,a),q=point(140,b),t=point(101,a+22.5);sectors+=`<path d="M160 160L${p}A140 140 0 0 1 ${q}Z" fill="${colors[i]}" stroke="#eac78b66" stroke-width="1.5"/><text x="${t[0]}" y="${t[1]-4}" text-anchor="middle" fill="#fff1cb" font-size="22" font-weight="900">${v?'+'+v:'0'}</text><text x="${t[0]}" y="${t[1]+17}" text-anchor="middle" fill="#efe3ce" font-size="11">${v===1?'PISTA':'PISTAS'}</text>`});
-   stage.innerHTML=`<div class="wheel-shell"><span class="wheel-pointer" aria-hidden="true">▼</span><svg class="prize-wheel" viewBox="0 0 320 320" role="img" aria-label="Ruleta con ocho sectores. Premios de cero a tres pistas.">${sectors}</svg><div class="wheel-hub">✦</div></div>`;
-   const wheel=stage.querySelector('.prize-wheel'),angle=2160-22.5-plan.wheel*45;
-   if(locked)wheel.style.transform=`rotate(${angle}deg)`;
-   action.onclick=async()=>{if(locked)return;locked=true;action.disabled=true;action.textContent='La rueda está girando…';$('bSpeech').textContent='«¡Mira la flecha dorada!»';sfx.start();
-    const dur=matchMedia('(prefers-reduced-motion: reduce)').matches?150:4800;const anim=wheel.animate([{transform:'rotate(0deg)'},{transform:`rotate(${angle}deg)`}],{duration:dur,easing:'cubic-bezier(.12,.74,.12,1)',fill:'forwards'});
-    let tick=0;const timer=setInterval(()=>{tone(350+(tick++%8)*45,.035,'triangle',.025)},140);
-    try{await anim.finished}finally{clearInterval(timer)}await finish(WHEEL_PRIZES[plan.wheel]);
+   WHEEL_PRIZES.forEach((v,i)=>{const a=-90+i*45,p=point(140,a),q=point(140,a+45),t=point(99,a+22.5),mark=point(126,a+22.5);sectors+=`<path data-sector="${i}" d="M160 160L${p}A140 140 0 0 1 ${q}Z" fill="${colors[i]}" stroke="#a6966e77" stroke-width="1"/><circle cx="${mark[0]}" cy="${mark[1]}" r="2" fill="#bdac7c"/><text x="${t[0]}" y="${t[1]+7}" data-label="${i}" style="transform-box:view-box;transform-origin:${t[0]}px ${t[1]}px" text-anchor="middle" fill="#e7d8b5" font-size="25" font-family="Georgia,serif">${v?'+'+v:'0'}</text>`});
+   stage.innerHTML=`<div class="wheel-shell"><span class="wheel-pointer" aria-hidden="true">▼</span><svg class="prize-wheel" viewBox="0 0 320 320" role="img" aria-label="Rueda de ocho sellos. La marca roja indica el premio en pistas.">${sectors}<circle cx="160" cy="160" r="140" fill="none" stroke="#b8a16d" stroke-width="2"/></svg><div class="wheel-hub">${runeIcon(0)}</div></div>`;
+   const wheel=stage.querySelector('.prize-wheel'),angle=1440-22.5-plan.wheel*45;
+   if(locked){wheel.style.transform=`rotate(${angle}deg)`;wheel.querySelectorAll('text').forEach(label=>label.style.transform=`rotate(${-angle}deg)`)}
+   action.onclick=async()=>{if(locked)return;locked=true;action.disabled=true;action.textContent='La rueda está girando…';$('bSpeech').textContent='La marca roja decide.';sfx.start();
+    const dur=matchMedia('(prefers-reduced-motion: reduce)').matches?150:2600;wheel.querySelectorAll('text').forEach(label=>label.animate([{transform:'rotate(0deg)'},{transform:`rotate(${-angle}deg)`}],{duration:dur,easing:'cubic-bezier(.12,.74,.12,1)',fill:'forwards'}));const anim=wheel.animate([{transform:'rotate(0deg)'},{transform:`rotate(${angle}deg)`}],{duration:dur,easing:'cubic-bezier(.12,.74,.12,1)',fill:'forwards'});
+    let tick=0;const timer=setInterval(()=>{tone(320+(tick++%8)*30,.035,'sine',.014)},250);
+    try{await anim.finished}finally{clearInterval(timer)}wheel.querySelector(`[data-sector="${plan.wheel}"]`).setAttribute('stroke','#f0d69e');await finish(WHEEL_PRIZES[plan.wheel]);
    };
   }else{
-   stage.innerHTML='<div class="amulet-machine"><div class="machine-crown">✦ LÍA EXPRESS ✦</div><div class="reels"></div><div class="machine-plaque">TRES AMULETOS · UN DESTINO</div><div class="machine-lights" aria-hidden="true">✧ · ✧ · ✧ · ✧ · ✧ · ✧ · ✧</div></div>';
-   stage.querySelector('.machine-crown').textContent=`✦ ${heroOf().name.toUpperCase()} EXPRESS ✦`;
+   stage.innerHTML='<div class="amulet-machine"><div class="machine-crown">✦ LÍA EXPRESS ✦</div><div class="reels"></div><div class="machine-plaque">TRES MARCAS · UNA RESPUESTA</div><div class="machine-lights" aria-hidden="true">✧ · ✧ · ✧ · ✧ · ✧ · ✧ · ✧</div></div>';
+   stage.querySelector('.machine-crown').textContent='EL ALTAR DE LOS ECOS';
    const reels=stage.querySelector('.reels');
-   for(let i=0;i<3;i++){const reel=document.createElement('div');reel.className='reel';reel.setAttribute('aria-label',`Amuleto ${i+1}`);reel.innerHTML=`<div class="reel-strip">${Array.from({length:22},(_,k)=>`<span>${REEL_SYMBOLS[k===21?plan.reels[i]:k%3]}</span>`).join('')}</div>`;reels.appendChild(reel)}
+   for(let i=0;i<3;i++){const reel=document.createElement('div');reel.className='reel';reel.setAttribute('aria-label',`Amuleto ${i+1}`);reel.innerHTML=`<div class="reel-strip">${Array.from({length:22},(_,k)=>`<span>${runeIcon(k===21?plan.reels[i]:k%3)}</span>`).join('')}</div>`;reels.appendChild(reel)}
    const strips=[...reels.querySelectorAll('.reel-strip')];if(locked)strips.forEach(s=>s.style.transform='translateY(-1848px)');
    action.onclick=async()=>{if(locked)return;locked=true;action.disabled=true;action.textContent='Los amuletos están girando…';stage.classList.add('spinning');$('bSpeech').textContent='«Uno… dos… ¡y el último!»';sfx.start();
-    await Promise.all(strips.map(async(strip,i)=>{const dur=matchMedia('(prefers-reduced-motion: reduce)').matches?150:2300+i*650;
+    await Promise.all(strips.map(async(strip,i)=>{const dur=matchMedia('(prefers-reduced-motion: reduce)').matches?150:1300+i*350;
      const anim=strip.animate([{transform:'translateY(0)'},{transform:'translateY(-1848px)'}],{duration:dur,easing:'cubic-bezier(.12,.7,.16,1)',fill:'forwards'});await anim.finished;tone(650+i*150,.15,'triangle',.07);strip.parentElement.classList.add('stopped');strip.parentElement.setAttribute('aria-label',`Amuleto ${i+1}: ${REEL_SYMBOLS[plan.reels[i]]}`);
     }));stage.classList.remove('spinning');const prize=slotPrize(plan.reels);const counts=plan.reels.map(v=>plan.reels.filter(n=>n===v).length);strips.forEach((strip,i)=>{if(counts[i]>=2)strip.parentElement.classList.add('match')});await finish(prize);
    };
@@ -1987,16 +1994,9 @@ function showFinale(prac,p,score,broken,heroId='lia'){
   const m=document.createElement('button');m.textContent='Ir al menú';m.onclick=()=>{$('finale').classList.remove('show');stopCrowd();Music.duck(1);openMenu()};box.appendChild(m);
   $('finale').classList.add('show');Music.duck(.3);
   if(!prac) countUp($('fScore'),0,score,1600);
-  // celebración
-  if(legend){
-    sfx.fanfare();applause(7000);rain();setTimeout(rain,1200);setTimeout(rain,2600);
-    let n=0;const em=['👏','👏','👏','🎉','⭐','👏'];
-    crowdTimer=setInterval(()=>{ if(++n>46){clearInterval(crowdTimer);return}
-      const e=document.createElement('span');e.className='clap';e.textContent=em[n%em.length];
-      e.style.left=(Math.random()*92+2)+'vw';e.style.fontSize=(22+Math.random()*30)+'px';e.style.setProperty('--dx',(Math.random()*60-30)+'px');
-      $('crowd').appendChild(e);setTimeout(()=>e.remove(),3600)},140);
-  } else { sfx.win();rain();setTimeout(rain,1100) }
+  tone(392,.35,'sine',.045);tone(523,.45,'sine',.035,.15);
 }
+
 function endRun(victory,why){
   const prac=run.mode==='p',p=pathOf(run.start),endingHero=heroOf().id;
   lastCfg={start:run.start,mode:run.mode};
@@ -2019,10 +2019,10 @@ $('bToMenu').onclick=()=>{$('over').classList.remove('show');openMenu()};
 /* ---------- Botones del juego ---------- */
 $('bUndo').onclick=()=>{
   if(!G||G.done||busy||!G.hist.length)return;
-  const free=run.mode==='p'||(heroOf().id==='jean'&&run.undoUsedAt!==G.n);
-  if(run.mode!=='p'&&free){run.undoUsedAt=G.n;saveRun()}
+  const free=run.mode==='p'||(heroOf().id==='jean'&&freeUndosLeft()>0);
+  if(run.mode!=='p'&&free){run.undoUsedCount=4-freeUndosLeft();run.undoUsedLevel=G.n;run.undoUsedAt=G.n;saveRun()}
   G.pos=G.hist.pop();G.moves=free?Math.max(0,G.moves-1):G.moves+1;layout();sfx.move();updateHud();$('bUndo').disabled=!G.hist.length;
-  if(free&&run.mode!=='p')$('msg').textContent='↶ Jean recuperó tu último movimiento. El deshacer gratis de este nivel está usado.';   // en Desafío deshacer cuesta 1 movimiento; en Práctica es gratis
+  if(free&&run.mode!=='p')$('msg').textContent=`↶ Un paso atrás. Quedan ${freeUndosLeft()} deshacer gratis.`;   // en Desafío deshacer cuesta 1 movimiento; en Práctica es gratis
   if(run.mode==='p'){}
   else if(G.moves>G.limit)fail('limit');else if(G.moves===G.limit)$('msg').textContent='⚠️ ÚLTIMO MOVIMIENTO: el siguiente te elimina.';
 };
@@ -2137,9 +2137,8 @@ $('bResume').onclick=()=>{$('menu').classList.remove('show');Music.muffle(false)
 $('bContinue').onclick=()=>{
   $('menu').classList.remove('show');Music.muffle(false);
   if(run&&G&&!G.done) return;
-  run={start:1,mode:'c',hero:'lia',lifeUsed:false,undoUsedAt:0,vanAwardedAt:0,recBroken:false,...store.run};syncHero();getPack(run.level);
-  (async()=>{ if(run.bonus&&run.mode==='c'){const prize=await showBonus();run.hints+=prize;run.bonus=0;saveRun()}
-    await showMap(zoneIdx(run.level),zoneIdx(run.level));startLevel(); })();
+  run={start:1,mode:'c',hero:'lia',lifeUsed:false,undoUsedAt:0,undoUsedLevel:0,undoUsedCount:0,vanAwardedAt:0,recBroken:false,...store.run};syncHero();getPack(run.level);
+  resumeAdventure();
 };
 fitBoard();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitBoard);
 openMenu();
@@ -2147,7 +2146,7 @@ openMenu();
 /* ============================ PWA ============================ */
 // El récord y la partida en curso viven en localStorage; pedimos al navegador que no los borre
 if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{});
-const APP_VERSION='35';                      // debe coincidir con VERSION de sw.js (desbloquea-vNN)
+const APP_VERSION='36';                      // debe coincidir con VERSION de sw.js (desbloquea-vNN)
 $('ver').textContent='Versión '+APP_VERSION;
 let pendingWorker=null,updating=false;
 function showUpdate(w){pendingWorker=w;$('upd').classList.add('show');sfx.hint()}
