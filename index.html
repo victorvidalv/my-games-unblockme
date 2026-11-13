@@ -1613,10 +1613,10 @@ function showMap(fromI,toI,{travel=false}={}){
   const key=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();end()}};
   el.addEventListener('pointerdown',end);el.addEventListener('keydown',key);el.removeAttribute('tabindex');
   if(travel){
-   sfx.journey();const path=paths[fromI],length=path.getTotalLength(),t0=performance.now(),duration=matchMedia('(prefers-reduced-motion: reduce)').matches?0:550;
+   sfx.journey();const path=paths[fromI],length=path.getTotalLength(),t0=performance.now(),duration=matchMedia('(prefers-reduced-motion: reduce)').matches?0:1400;
    art.classList.add('walking');
    function step(t){const k=duration?Math.min(1,(t-t0)/duration):1,e=k*k*(3-2*k),p=path.getPointAtLength(length*e);place(p.x,p.y);
-    if(k<1)frame=requestAnimationFrame(step);else{art.classList.remove('walking');applyZone(toI);cards[fromI].classList.remove('current');cards[fromI].querySelectorAll('text')[1].textContent='COMPLETADA';cards[fromI].querySelector('rect').setAttribute('stroke','#73bfaa');cards[toI].classList.remove('undiscovered');cards[toI].classList.add('current');const pic=cards[toI].querySelector('image');pic.setAttribute('opacity',1);cards[toI].querySelector('rect').setAttribute('stroke','#ffdb8f');const texts=cards[toI].querySelectorAll('text');texts[1].textContent='ESTÁS AQUÍ';$('mName').textContent=ZONES[toI].n;$('mSub').textContent=`${heroOf().name}: ${HERO_LORE[heroOf().id].quote}`;ready=true;timer=setTimeout(end,250);sfx.win()}}
+    if(k<1)frame=requestAnimationFrame(step);else{art.classList.remove('walking');applyZone(toI);cards[fromI].classList.remove('current');cards[fromI].querySelectorAll('text')[1].textContent='COMPLETADA';cards[fromI].querySelector('rect').setAttribute('stroke','#73bfaa');cards[toI].classList.remove('undiscovered');cards[toI].classList.add('current');const pic=cards[toI].querySelector('image');pic.setAttribute('opacity',1);cards[toI].querySelector('rect').setAttribute('stroke','#ffdb8f');const texts=cards[toI].querySelectorAll('text');texts[1].textContent='ESTÁS AQUÍ';$('mName').textContent=ZONES[toI].n;$('mSub').textContent=`${heroOf().name}: ${HERO_LORE[heroOf().id].quote}`;ready=true;timer=setTimeout(end,matchMedia('(prefers-reduced-motion: reduce)').matches?100:450);sfx.win()}}
    frame=requestAnimationFrame(step);
   }else{applyZone(toI);sfx.start();timer=setTimeout(end,650)}
  });
@@ -1630,7 +1630,7 @@ async function startRun(start,mode){
   Object.keys(packs).forEach(k=>{if(!k.startsWith(seed+':'))delete packs[k]});
   run={seed,level:1,start,mode,hero:chosen,lifeUsed:false,undoUsedAt:0,undoUsedLevel:0,undoUsedCount:0,vanAwardedAt:0,score:0,hints:3+Math.floor(start/25),adj:0,streak:0,recBroken:false};
   syncHero();syncRouteStyle();applyZone(0);saveRun();getPack(run.level);                     // se genera el nivel mientras se muestra el mapa
-  run.enterPending=true;saveRun();await resumeAdventure();
+  run.route='normal';run.routeZone=0;run.travelFrom=0;saveRun();await resumeAdventure();
 }
 async function startLevel(){
   busy=true;
@@ -1819,17 +1819,18 @@ function freeUndosLeft(level=run?.level){
  const used=run.undoUsedLevel===level?Math.max(0,Math.min(3,run.undoUsedCount||0)):run.undoUsedAt===level?1:0;
  return 3-used;
 }
-function travelDialog(intro=false){
+function travelDialog(){
+ if(!run?.pendingClear||run.pendingClear.level%10!==0||run.pendingClear.level>=100)return Promise.resolve();
  return new Promise(resolve=>{
-  const session=run,modal=$('travel'),h=heroOf(),city=intro?0:Math.min(9,Math.floor(run.level/10)),story=storyFor(h.id,city*10+1);
+  const session=run,modal=$('travel'),h=heroOf(),city=Math.min(9,Math.floor(run.pendingClear.level/10)),story=storyFor(h.id,city*10+1);
   $('travelScene').src=`backgrounds/zone-${city+1}.webp`;$('travelPortrait').src=heroArt(h.id,'story');$('travelPortrait').alt=h.name;
   $('travelTag').textContent=`CAPÍTULO ${city+1} / 10 · NIVELES ${city*10+1}–${(city+1)*10}`;
   $('travelTitle').textContent=ZONES[city].n;$('travelText').textContent=story.body;$('travelHeroLine').textContent=`${h.name}: «${story.action}»`;
-  $('routeSummary').textContent=intro?'Elige cómo empezar.':`Nivel ${run.pendingClear?.level||run.level} completado · +${run.pendingClear?.gain||0} puntos`;
+  $('routeSummary').textContent=`Nivel ${run.pendingClear?.level||run.level} completado · +${run.pendingClear?.gain||0} puntos`;
   let chosen=false;const buttons=[$('routeNormal'),$('routeBrave')];buttons.forEach(b=>b.disabled=false);
   const key=e=>{if(e.key!=='Tab')return;if(e.shiftKey&&document.activeElement===buttons[0]){e.preventDefault();buttons[1].focus()}else if(!e.shiftKey&&document.activeElement===buttons[1]){e.preventDefault();buttons[0].focus()}};
   const choose=choice=>{if(chosen||run!==session)return;chosen=true;buttons.forEach(b=>b.disabled=true);run.route=choice;run.routeZone=city;run.storyChapterSeen=city;run.storySeen=city*10+1;
-   if(intro){run.enterPending=false;run.travelFrom=0}else if(run.pendingClear)run.pendingClear.routeChosen=true;
+   if(run.pendingClear)run.pendingClear.routeChosen=true;
    saveRun();modal.classList.remove('show');modal.removeEventListener('keydown',key);resolve();
   };
   buttons[0].onclick=()=>choose('normal');buttons[1].onclick=()=>choose('brave');modal.classList.add('show');modal.addEventListener('keydown',key);buttons[0].focus();
@@ -1838,8 +1839,9 @@ function travelDialog(intro=false){
 let advancingClear=false;
 async function resumeAdventure(){
  if(!run)return;busy=true;
+ if(run.enterPending){delete run.enterPending;run.route='normal';run.routeZone=0;run.travelFrom=0;saveRun()}
+ if(run.level<=10&&!run.pendingClear?.routeChosen&&run.route!=='normal'){run.route='normal';run.routeZone=0;saveRun()}
  if(run.pendingClear){await advanceClear();return}
- if(run.enterPending)await travelDialog(true);
  if(run.bonus){const prize=await showBonus();run.hints+=prize;run.bonus=0;saveRun()}
  if(run.travelFrom!==undefined){const from=run.travelFrom,to=zoneIdx(run.level);await showMap(from,to,{travel:from!==to});delete run.travelFrom;saveRun()}
  await startLevel();
@@ -1850,7 +1852,7 @@ async function advanceClear(){
   const done=run.pendingClear,n=done.level;
   if(n>=MAXL){endRun(true);busy=false;return}
   const crossing=n%10===0;
-  if(crossing&&!done.routeChosen)await travelDialog(false);
+  if(crossing&&!done.routeChosen)await travelDialog();
   run.level=n+1;if(crossing)run.travelFrom=zoneIdx(n);if(isBonusLevel(n))run.bonus=1;
   delete run.pendingClear;saveRun();await resumeAdventure();
  }finally{advancingClear=false}
@@ -2146,7 +2148,7 @@ openMenu();
 /* ============================ PWA ============================ */
 // El récord y la partida en curso viven en localStorage; pedimos al navegador que no los borre
 if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{});
-const APP_VERSION='36';                      // debe coincidir con VERSION de sw.js (desbloquea-vNN)
+const APP_VERSION='37';                      // debe coincidir con VERSION de sw.js (desbloquea-vNN)
 $('ver').textContent='Versión '+APP_VERSION;
 let pendingWorker=null,updating=false;
 function showUpdate(w){pendingWorker=w;$('upd').classList.add('show');sfx.hint()}
