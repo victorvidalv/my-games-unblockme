@@ -7,12 +7,12 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Desbloquea">
+<meta name="apple-mobile-web-app-title" content="SLIDE &amp; SLAY">
 <meta name="format-detection" content="telephone=no">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<title>Desbloquea · Roguelike de bloques</title>
+<title>SLIDE &amp; SLAY</title>
 <style>
 :root{
   --cell: clamp(40px, min(calc((100vw - 52px)/6), calc((100dvh - 395px)/6)), 84px);
@@ -739,6 +739,19 @@ button:active,button.primary:active{transform:translateY(1px);box-shadow:none}
 #bHints{background:none!important;color:inherit!important;padding:0!important;border-radius:0!important;box-shadow:none!important}.bonus-wallet b{border:1px solid #ad9a6b66;background:#caba92;color:#22383f;padding:3px 9px;border-radius:5px;font-variant-numeric:tabular-nums}
 
 .brand-key{display:inline-block;width:23px;height:29px;vertical-align:-4px;margin-right:7px;color:#bc715b}.pemo{font-family:Georgia,serif;color:#b9aa89}
+
+.logo{font-size:clamp(25px,7.3vw,34px);letter-spacing:.005em}
+#pause .pause-menu{width:min(92vw,350px);padding:25px;border-radius:15px;border:1px solid #bca67b55;background:#1b2d38;text-align:left;box-shadow:0 18px 50px #0007}
+.pause-menu>.tag{font-size:10px;letter-spacing:.13em;color:#bba77d}.pause-menu h2{font-family:Georgia,serif;font-size:31px;font-weight:500;letter-spacing:0;margin:10px 0 5px;color:#ece0c5}
+.pause-context{font-size:12px;color:#aebfbe;margin:0 0 23px!important;opacity:1!important}.pause-actions{display:flex;flex-direction:column;gap:10px}
+.pause-actions button{display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;min-height:55px;padding:13px 16px;border:1px solid #b4a17b38;border-radius:8px;background:#ffffff04;color:#e2dccd;font-size:14px;box-shadow:none;text-align:left}
+.pause-actions button.primary{background:#b96f57;border-color:#c88c6c;color:#fff0d6}.pause-actions button:hover{border-color:#c0b18b88;background:#ffffff08}.pause-actions button.primary:hover{background:#c07a60}
+.pause-actions .pause-end{margin-top:4px;color:#d6b7a2;border-color:#a67b5b44}.pause-icon{flex:none;width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.8}
+.pause-actions button:focus-visible,.map-close:focus-visible{outline:2px solid #d2bd8a;outline-offset:3px}
+.map-close{position:absolute;bottom:calc(env(safe-area-inset-bottom) + 16px);left:50%;transform:translateX(-50%);min-width:170px;min-height:44px;padding:11px 18px;border:1px solid #b9a57b66;border-radius:8px;background:#253b45;color:#e7dbc0;box-shadow:none;font-size:13px}
+.map-close[hidden]{display:none}.map-close:active{transform:translate(-50%,1px)}#journey[aria-modal=true]{padding-bottom:calc(env(safe-area-inset-bottom) + 75px)}#journey[aria-modal=true] .mcap p{font-size:13px;color:#d7d6c8}
+
+#journey[aria-modal=true]{background:#142631}
 </style>
 </head>
 <body>
@@ -804,7 +817,7 @@ button:active,button.primary:active{transform:translateY(1px);box-shadow:none}
   <div class="mtag" id="mTag"></div>
   <div class="mapwrap"><svg id="mapSvg" viewBox="0 0 320 540" preserveAspectRatio="xMidYMid meet"></svg></div>
   <div class="mcap"><h2 id="mName"></h2><p id="mSub"></p></div>
-  <div class="jskip">Toca para continuar</div>
+  <div class="jskip">Toca para continuar</div><button id="mapClose" class="map-close" hidden>← Volver al menú</button>
 </div>
 <div id="upd" role="alert">
   <div class="updico">⬆️</div>
@@ -818,7 +831,7 @@ button:active,button.primary:active{transform:translateY(1px);box-shadow:none}
 <div class="modal show" id="menu">
   <div class="card">
     <div class="tag">LAS CRÓNICAS DE LA LLAVE ROJA</div>
-    <h1 class="logo"><svg class="brand-key" viewBox="0 0 30 38" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><circle cx="15" cy="9" r="6"/><path d="M15 15v19h7m-7-6h5"/></svg>DESBLOQUEA</h1>
+    <h1 class="logo"><svg class="brand-key" viewBox="0 0 30 38" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><circle cx="15" cy="9" r="6"/><path d="M15 15v19h7m-7-6h5"/></svg>SLIDE &amp; SLAY</h1>
     <p class="tagline">Tri cerró el camino. Tú decides cómo abrirlo.</p>
     <button class="primary cont" id="bContinue" style="display:none"></button>
     <div class="tag" style="margin-top:10px">ELIGE TU CAMINO</div>
@@ -828,28 +841,20 @@ button:active,button.primary:active{transform:translateY(1px);box-shadow:none}
       <button id="bResume" style="display:none">↩ Volver al juego</button>
       <button class="install optb">📲 Instalar app</button>
     </div>
-    <button class="linkbtn" id="bHowMenu">Cómo se juega</button>
+    <button class="linkbtn" id="bHowMenu">Cómo se juega</button><div class="ver" id="ver"></div>
   </div>
 </div>
 
-<!-- Opciones (pausa) -->
-<div class="modal" id="pause">
-  <div class="card sheet">
-    <div class="tag">PAUSA</div>
-    <h2>Opciones</h2>
-    <div class="pstat" id="pauseStat"></div>
-    <div class="stack">
-      <button class="primary big" id="pResume">Seguir jugando</button>
-      <button class="opt" id="pRestart"><span>↻ Reiniciar nivel</span><small id="restartCost"></small></button>
-      <button class="opt" id="pPaths"><span>Cambiar de camino</span></button>
-      <button class="opt dangerish" id="pQuit"><span>Terminar partida</span><small>Guarda tu récord</small></button>
-      <button class="opt" id="pSound"><span>🔊 Sonido: activado</span></button>
-      <button class="opt" id="pStory"><span>📖 Leer el libro de la aventura</span></button>
-      <button class="opt" id="pHow"><span>Cómo se juega</span></button>
-      <button class="opt install"><span>📲 Instalar app</span></button>
-    </div>
-    <div class="ver" id="ver"></div>
+<!-- Menú de pausa -->
+<div class="modal" id="pause" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
+ <div class="card pause-menu"><div class="tag">SLIDE &amp; SLAY</div><h2 id="pauseTitle">Pausa</h2><p class="pause-context" id="pauseContext"></p>
+  <div class="pause-actions">
+   <button class="primary" id="pResume"><span>Continuar</span><span aria-hidden="true">→</span></button>
+   <button id="pProgress"><span>Ver progreso</span><svg class="pause-icon" viewBox="0 0 28 28" aria-hidden="true"><path d="M5 21l8-14 10 14M5 21h18"/><circle cx="5" cy="21" r="2"/><circle cx="13" cy="7" r="2"/><circle cx="23" cy="21" r="2"/></svg></button>
+   <button id="pSound">Desactivar sonido</button>
+   <button class="pause-end" id="pQuit"><span>Terminar</span><svg class="pause-icon" viewBox="0 0 28 28" aria-hidden="true"><path d="M5 13L14 5l9 8v11H5V13Zm6 11v-8h6v8"/></svg></button>
   </div>
+ </div>
 </div>
 
 <!-- Confirmación personalizada -->
@@ -1314,7 +1319,13 @@ function applause(ms=6500){
   }catch(e){}
 }
 const vib=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
-function soundLabel(){const e=$('pSound');if(e)e.innerHTML=muted?'<span>🔇 Sonido: desactivado</span>':'<span>🔊 Sonido: activado</span>'}
+function soundLabel(){
+ const button=$('pSound');if(!button)return;
+ const label=muted?'Activar sonido':'Desactivar sonido';
+ const extra=muted?'<path d="m21 11 5 6m0-6-5 6"/>':'<path d="M21 10q6 4 0 8m3-11q9 7 0 14"/>';
+ button.innerHTML=`<span>${label}</span><svg class="pause-icon" viewBox="0 0 30 28" aria-hidden="true"><path d="M4 11h5l7-6v18l-7-6H4Z"/>${extra}</svg>`;
+ button.setAttribute('aria-pressed',String(!muted));button.setAttribute('aria-label',label);
+}
 function toggleSound(){
   muted=!muted;localStorage.setItem('desbloquea.mute',muted?'1':'0');soundLabel();
   if(muted)Music.stop(.2);
@@ -1567,7 +1578,7 @@ function renderStage(){                                   // barra de 10 tramos 
 }
 /* Mapa de zonas: se muestra al empezar un camino y al cambiar de zona (la llave roja viaja a la siguiente parada) */
 const ZDECO=[['🌳','🌼'],['🌊','⛵'],['🌵','🐪'],['🍁','🌲'],['🌆','✨'],['❄️','🏔️'],['🌸','⛩️'],['🌋','🔥'],['🪐','⭐'],['🏰','🚩']];
-function showMap(fromI,toI,{travel=false}={}){
+function showMap(fromI,toI,{travel=false,overview=false}={}){
  return new Promise(resolve=>{
   const el=$('journey'),svg=$('mapSvg'),NS='http://www.w3.org/2000/svg';
   const wide=innerWidth/innerHeight>1.3,W=wide?1000:480,H=wide?390:650;
@@ -1606,19 +1617,20 @@ function showMap(fromI,toI,{travel=false}={}){
   el.style.setProperty('--atlas-scene',`url("backgrounds/zone-${toI+1}.webp")`);
   $('mTag').textContent=travel?`EL ATLAS DE ${heroOf().name.toUpperCase()} · UN NUEVO HORIZONTE`:`EL ATLAS DE ${heroOf().name.toUpperCase()} · CIUDAD ${toI+1} DE 10`;
   $('mName').textContent=travel?`Hasta pronto, ${ZONES[fromI].n}`:ZONES[toI].n;
-  $('mSub').textContent=travel?CHAPTERS[fromI].end:`Diez puzles, una ciudad y un nuevo capítulo. Nivel ${run.level} de 100.`;
+  $('mSub').textContent=overview?`Nivel actual ${run.level} de 100 · Tramo ${zoneStep(run.level)} de 10 en esta ciudad`:travel?CHAPTERS[fromI].end:`Diez puzles, una ciudad y un nuevo capítulo. Nivel ${run.level} de 100.`;
+  el.setAttribute('role',overview?'dialog':'status');if(overview)el.setAttribute('aria-modal','true');else el.removeAttribute('aria-modal');el.setAttribute('aria-labelledby','mName');$('mapClose').hidden=!overview;
   el.classList.remove('out');el.classList.add('show');Music.duck(.35);
   let finished=false,frame=0,timer=0,ready=!travel;
-  const end=()=>{if(finished||!ready)return;finished=true;clearTimeout(timer);cancelAnimationFrame(frame);el.removeEventListener('pointerdown',end);el.removeEventListener('keydown',key);el.classList.add('out');setTimeout(()=>{el.classList.remove('show','out');Music.duck(1);resolve()},150)};
-  const key=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();end()}};
-  el.addEventListener('pointerdown',end);el.addEventListener('keydown',key);el.removeAttribute('tabindex');
+  const end=()=>{if(finished||!ready)return;finished=true;clearTimeout(timer);cancelAnimationFrame(frame);el.removeEventListener('pointerdown',end);el.removeEventListener('keydown',key);document.removeEventListener('keydown',key);el.classList.add('out');setTimeout(()=>{el.classList.remove('show','out');$('mapClose').hidden=true;Music.duck(1);resolve()},150)};
+  const key=e=>{if(overview){if(e.key==='Escape'){e.preventDefault();end()}else if(e.key==='Tab'){e.preventDefault();$('mapClose').focus()}}else if(e.key==='Enter'||e.key===' '){e.preventDefault();end()}};
+  if(!overview){el.addEventListener('pointerdown',end);el.addEventListener('keydown',key)}else document.addEventListener('keydown',key);el.removeAttribute('tabindex');$('mapClose').onclick=end;if(overview)$('mapClose').focus();
   if(travel){
    sfx.journey();const path=paths[fromI],length=path.getTotalLength(),t0=performance.now(),duration=matchMedia('(prefers-reduced-motion: reduce)').matches?0:1400;
    art.classList.add('walking');
    function step(t){const k=duration?Math.min(1,(t-t0)/duration):1,e=k*k*(3-2*k),p=path.getPointAtLength(length*e);place(p.x,p.y);
     if(k<1)frame=requestAnimationFrame(step);else{art.classList.remove('walking');applyZone(toI);cards[fromI].classList.remove('current');cards[fromI].querySelectorAll('text')[1].textContent='COMPLETADA';cards[fromI].querySelector('rect').setAttribute('stroke','#73bfaa');cards[toI].classList.remove('undiscovered');cards[toI].classList.add('current');const pic=cards[toI].querySelector('image');pic.setAttribute('opacity',1);cards[toI].querySelector('rect').setAttribute('stroke','#ffdb8f');const texts=cards[toI].querySelectorAll('text');texts[1].textContent='ESTÁS AQUÍ';$('mName').textContent=ZONES[toI].n;$('mSub').textContent=`${heroOf().name}: ${HERO_LORE[heroOf().id].quote}`;ready=true;timer=setTimeout(end,matchMedia('(prefers-reduced-motion: reduce)').matches?100:450);sfx.win()}}
    frame=requestAnimationFrame(step);
-  }else{applyZone(toI);sfx.start();timer=setTimeout(end,650)}
+  }else{applyZone(toI);if(!overview){sfx.start();timer=setTimeout(end,650)}}
  });
 }
 
@@ -1759,6 +1771,7 @@ function attach(el,i){
   });
 }
 function afterMove(){
+  if(!run||!G||G.done)return;
   updateHud();
   const prac=run.mode==='p';
   if(!prac&&G.moves>G.limit){fail('limit');return}
@@ -2089,10 +2102,9 @@ async function pickPath(s,mode){
 }
 /* ---------- Opciones (pausa) ---------- */
 function openPause(){
-  const p=pathOf(run.start),prac=run.mode==='p';
-  $('pauseStat').innerHTML=`<div><small>CAMINO</small><b style="color:${p.c}">${p.n}</b></div><div><small>NIVEL</small><b>${run.level}/100</b></div><div><small>${prac?'MODO':'PUNTOS'}</small><b>${prac?'Práctica':run.score.toLocaleString('de-DE')}</b></div>`;
-  $('restartCost').textContent=prac?'Gratis':'Cuenta 1 movimiento';
-  soundLabel();$('pause').classList.add('show');Music.muffle(true);
+ if(!run||!G||G.done)return;
+ $('pauseContext').textContent=`${heroOf().name} · Nivel ${run.level} de 100`;
+ soundLabel();$('pause').classList.add('show');Music.muffle(true);$('pResume').focus();
 }
 function closePause(){$('pause').classList.remove('show');Music.muffle(false)}
 function restartLevel(){
@@ -2104,25 +2116,21 @@ function restartLevel(){
 }
 $('bMenu').onclick=()=>{ if(busy)return; if(run&&G&&!G.done)openPause(); else openMenu(); };
 $('pResume').onclick=closePause;
-$('pRestart').onclick=async()=>{
-  const prac=run.mode==='p';
-  const ok=await ask({ico:'↻',title:'¿Reiniciar el nivel?',yes:'Reiniciar',no:'Cancelar',danger:!prac,
-    text:prac?'Las piezas vuelven a su posición inicial.':'Las piezas vuelven a su posición inicial, pero <b>los movimientos ya usados se conservan</b> y se suma 1 más.'});
-  if(ok){closePause();restartLevel()}
+$('pause').addEventListener('keydown',e=>{
+ if(e.key==='Escape'){e.preventDefault();closePause();return}
+ if(e.key!=='Tab')return;const buttons=[...$('pause').querySelectorAll('button')],first=buttons[0],last=buttons.at(-1);
+ if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+});
+$('pProgress').onclick=async()=>{
+ if(!run||!G||G.done)return;const session=run,wasBusy=busy;busy=true;$('pause').classList.remove('show');
+ const zone=zoneIdx(run.level);await showMap(zone,zone,{overview:true});busy=wasBusy;
+ if(run===session&&!G.done)openPause();
 };
-$('pPaths').onclick=()=>{$('pause').classList.remove('show');openMenu()};
-$('pQuit').onclick=async()=>{
-  const prac=run.mode==='p';
-  const ok=await ask({ico:'🏁',danger:true,yes:'Terminar',no:'Volver',title:'¿Terminar la partida?',
-    text:prac?'Se guarda tu nivel máximo y vuelves al menú.':`Se guarda tu récord (${run.score.toLocaleString('de-DE')} pts) y vuelves al menú.`});
-  if(!ok) return;
-  $('pause').classList.remove('show');
-  recordBest(true);store.run=null;persist();if(G)G.done=true;run=null;
-  Music.stop(.4);setTensionFx(0,false);openMenu();
+$('pQuit').onclick=()=>{
+ if(!run)return;recordBest(true);store.run=null;if(G)G.done=true;run=null;busy=false;persist();
+ $('pause').classList.remove('show');Music.stop(.2);setTensionFx(0,false);openMenu();
 };
 $('pSound').onclick=toggleSound;
-$('pStory').onclick=()=>{closePause();showStoryPage(run.level,true)};
-$('pHow').onclick=()=>$('how').classList.add('show');
 $('bHowMenu').onclick=()=>$('how').classList.add('show');
 $('howOk').onclick=()=>$('how').classList.remove('show');
 function openMenu(){
@@ -2148,7 +2156,7 @@ openMenu();
 /* ============================ PWA ============================ */
 // El récord y la partida en curso viven en localStorage; pedimos al navegador que no los borre
 if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{});
-const APP_VERSION='37';                      // debe coincidir con VERSION de sw.js (desbloquea-vNN)
+const APP_VERSION='38';                      // debe coincidir con VERSION de sw.js (desbloquea-vNN)
 $('ver').textContent='Versión '+APP_VERSION;
 let pendingWorker=null,updating=false;
 function showUpdate(w){pendingWorker=w;$('upd').classList.add('show');sfx.hint()}

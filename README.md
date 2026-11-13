@@ -1,6 +1,6 @@
-# Unblockme Roguelike
+# SLIDE & SLAY
 
-Juego de rompecabezas roguelike para navegador. Los archivos del juego están en la raíz para que GitHub Pages pueda servirlo directamente.
+Un puzle de bloques con tres héroes y cien niveles. Abre el camino entre las diez ciudades de Tri y devuelve la luz al Faro del Alba.
 
 ## Publicación
 

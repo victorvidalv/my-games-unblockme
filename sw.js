@@ -1,7 +1,7 @@
 /* Service worker: la app funciona sin conexión.
    ACTUALIZAR: al publicar cambios, sube VERSION aquí y APP_VERSION en index.html.
    El navegador detecta el cambio de este archivo y la app muestra el aviso «Nueva versión disponible». */
-const VERSION = 'desbloquea-v37';
+const VERSION = 'desbloquea-v38';
 const SHELL = [
   './', './index.html', './manifest.webmanifest',
   ...Array.from({length:10},(_,i)=>'./backgrounds/zone-'+(i+1)+'.webp'),
