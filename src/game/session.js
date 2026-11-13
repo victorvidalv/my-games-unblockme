@@ -5,11 +5,14 @@ import { ZONES, zoneIdx, zoneOf, zoneStep } from '../data/zones.js';
 import { $ } from '../dom.js';
 import { MAX_LEVEL, moveLimit, rateAt } from '../engine/difficulty.js';
 import { hash32 } from '../engine/rng.js';
+import { playSkipEffect } from '../ui/turns.js';
+import { startCoach } from '../ui/coach.js';
 import { buildLevel, pickBoard, varyBoard } from '../engine/levels.js';
 import levelBank from '../data/levels.json';
+import specialBank from '../data/special.json';
+import { BOSS_BOOST, BOSS_HINTS, BOSS_NAMES, levelPlan } from './mechanics.js';
 import { baseScore } from '../engine/scoring.js';
 import { canRescue, clearRewards, useRescue } from './heroes.js';
-import { hintMove } from '../engine/solver.js';
 import { S, gainNow, heroOf, persist, rkey, store, undosLeft } from '../state.js';
 import { boardEl, buildPieces, cellPx, fitBoard, recLine, syncRouteStyle, updateHud } from '../ui/board.js';
 import { isBonusLevel, showBonus } from '../ui/bonus.js';
@@ -21,7 +24,7 @@ import { openMenu } from '../ui/menu.js';
 import { heroArt, storyFor } from '../ui/story.js';
 export function saveRun(){
  if(S.run&&S.G&&!S.G.done&&S.G.n===S.run.level&&!S.run.pendingClear&&!S.run.rescue){
-  S.run.board={level:S.G.n,rate:S.G.rate,pieces:S.G.pieces.map(p=>({...p})),pos:S.G.pos.slice(),start:S.G.start.slice(),opt:S.G.opt,limit:S.G.limit,moves:S.G.moves,hist:S.G.hist.map(p=>p.slice()),colors:S.G.colors?.slice()};
+  S.run.board={level:S.G.n,rate:S.G.rate,pieces:S.G.pieces.map(p=>({...p})),walls:(S.G.walls||[]).map(w=>w.slice()),pos:S.G.pos.slice(),start:S.G.start.slice(),opt:S.G.opt,limit:S.G.limit,bought:S.G.bought||0,moves:S.G.moves,hist:S.G.hist.map(p=>p.slice()),colors:S.G.colors?.slice()};
  }
  store.run=S.run&&{...S.run};persist();
 }
@@ -39,14 +42,15 @@ export async function startLevel(){
   S.busy=true;
   const rate=rateAt(S.run.start,S.run.level);
   // Tablero precalculado para esta dificultad; el objetivo se desplaza según tu eficiencia (adaptativo)
-  const base=pickBoard(levelBank.ratings,rate,S.run.seed,S.run.level);
+  const plan=levelPlan(S.run.level);                               // ¿normal, con muros, candados, pesadas o jefe?
+  const base=pickBoard(levelBank.ratings,rate,S.run.seed,S.run.level,plan.family,specialBank);
   const board=varyBoard(base,rate,hash32(S.run.seed,S.run.level,7));   // variante propia de cada partida
-  const lvl=buildLevel(board,{rating:rate,adj:S.run.adj,brave:S.run.route==='brave'});
-  S.G={n:S.run.level,rate,pieces:lvl.pieces,pos:lvl.pos,start:lvl.pos.slice(),opt:lvl.opt,limit:moveLimit(lvl.opt),moves:0,hist:[],done:false,els:[]};
-  if(S.run.rescue&&S.run.rescue.level===S.run.level){const r=S.run.rescue;S.G={...S.G,rate:r.rate,pieces:r.pieces,pos:r.start.slice(),start:r.start.slice(),opt:r.opt,limit:moveLimit(r.opt)}}
+  const lvl=buildLevel(board,{rating:rate,adj:S.run.adj,brave:S.run.route==='brave',boost:plan.boss?BOSS_BOOST:0});
+  S.G={n:S.run.level,rate,pieces:lvl.pieces,pos:lvl.pos,walls:lvl.walls||[],start:lvl.pos.slice(),opt:lvl.opt,limit:moveLimit(lvl.opt),moves:0,hist:[],done:false,els:[],boss:plan.boss,plan,family:base.family};
+  if(S.run.rescue&&S.run.rescue.level===S.run.level){const r=S.run.rescue;S.G={...S.G,rate:r.rate,pieces:r.pieces,walls:(r.walls||[]).map(w=>w.slice()),pos:r.start.slice(),start:r.start.slice(),opt:r.opt,limit:moveLimit(r.opt)}}
   const saved=S.run.board;
   if(!S.run.rescue&&saved?.level===S.run.level&&saved.pieces?.length===saved.pos?.length&&saved.start?.length===saved.pos.length){
-   S.G={...S.G,rate:saved.rate,pieces:saved.pieces.map(p=>({...p})),pos:saved.pos.slice(),start:saved.start.slice(),opt:saved.opt,limit:saved.limit,moves:saved.moves||0,hist:(saved.hist||[]).map(p=>p.slice())};
+   S.G={...S.G,rate:saved.rate,pieces:saved.pieces.map(p=>({...p})),walls:(saved.walls||[]).map(w=>w.slice()),pos:saved.pos.slice(),start:saved.start.slice(),opt:saved.opt,limit:saved.limit,bought:saved.bought||0,moves:saved.moves||0,hist:(saved.hist||[]).map(p=>p.slice())};
   }
   S.G.colors=saved?.level===S.run.level&&saved.colors?saved.colors.slice():[0,1,2,3,4,5,6,7].sort(()=>Math.random()-.5);
   $('lvl').textContent=S.G.n;$('mn').textContent=S.G.opt;$('base').textContent=S.run.mode==='p'?'—':baseScore(S.G.rate);
@@ -61,14 +65,7 @@ export async function startLevel(){
   fitBoard();Music.setLevel(S.G.n,S.G.rate);setTensionFx(0,false);Music.duck(1);Music.muffle(false);Music.start();
   if(S.run.rescue){showRescue();return}
   S.busy=false;boardEl.classList.remove('board-lock');saveRun();banner();
-  if(!store.tutorial&&S.G.n===1){                      // primera vez: señala el primer movimiento
-    store.tutorial=true;persist();const g0=S.G;
-    setTimeout(()=>{ if(S.G!==g0||S.G.done||S.G.moves>0)return;
-      const h=hintMove(S.G.pieces,S.G.pos); if(!h)return;
-      const p=S.G.pieces[h.i],dir=p.o==='h'?(h.to>h.from?'derecha':'izquierda'):(h.to>h.from?'abajo':'arriba');
-      $('msg').textContent=`👆 Arrastra el bloque que brilla hacia ${dir}`;S.G.els[h.i].classList.add('hint');sfx.hint();
-    },2300);
-  }
+  startCoach();                                        // avisos y guía de los primeros niveles / mecánicas nuevas
 }
 function tipFor(g){
   if(heroOf().id==='jean'&&undosLeft()>0)return `↶ Jean puede deshacer ${undosLeft()} veces gratis en este tablero.`;
@@ -76,8 +73,8 @@ function tipFor(g){
   return t[(g.n*7)%t.length];
 }
 function banner(){
-  const b=$('banner'),z=zoneOf(S.G.n);b.querySelector('b').textContent='NIVEL '+S.G.n;
-  b.querySelector('span').textContent=`${z.e} ${z.n} · ${zoneStep(S.G.n)}/10`;
+  const b=$('banner'),z=zoneOf(S.G.n);b.querySelector('b').textContent=S.G.boss?'👑 JEFE':'NIVEL '+S.G.n;
+  b.querySelector('span').textContent=S.G.boss?BOSS_NAMES[zoneIdx(S.G.n)]:`${z.e} ${z.n} · ${zoneStep(S.G.n)}/10`;
   b.querySelector('.b2').textContent=`Mínimo ${S.G.opt} mov.`+(S.run.mode==='p'?'':` · Límite ${S.G.limit}`);
   b.classList.remove('go');void b.offsetWidth;b.classList.add('go');
 }
@@ -125,7 +122,8 @@ export function win(){
  const gain=gainNow(),previous=S.run.score;
  S.run.score+=gain.total;S.run.cleared=(S.run.cleared||0)+1;S.run.streak=gain.eff>=.9?(S.run.streak||0)+1:0;
  S.run.adj=Math.max(-2,Math.min(S.run.level<10?1:2,S.run.adj+(gain.eff>=.9?1:gain.eff<.4?-1:0)));
- clearRewards(heroOf().id,S.run,S.G.n);                       // +1 pista cada 5 niveles; Van +2 por ciudad
+ clearRewards(heroOf().id,S.run,S.G.n);
+ if(S.G.boss)S.run.hints+=BOSS_HINTS;                         // el jefe regala 2 pistas                       // +1 pista cada 5 niveles; Juth +2 por ciudad
  S.run.pendingClear={level:S.G.n,gain:gain.total,moves:S.G.moves,opt:S.G.opt,routeChosen:false};recordBest();saveRun();
  setTensionFx(0,false);Music.duck(.55);tone(523,.13,'sine',.06);tone(784,.18,'sine',.045,.08);
  S.G.els[0].classList.add('exit');S.G.els[0].style.left=7*cellPx()+'px';
@@ -138,7 +136,21 @@ export function win(){
  },reduce?100:650);
 }
 /* ---------- Derrota ---------- */
+/** Al pasarte del límite la aventura termina (la tienda se usa antes, no al perder). */
 export function fail(why){
+  if(S.G.done)return;
+  finalFail(why);
+}
+/** Saltar nivel (tienda): sin puntos, sin racha; avanza como si se hubiera superado. */
+export function skipLevel(){
+  if(!S.G||S.G.done)return;
+  S.G.done=true;S.busy=true;boardEl.classList.add('board-lock');
+  S.run.streak=0;S.run.pendingClear={level:S.G.n,gain:0,moves:S.G.moves,opt:S.G.opt,routeChosen:false,skipped:true};
+  recordBest();saveRun();setTensionFx(0,false);
+  $('msg').textContent='⏭ Nivel saltado. Sin puntos.';
+  playSkipEffect().then(()=>advanceClear());
+}
+function finalFail(why){
   if(S.G.done)return;
   if(canRescue(heroOf().id,S.run,S.run.mode)){useRescue(S.run,S.G);saveRun();showRescue();return}
   S.G.done=true;S.busy=true;boardEl.classList.add('board-lock');Music.stop(.25);setTensionFx(0,false);tone(220,.25,'sine',.045);S.G.els.forEach(el=>el.style.opacity='.5');

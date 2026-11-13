@@ -1,11 +1,14 @@
 import { setTensionFx } from '../audio/music.js';
 import { sfx, tone, vib } from '../audio/sound.js';
-import { slideRange, snapDrag } from '../engine/board.js';
+import { isLocked, slideRange, snapDrag } from '../engine/board.js';
 import { isWon, moveStatus, movesLeft } from '../engine/rules.js';
 import { $ } from '../dom.js';
 import { fail, saveRun, win } from '../game/session.js';
 import { S, gainNow, pathOf, rkey, store } from '../state.js';
+import { zoneIdx } from '../data/zones.js';
+import { coachOnMove } from './coach.js';
 import { updateHeroHud } from './heroes.js';
+import { renderTurns } from './turns.js';
 export const boardEl=$('board'), cellPx=()=>boardEl.clientWidth/6;
 /* Mide el espacio libre real y da al tablero el mayor tamaño posible (sin scroll) */
 export function fitBoard(){
@@ -33,13 +36,20 @@ export function fitBoard(){
 }
 addEventListener('resize',fitBoard);addEventListener('orientationchange',()=>setTimeout(fitBoard,200));
 if(window.visualViewport)visualViewport.addEventListener('resize',fitBoard);
+const LOCK_SVG='<svg class="lk shut" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><circle cx="12" cy="16" r="1.6" class="hole"/></svg>'
+  +'<svg class="lk free" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/><circle cx="12" cy="16" r="1.6" class="hole"/></svg>';
+const HEAVY_MARK='<span class="mk heavy" title="Pesada: 1 casilla"><b>1</b><i>⇄</i></span>';
 export function buildPieces(){
-  boardEl.querySelectorAll('.piece').forEach(e=>e.remove());
+  boardEl.querySelectorAll('.piece,.wall,.plate').forEach(e=>e.remove());
+  boardEl.dataset.city=zoneIdx(S.G.n);
+  S.G.gateLocked={};
+  S.G.wallEls=(S.G.walls||[]).map(()=>{const el=document.createElement('div');el.className='wall';el.innerHTML='<i></i>';boardEl.appendChild(el);return el});
+  S.G.plateEls=S.G.pieces.map(p=>{if(p.kind!=='gate')return null;const el=document.createElement('div');el.className='plate';el.innerHTML='<i></i>';boardEl.appendChild(el);return el});
   S.G.els=S.G.pieces.map((p,i)=>{
     const el=document.createElement('div');
-    el.className='piece enter '+p.o+' '+(i===0?'red':'c'+S.G.colors[i%8]);
+    el.className='piece enter '+p.o+' '+(i===0?'red':'c'+S.G.colors[i%8])+(p.kind?' '+p.kind:'');
     el.style.setProperty('--dl',(i*18)+'ms');
-    el.innerHTML='<div class="face"></div>';
+    el.innerHTML='<div class="face"></div>'+(p.kind==='gate'?'<span class="mk gate">'+LOCK_SVG+'</span>':p.kind==='heavy'?HEAVY_MARK:'');
     el.addEventListener('animationend',e=>{if(e.animationName==='enter')el.classList.remove('enter')});
     boardEl.appendChild(el);attach(el,i);return el;
   });
@@ -50,7 +60,27 @@ export function place(i,x=S.G.pos[i]){
   el.style.width=(p.o==='h'?p.len:1)*s+'px';el.style.height=(p.o==='v'?p.len:1)*s+'px';
   el.style.left=(p.o==='h'?x:p.fix)*s+'px';el.style.top=(p.o==='v'?x:p.fix)*s+'px';
 }
-export const layout=()=>S.G&&S.G.els.forEach((_,i)=>place(i));
+function placeStatic(){
+  const s=cellPx();
+  (S.G.walls||[]).forEach(([r,c],k)=>{const el=S.G.wallEls?.[k];if(!el)return;el.style.left=c*s+'px';el.style.top=r*s+'px';el.style.width=el.style.height=s+'px'});
+  S.G.pieces.forEach((p,i)=>{const el=S.G.plateEls?.[i];if(!el)return;el.style.left=p.plate[1]*s+'px';el.style.top=p.plate[0]*s+'px';el.style.width=el.style.height=s+'px'});
+}
+const flashEl=(el,cls,ms)=>{el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);setTimeout(()=>el.classList.remove(cls),ms)};
+/** Candados: se cierran o se abren según la placa; al abrirse suena y brilla. */
+export function syncSpecials(animate=true){
+  const G=S.G;if(!G||!G.plateEls)return;
+  G.pieces.forEach((p,i)=>{
+    if(p.kind!=='gate')return;
+    const locked=isLocked(G.pieces,G.pos,i,G.walls),el=G.els[i],plate=G.plateEls[i],was=G.gateLocked[i];
+    G.gateLocked[i]=locked;
+    el.classList.toggle('locked',locked);el.classList.toggle('open',!locked);plate.classList.toggle('on',!locked);
+    if(animate&&was!==undefined&&was!==locked){
+      if(!locked){sfx.unlock();vib([15,20,15]);flashEl(el,'just-open',900);flashEl(plate,'pulse',900);$('msg').textContent='🔓 ¡Candado abierto! Ya puedes moverla mientras la placa siga cubierta.'}
+      else{sfx.plate();$('msg').textContent='🔒 Sin nadie sobre la placa, el candado se cierra otra vez.'}
+    }
+  });
+}
+export const layout=()=>{if(!S.G)return;S.G.els.forEach((_,i)=>place(i));placeStatic();syncSpecials(false)};
 
 
 let activeDrag=null;                           // arrastre en curso: solo puede haber uno (evita dos dedos a la vez)
@@ -59,7 +89,11 @@ function attach(el,i){
     if(!S.G||S.G.done||S.busy) return;
     if(activeDrag) activeDrag.cancel();          // un arrastre anterior que no terminó nunca bloquea el tablero
     e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(_){}
-    const p=S.G.pieces[i],s=cellPx(),[lo,hi]=slideRange(S.G.pieces,S.G.pos,i),x0=S.G.pos[i],start=p.o==='h'?e.clientX:e.clientY;
+    const p=S.G.pieces[i],s=cellPx(),[lo,hi]=slideRange(S.G.pieces,S.G.pos,i,S.G.walls),x0=S.G.pos[i],start=p.o==='h'?e.clientX:e.clientY;
+    if(p.kind==='gate'&&isLocked(S.G.pieces,S.G.pos,i,S.G.walls)){      // candado cerrado: sacude, avisa y señala la placa
+      flashEl(el,'deny',450);flashEl(S.G.plateEls[i],'hint',1500);sfx.locked();vib([30,30,30]);
+      $('msg').textContent='🔒 Está atrapada. Cubre la placa ▣ con otra pieza para abrirla.';return;
+    }
     el.classList.remove('hint');el.classList.add('drag');let cur=x0,lastCell=x0,delta=0;
     const move=ev=>{
       if(ev.pointerId!==e.pointerId) return;
@@ -74,8 +108,8 @@ function attach(el,i){
       try{el.releasePointerCapture(e.pointerId)}catch(_){}
       el.classList.remove('drag');
       const x=commit&&S.G&&!S.G.done?snapDrag(x0,lo,hi,delta):x0;
-      if(x!==x0){S.G.hist.push(S.G.pos.slice());S.G.pos[i]=x;S.G.moves++;sfx.move();$('bUndo').disabled=false}
-      if(S.G&&S.G.els[i]===el) place(i);
+      if(x!==x0){S.G.hist.push(S.G.pos.slice());S.G.pos[i]=x;S.G.moves++;(p.kind==='heavy'?sfx.heavyMove:p.kind==='gate'?sfx.gateMove:sfx.move)();$('bUndo').disabled=false}
+      if(S.G&&S.G.els[i]===el){place(i);syncSpecials()}
       if(x!==x0) afterMove();
     };
     const handlers={pointermove:move,pointerup:ev=>{if(ev.pointerId===e.pointerId)end(true)},pointercancel:()=>end(true),lostpointercapture:()=>end(true)};
@@ -85,7 +119,7 @@ function attach(el,i){
 }
 function afterMove(){
   if(!S.run||!S.G||S.G.done)return;
-  updateHud();saveRun();
+  updateHud();saveRun();coachOnMove();
   const prac=S.run.mode==='p';
   const status=prac?'ok':moveStatus(S.G.moves,S.G.limit);
   if(status==='over'){fail('limit');return}
@@ -133,6 +167,7 @@ export function updateHud(){
   $('meter').classList.toggle('danger',!prac&&S.G.moves>=S.G.limit*.8);
   const panic=!prac&&!S.G.done&&S.G.moves>=S.G.limit&&S.G.pos[0]!==4, tn=(prac||S.G.done)?0:Math.max(0,Math.min(1,(S.G.moves/S.G.limit-.5)/.5));
   setTensionFx(tn,panic);
+  renderTurns();
 }
 
 /* ---------- Victoria de nivel ---------- */

@@ -42,7 +42,7 @@ export function showResult({ level, gain, moves, opt, previous, total, streakMul
     el.classList.toggle('perfect', perfect);
     $('resTitle').textContent = perfect ? '¡PERFECTO!' : '';
     $('resLevel').textContent = `NIVEL ${level} COMPLETADO`;
-    $('resLine').textContent = `${moves} movimientos · mínimo ${opt}` + (gain.routeBonus ? ` · ruta aventurera +${fmt(gain.routeBonus)}` : '');
+    $('resLine').textContent = `${moves} movimientos · mínimo ${opt}` + (gain.routeBonus ? ` · ruta aventurera +${fmt(gain.routeBonus)}` : '') + (gain.bossBonus ? ` · 👑 jefe +${fmt(gain.bossBonus)}` : '');
     $('resTotal').textContent = `Total ${fmt(total)} pts`;
     $('resBar').style.animationDuration = ms + 'ms';
     el.classList.remove('show');

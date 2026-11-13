@@ -7,6 +7,7 @@ import { fail, saveRun, startRun } from '../game/session.js';
 import { S, heroOf, persist, store, undosLeft } from '../state.js';
 import { layout, updateHud } from './board.js';
 import { burst } from './fx.js';
+import { openShop } from './shop.js';
 import { openMenu } from './menu.js';
 $('bAgain').onclick=()=>{$('over').classList.remove('show');store.mode=S.lastCfg.mode;persist();startRun(S.lastCfg.start,S.lastCfg.mode)};
 $('bToMenu').onclick=()=>{$('over').classList.remove('show');openMenu()};
@@ -21,9 +22,10 @@ $('bUndo').onclick=()=>{
   if(S.run.mode==='p'){}
   else if(moveStatus(S.G.moves,S.G.limit)==='over')fail('limit');else if(moveStatus(S.G.moves,S.G.limit)==='last')$('msg').textContent='⚠️ ÚLTIMO MOVIMIENTO: el siguiente te elimina.';
 };
+$('bShop').onclick=openShop;
 $('bHint').onclick=()=>{
   if(!S.G||S.G.done||S.busy||(S.run.mode!=='p'&&S.run.hints<=0))return;
-  const h=hintMove(S.G.pieces,S.G.pos);
+  const h=hintMove(S.G.pieces,S.G.pos,S.G.walls);
   if(!h){$('msg').textContent='No encuentro pista desde aquí.';return}
   if(S.run.mode!=='p'){S.run.hints--;saveRun();$('hintN').textContent=S.run.hints;$('bHint').disabled=S.run.hints<=0}
   const p=S.G.pieces[h.i],n=Math.abs(h.to-h.from);

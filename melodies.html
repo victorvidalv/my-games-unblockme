@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SLIDE &amp; SLAY · Melodías</title>
+<link rel="icon" type="image/png" href="/icons/icon-192.png">
+<style>
+  :root{color-scheme:dark;--bg:#10202b;--card:#17303d;--ink:#e9ddc3;--mut:#9fb1b8;--line:#ffffff18}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,sans-serif;padding:20px 14px 60px}
+  main{max-width:1100px;margin:0 auto}
+  h1{font:700 28px Georgia,serif;margin:0 0 4px}
+  p.lead{color:var(--mut);margin:0 0 18px}
+  .bar{position:sticky;top:0;z-index:5;display:flex;gap:10px;align-items:center;padding:10px 0;background:linear-gradient(var(--bg) 80%,#0000)}
+  button{font:inherit;font-weight:700;color:var(--ink);background:#2b3b46;border:1px solid var(--line);border-radius:9px;padding:8px 14px;cursor:pointer}
+  button:hover{background:#34495a}button.on{background:#b66a53;border-color:#e0907a;color:#fff5e3}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:0 0 16px}
+  .head{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .head h2{font-size:19px;margin:0}.head small{color:var(--mut)}
+  .head .sp{flex:1}
+  .meta{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+  .tag{font-size:12px;padding:2px 9px;border-radius:99px;background:#ffffff10;color:var(--mut)}
+  .chords{display:grid;grid-template-columns:repeat(16,1fr);gap:2px;margin:8px 0 4px;font-size:11px;text-align:center}
+  .chords span{background:#ffffff0d;border-radius:4px;padding:2px 0;white-space:nowrap;overflow:hidden}
+  .chords span.hit{background:#ffd98a33;color:#ffd98a}
+  .roll{position:relative}
+  svg{width:100%;height:auto;display:block;border-radius:8px;background:#0c1820}
+  .cursor{position:absolute;top:0;bottom:0;width:2px;background:#ffd98a;box-shadow:0 0 8px #ffd98a;pointer-events:none;display:none}
+  .legend{color:var(--mut);font-size:12px;margin-top:6px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Melodías de SLIDE &amp; SLAY</h1>
+  <p class="lead">Una por ciudad, más el menú y la elección de héroe. Pulsa <b>▶ Escuchar</b> para oírla con el mismo motor del juego. Cada recuadro del piano muestra la melodía (16 compases); arriba, los acordes.</p>
+  <div class="bar"><button id="stop">■ Parar todo</button><span id="now" class="tag">Nada sonando</span></div>
+  <div id="list"></div>
+  <button id="audioRecover" hidden></button>
+</main>
+<script type="module" src="/src/tools/melodies.js"></script>
+</body>
+</html>

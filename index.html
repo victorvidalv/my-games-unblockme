@@ -30,8 +30,9 @@
   <div class="meter" id="meter">
     <div class="hero-hud"><img id="heroHudImg" alt="" width="30" height="34"><b id="heroHudName"></b><span id="heroHudPower"></span></div>
     <div class="route-status" id="routeStatus"><span id="routeIcon" aria-hidden="true">🌿</span><strong id="routeName">RUTA TRANQUILA</strong><small id="routeScope">NIV. 1–10</small><span class="route-reward" id="routeReward">Normal</span></div>
-    <div class="mrow"><span>Movimientos <b id="mv">0</b></span><span>Mínimo <b id="mn" style="font-size:14px">–</b> · Límite <b id="lim" style="font-size:14px">–</b></span></div>
+    <div class="mrow"><span>Movimientos <b id="mv">0</b></span><span>Mínimo <b id="mn" style="font-size:14px">–</b> · Límite <b id="lim" style="font-size:14px">–</b> · Restan <b id="left" style="font-size:14px">–</b></span></div>
     <div class="bar"><i id="fill"></i><u></u></div>
+    <div class="bought" id="bought" hidden><span class="bl">❄ TURNOS COMPRADOS</span><span class="pips" id="boughtPips"></span><span class="bq">quedan <b id="boughtLeft">0</b></span></div>
     <div class="pot"><span>Base <b id="base">0</b></span><span>Premio posible <b id="pot">+0</b></span></div>
   </div>
 
@@ -41,10 +42,12 @@
   </div>
 
   <div class="hint-text" id="msg"></div>
+  <div class="legend" id="legend"></div>
 
   <div class="controls">
     <button id="bUndo">↶ Deshacer <em>+1 mov</em></button>
     <button id="bHint">Pista <span class="badge" id="hintN">3</span></button>
+    <button id="bShop" aria-label="Tienda">🛒 <span>Tienda</span></button>
   </div>
 </div>
 
@@ -86,6 +89,8 @@
   <button class="updx" id="updNo" aria-label="Más tarde">✕</button>
 </div>
 <div id="result" role="status"><div class="res-card"><small id="resLevel"></small><strong id="resTitle"></strong><b id="resPts">+0</b><span id="resLine"></span><em id="resTotal"></em><i class="res-bar"><u id="resBar"></u></i><small class="res-skip">Toca para continuar</small></div></div>
+<div id="rewindFx" aria-hidden="true"><span>↺</span><i></i></div>
+<div id="skipFx" aria-hidden="true"><div class="chev"><b>»</b><b>»</b><b>»</b></div><strong>NIVEL SALTADO</strong><small>Sin puntos · sin racha</small></div>
 <div id="perfect"><div class="rays"></div><div class="glow"></div><b>¡PERFECTO!</b><div class="stars">★ ★ ★</div><span id="perfectSub"></span></div>
 
 <!-- Menú -->
@@ -102,7 +107,7 @@
       <button id="bResume" style="display:none">↩ Volver al juego</button>
       <button class="install optb">📲 Instalar app</button>
     </div>
-    <button class="linkbtn" id="bHowMenu">Cómo se juega</button><div class="ver" id="ver"></div>
+    <div class="ver" id="ver"></div>
   </div>
 </div>
 
@@ -119,6 +124,34 @@
  </div>
 </div>
 
+<!-- Tienda: escena con el fondo y el mercader (los textos y las ayudas se dibujan encima) -->
+<div class="modal" id="shop" role="dialog" aria-modal="true" aria-labelledby="shopTitle">
+  <div class="shop-world">
+    <div class="shop-scene">
+      <img class="shop-bg" src="/tienda/fondo-tienda.webp" alt="" draggable="false">
+      <h2 class="shop-sign" id="shopTitle">Tienda de Don Dublón</h2>
+      <div class="shop-list" id="shopList"></div>
+      <div class="shop-merchant" id="merchant"><img src="/heroes/vendedor.webp" alt="Don Dublón, el mercader" draggable="false"></div>
+      <div class="shop-bubble" id="shopBubble" aria-live="polite"></div>
+      <div class="shop-counter">
+        <div class="shop-wallet"><span class="coin" aria-hidden="true"></span><span><small>TUS PUNTOS</small><b id="shopScore">0</b></span></div>
+        <button id="shopClose" class="primary">Salir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Guía: avisos de los primeros niveles y de cada pieza nueva -->
+<div class="modal" id="coach" role="dialog" aria-modal="true" aria-labelledby="coachTitle">
+  <div class="card coach-card">
+    <div class="coach-demo" id="coachDemo" aria-hidden="true"></div>
+    <div class="tag" id="coachTag"></div>
+    <h2 id="coachTitle"></h2>
+    <p id="coachText"></p>
+    <button class="primary" id="coachOk">Entendido</button>
+  </div>
+</div>
+
 <!-- Confirmación personalizada -->
 <div class="modal" id="ask">
   <div class="card askcard">
@@ -129,21 +162,6 @@
   </div>
 </div>
 
-<!-- Cómo se juega -->
-<div class="modal" id="how">
-  <div class="card sheet">
-    <div class="tag">AYUDA</div>
-    <h2>Cómo se juega</h2>
-    <div class="rules">
-      <div>🎯 <span>Desliza los bloques y saca la <b>llave roja</b> por la salida de la derecha.</span></div>
-      <div>🗺️ <span>Elige un camino: <b>Normal</b>, <b>Difícil</b> o <b>Experto</b>. Cada uno tiene 100 niveles que suben de dificultad.</span></div>
-      <div>🏆 <span><b>Aventura:</b> ganas puntos por nivel. Pierdes puntos por cada movimiento sobre el mínimo. Jugar perfecto da bonus y rachas.</span></div>
-      <div>💀 <span>En Desafío, si usas <b>más del doble</b> del mínimo, la partida termina.</span></div>
-      <div>🎁 <span>Cada <b>12 niveles</b> hay una <b>fase bonus</b>: voltea cartas y encuentra 3 iguales para ganar pistas (¡cuidado con el enemigo!).</span></div>
-    </div>
-    <button class="primary big" id="howOk" style="width:100%">Entendido</button>
-  </div>
-</div>
 
 <!-- Nivel superado -->
 <!-- Parada sorpresa: uno de tres minijuegos, siempre con Lía. -->

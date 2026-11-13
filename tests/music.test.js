@@ -83,10 +83,10 @@ describe('temas musicales', () => {
     expect(new Set(ZONE_THEMES.map((t) => t.leadVoice)).size).toBeGreaterThanOrEqual(6);
   });
 
-  it('son alegres y bailables: tempo entre 84 y 124, con swing y mayoría de escalas luminosas', () => {
+  it('son alegres y bailables: tempo entre 100 y 136, con swing y mayoría de escalas luminosas', () => {
     for (const th of ALL_THEMES) {
-      expect(th.bpm, th.name).toBeGreaterThanOrEqual(84);
-      expect(th.bpm, th.name).toBeLessThanOrEqual(124);
+      expect(th.bpm, th.name).toBeGreaterThanOrEqual(100);
+      expect(th.bpm, th.name).toBeLessThanOrEqual(136);
       expect(th.swing, th.name).toBeGreaterThan(0);
       expect(th.swing, th.name).toBeLessThanOrEqual(0.33);
     }

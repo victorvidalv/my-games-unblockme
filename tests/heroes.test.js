@@ -81,7 +81,7 @@ describe('Jean · tres pasos atrás', () => {
   });
 });
 
-describe('pistas · Van y recompensas de nivel', () => {
+describe('pistas · Juth y recompensas de nivel', () => {
   it('todos ganan +1 pista cada 5 niveles', () => {
     for (const hero of ['lia', 'jean', 'van']) {
       const run = newRun({ hints: 0 });
@@ -90,17 +90,17 @@ describe('pistas · Van y recompensas de nivel', () => {
       expect(run.hints).toBe(1);
     }
   });
-  it('Van gana +2 más al completar cada ciudad (10, 20, … 100), una sola vez', () => {
+  it('Juth gana +2 más al completar cada ciudad (10, 20, … 100), una sola vez', () => {
     const run = newRun({ hints: 0 });
-    expect(clearRewards('van', run, 10)).toBe(3); // 1 (cada 5) + 2 (Van)
-    expect(clearRewards('van', run, 10)).toBe(1); // repetir el nivel 10 no duplica el bono de Van
+    expect(clearRewards('van', run, 10)).toBe(3); // 1 (cada 5) + 2 (Juth)
+    expect(clearRewards('van', run, 10)).toBe(1); // repetir el nivel 10 no duplica el bono de Juth
     expect(run.vanAwardedAt).toBe(10);
     let total = 0;
     for (let l = 11; l <= 100; l++) total += clearRewards('van', run, l);
     // niveles 15,25,…,95 (9) + múltiplos de 10 de 20 a 100 (9) × 3 = pistas
     expect(total).toBe(9 * 1 + 9 * 3);
   });
-  it('Lía y Jean no reciben el bono de Van', () => {
+  it('Lía y Jean no reciben el bono de Juth', () => {
     for (const hero of ['lia', 'jean']) expect(clearRewards(hero, newRun({ hints: 0 }), 10)).toBe(1);
   });
 });

@@ -1,9 +1,10 @@
-import { sfx, tone } from '../audio/sound.js';
+import { sfx, tone, vib } from '../audio/sound.js';
 import { HERO_TALK } from '../data/story.js';
 import { ZONES, zoneIdx } from '../data/zones.js';
 import { $ } from '../dom.js';
 import { saveRun } from '../game/session.js';
 import { S, heroOf } from '../state.js';
+import { catchPrize, pickBonusKind } from '../game/minigames.js';
 import { heroMarkup } from './heroes.js';
 
 function runeIcon(index){
@@ -25,7 +26,7 @@ const REEL_SYMBOLS=['Llave','Llama','Luna'];
 const bonusDelay=ms=>new Promise(r=>setTimeout(r,matchMedia('(prefers-reduced-motion: reduce)').matches?Math.min(ms,100):ms));
 function slotPrize(symbols){const n=Math.max(...REEL_SYMBOLS.map((_,i)=>symbols.filter(v=>v===i).length));return n===3?3:n===2?1:0}
 function createBonusPlan(){
- const kind=['cards','wheel','slots'][Math.floor(Math.random()*3)];
+ const kind=pickBonusKind();
  const deck=[0,0,0,1,1,1,2,2,2];for(let i=8;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}
  return {kind,deck,opened:[],wheel:Math.floor(Math.random()*8),reels:Array.from({length:3},()=>Math.floor(Math.random()*3))};
 }
@@ -35,16 +36,16 @@ export async function showBonus(){
  return new Promise(resolve=>{
   const plan=S.run.bonusPlan||(S.run.bonusPlan=createBonusPlan());saveRun();
   const m=$('bonus'),stage=$('bStage'),go=$('bGo'),action=$('bAction'),result=$('bRes');
-  const titles={cards:'Las cartas del umbral',wheel:'La rueda de los sellos',slots:'El altar de los ecos'};
-  const lines={cards:'Busca tres símbolos iguales. El primer trío decide tu premio.',wheel:'Gira una vez. La marca roja señala tu premio en pistas.',slots:'Tres amuletos iguales: +3 pistas. Dos iguales: +1. Todos distintos: 0.'};
+  const titles={cards:'Las cartas del umbral',wheel:'La rueda de los sellos',slots:'El altar de los ecos',catch:'Las luciérnagas del camino'};
+  const lines={cards:'Busca tres símbolos iguales. El primer trío decide tu premio.',wheel:'Gira una vez. La marca roja señala tu premio en pistas.',slots:'Tres amuletos iguales: +3 pistas. Dos iguales: +1. Todos distintos: 0.',catch:'Toca las luciérnagas antes de que se escapen. ¡Las doradas valen 3!'};
   const zone=zoneIdx(Math.max(1,S.run.level-1));m.style.setProperty('--bonus-scene',`url("backgrounds/zone-${zone+1}.webp")`);m.dataset.game=plan.kind;
   $('bTag').textContent=`UN DESCANSO · ${ZONES[zone].n.toUpperCase()}`;
   $('bTitle').textContent=titles[plan.kind];$('bSub').textContent=lines[plan.kind];
   $('bHero').innerHTML=heroMarkup(heroOf(),'story');$('bSpeech').textContent=HERO_TALK[heroOf().id].bonus[plan.kind];
   $('bHints').textContent=S.run.hints;result.innerHTML='';result.className='bres';stage.innerHTML='';stage.className='bonus-stage '+plan.kind;
   go.hidden=true;go.style.display='none';go.disabled=false;action.hidden=plan.kind==='cards';action.disabled=false;
-  action.textContent=plan.kind==='wheel'?'Girar la rueda':'Escuchar los ecos';
-  $('bLegend').innerHTML=plan.kind==='cards'?'<span>Llaves: +1</span><span>Llamas: +3</span><span>Lunas: 0</span>':plan.kind==='wheel'?'<span>Premios: 0, 1, 2 o 3 pistas</span>':'<span>Tres iguales: +3</span><span>Dos iguales: +1</span>';
+  action.textContent=plan.kind==='wheel'?'Girar la rueda':plan.kind==='catch'?'¡Empezar a cazar!':'Escuchar los ecos';
+  $('bLegend').innerHTML=plan.kind==='cards'?'<span>Llaves: +1</span><span>Llamas: +3</span><span>Lunas: 0</span>':plan.kind==='wheel'?'<span>Premios: 0, 1, 2 o 3 pistas</span>':plan.kind==='catch'?'<span>6 luces: +1</span><span>12: +2</span><span>18: +3</span>':'<span>Tres iguales: +3</span><span>Dos iguales: +1</span>';
   let locked=plan.prize!==undefined;
   async function finish(prize,restore=false){
    locked=true;plan.prize=prize;saveRun();action.disabled=true;action.hidden=true;
@@ -64,6 +65,25 @@ export async function showBonus(){
      if(count===2){$('bSpeech').textContent='«¡Ya hay dos iguales! Falta una…»';cards.forEach((c,k)=>{if(plan.opened.includes(k)&&plan.deck[k]===ty)c.classList.add('pair')})}
      if(count===3){locked=true;cards.forEach((c,k)=>c.classList.add(plan.deck[k]===ty?'winc':'dim'));finish(P.v)}
     };return b});
+  }else if(plan.kind==='catch'){
+   stage.innerHTML='<div class="catch-field" id="cField"><div class="catch-hud"><span>⏱ <b id="cTime">10</b> s</span><span>✦ <b id="cScore">0</b></span></div><div class="catch-bar"><i id="cBar"></i></div></div>';
+   const field=$('cField');
+   if(locked){field.insertAdjacentHTML('beforeend',`<div class="catch-end">Cazaste ${plan.score||0} ✦</div>`);$('cScore').textContent=plan.score||0}
+   action.onclick=()=>{
+    if(locked)return;locked=true;action.hidden=true;let score=0,left=10;$('bSpeech').textContent=HERO_TALK[heroOf().id].bonus.catch;sfx.start();
+    const DURATION=10000,t0=performance.now();field.classList.add('playing');
+    const spawn=()=>{
+     const f=document.createElement('button'),gold=Math.random()<.14;f.type='button';f.className='ff'+(gold?' gold':'');f.setAttribute('aria-label',gold?'Luciérnaga dorada: 3 puntos':'Luciérnaga');
+     f.style.left=(8+Math.random()*78)+'%';f.style.setProperty('--t',(2.1+Math.random()*1.3)+'s');f.style.setProperty('--dx',(Math.random()*60-30)+'px');f.innerHTML=gold?'★':'✦';
+     f.onpointerdown=e=>{e.preventDefault();if(f.classList.contains('caught'))return;f.classList.add('caught');score+=gold?3:1;$('cScore').textContent=score;
+      tone(gold?1175:700+Math.min(score,20)*28,gold?.22:.09,gold?'triangle':'sine',gold?.09:.06);if(gold){tone(1568,.25,'sine',.06,.08);vib(15)}setTimeout(()=>f.remove(),320)};
+     f.addEventListener('animationend',e=>{if(e.animationName==='ff-rise')f.remove()});field.appendChild(f);
+    };
+    spawn();const spawner=setInterval(spawn,320+Math.random()*60);
+    const clock=setInterval(()=>{const used=performance.now()-t0;left=Math.max(0,Math.ceil((DURATION-used)/1000));$('cTime').textContent=left;$('cBar').style.width=Math.min(100,used/DURATION*100)+'%';
+     if(used>=DURATION){clearInterval(clock);clearInterval(spawner);field.classList.remove('playing');field.querySelectorAll('.ff').forEach(e=>e.remove());plan.score=score;
+      field.insertAdjacentHTML('beforeend',`<div class="catch-end">¡Cazaste ${score} ✦!</div>`);finish(catchPrize(score))}},100);
+   };
   }else if(plan.kind==='wheel'){
    const colors=['#314b4e','#283f49','#474b50','#29464a','#765545','#33444a','#46544e','#2c424b'];let sectors='';
    const point=(r,a)=>[160+r*Math.cos(a*Math.PI/180),160+r*Math.sin(a*Math.PI/180)];

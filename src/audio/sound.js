@@ -36,6 +36,11 @@ export const sfx={
     [1760,2349,2637,3136].forEach((f,i)=>tone(f,.18,'triangle',.05,.5+i*.09));tone(196,.5,'sine',.05,0,30)},
   fail:()=>{tone(260,.7,'triangle',.07,0,-140);tone(130,.8,'sine',.05,.1,-50)},
   hint:()=>{tone(880,.2,'sine',.1);tone(1320,.3,'sine',.08,.08)},
+  gateMove:()=>{tone(740,.07,'square',.045);tone(520,.1,'triangle',.06,.05);tone(1480,.05,'sine',.03,.02)},          // metal: clic de cerradura y deslizar
+  heavyMove:()=>{tone(95,.16,'triangle',.13);tone(70,.22,'sine',.1,.04,-25);tone(190,.06,'square',.04)},                  // golpe sordo y grave
+  unlock:()=>{[523,784,1047,1568].forEach((f,i)=>tone(f,.16,'triangle',.09,i*.05));tone(1976,.3,'sine',.06,.2)},
+  locked:()=>{tone(150,.18,'square',.06);tone(120,.22,'square',.05,.1)},
+  plate:()=>{tone(330,.1,'triangle',.08);tone(494,.14,'triangle',.07,.07)},
   start:()=>{tone(330,.12,'triangle',.08);tone(494,.18,'triangle',.08,.08)},
   warn:()=>tone(220,.16,'sine',.04),
   fanfare:()=>{[523,659,784,1047,1319,1568,2093].forEach((f,i)=>tone(f,.45,'sine',.12,i*.11));[523,659,784,1047].forEach(f=>tone(f,1.6,'triangle',.07,.85))},

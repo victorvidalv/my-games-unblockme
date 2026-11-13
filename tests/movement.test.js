@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import bank from '../src/data/levels.json';
 import {
-  N, decodeBoard, decode, isValidState, occupancy, slideRange, snapDrag, DRAG_MIN, expand, analyze,
-  buildLevel, mulberry32, curve,
+  N, decodeBoard, decode, isValidState, slideRange, snapDrag, DRAG_MIN, expand, analyze,
+  buildLevel, mulberry32, curve, minReach,
 } from '../src/engine/index.js';
 
 /** Para cada pieza, el rango [mín, máx] que resulta de los movimientos que permite el solver. */
@@ -25,9 +25,8 @@ describe('movilidad de las piezas', () => {
       const an = analyze(lvl.pieces, lvl.pos, 600000);
       for (const k of an.list.slice(0, 400)) {
         const pos = decode(k, lvl.pieces.length);
-        const g = occupancy(lvl.pieces, pos);
         const expected = solverRanges(lvl.pieces, pos);
-        lvl.pieces.forEach((_, i) => expect(slideRange(lvl.pieces, pos, i, g), `dif ${rating} pieza ${i}`).toEqual(expected[i]));
+        lvl.pieces.forEach((_, i) => expect(slideRange(lvl.pieces, pos, i), `dif ${rating} pieza ${i}`).toEqual(expected[i]));
       }
     }
   });
@@ -68,7 +67,8 @@ describe('movilidad de las piezas', () => {
       const lvl = buildLevel(decodeBoard(bank.ratings[rating - 1][2]), { rating, rng: mulberry32(rating) });
       const movable = lvl.pieces.filter((_, i) => { const [lo, hi] = slideRange(lvl.pieces, lvl.pos, i); return hi > lo; });
       expect(movable.length, `dif ${rating}`).toBeGreaterThan(0);
-      expect(lvl.opt).toBe(curve(rating).target);
+      expect(lvl.opt).toBeLessThanOrEqual(curve(rating).target);
+      expect(lvl.opt).toBeGreaterThanOrEqual(minReach(rating)); // en las dificultades más altas el banco admite hasta 3 menos
     }
   });
 });

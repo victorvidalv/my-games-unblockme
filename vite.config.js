@@ -11,7 +11,11 @@ const base = process.env.BASE_PATH || './';
 export default defineConfig({
   base,
   define: { __APP_VERSION__: JSON.stringify(pkg.version.split('.')[0]) },
-  build: { target: 'es2022', chunkSizeWarningLimit: 600 },
+  build: {
+    target: 'es2022',
+    chunkSizeWarningLimit: 600,
+    rollupOptions: { input: { main: 'index.html', melodies: 'melodies.html' } }, // melodies.html: visor de las melodías
+  },
   plugins: [
     VitePWA({
       strategies: 'injectManifest',

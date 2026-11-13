@@ -15,10 +15,11 @@ import { curve, minReach } from './difficulty.js';
  * @param {object} [opts]
  * @param {number} [opts.goalIters=60]    iteraciones para buscar margen extra (target+3)
  * @param {number} [opts.maxIters=20000]  tope duro de iteraciones
+ * @param {number} [opts.walls=0]         muros sueltos que lleva el tablero (familia «muros»)
  * @returns {{pieces, pos, maxd, target, reached:boolean, iters:number}}
  *   pos = estado más lejano de la victoria encontrado; reached = maxd >= target.
  */
-export function generateBoard(rating, seed, { goalIters = 60, maxIters = 20000 } = {}) {
+export function generateBoard(rating, seed, { goalIters = 60, maxIters = 20000, walls: wallCount = 0 } = {}) {
   const c = curve(rating);
   const floor = minReach(rating);
   const goal = c.target + 3;
@@ -31,8 +32,8 @@ export function generateBoard(rating, seed, { goalIters = 60, maxIters = 20000 }
   while (iters < maxIters) {
     iters++;
     if (!cur) {
-      const b = randomBoard(rng, c.others, c.pLong);
-      const an = analyze(b.pieces, b.pos);
+      const b = randomBoard(rng, c.others, c.pLong, wallCount);
+      const an = analyze(b.pieces, b.pos, 300000, b.walls);
       if (an) {
         cur = b;
         curM = maxDistance(an);
@@ -40,7 +41,7 @@ export function generateBoard(rating, seed, { goalIters = 60, maxIters = 20000 }
       }
     } else {
       const b = mutate(cur, rng, c.pLong);
-      const an = b && analyze(b.pieces, b.pos);
+      const an = b && analyze(b.pieces, b.pos, 300000, b.walls);
       if (an) {
         const m = maxDistance(an);
         if (m > curM) stall = 0;
@@ -56,7 +57,7 @@ export function generateBoard(rating, seed, { goalIters = 60, maxIters = 20000 }
         stall = 0;
       }
     }
-    if (cur && (!best || curM > best.maxd)) best = { pieces: cur.pieces, pos: cur.farthest, maxd: curM };
+    if (cur && (!best || curM > best.maxd)) best = { pieces: cur.pieces, pos: cur.farthest, walls: cur.walls || [], maxd: curM };
     if (best && best.maxd >= goal) break;
     if (best && best.maxd >= floor && iters >= goalIters) break;
   }

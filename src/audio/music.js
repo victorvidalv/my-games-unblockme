@@ -48,6 +48,10 @@ export const Music=(()=>{
         osc('triangle',f,t,duration,volume,.055,1100);osc('sine',f*2,t,duration*.8,volume*.08,.06,2600);break;
       case 'brass':
         osc('sawtooth',f,t,duration,volume*.55,.035,1700);osc('triangle',f/2,t,duration,volume*.45,.04,900);break;
+      case 'fiddle':                                              // violín folk: sierra suave con ataque de arco
+        osc('sawtooth',f,t,duration,volume*.5,.05,2300,-5);osc('sawtooth',f,t,duration,volume*.3,.05,2300,7);break;
+      case 'synth':
+        osc('triangle',f,t,duration,volume*.7,.02,2400);osc('square',f,t,duration*.7,volume*.18,.02,1800,3);break;
       case 'strings':
         osc('sawtooth',f,t,duration*.9,volume*.55,.045,1500,-6);osc('sawtooth',f,t,duration*.9,volume*.55,.045,1500,6);break;
       case 'guitar':                                              // cuerda de nailon: ataque rápido, caída corta
@@ -79,8 +83,58 @@ export const Music=(()=>{
   const bpm=()=>tempoNow;
   const noteOf=(th,deg)=>{const s=SC[th.sc],n=s.length;return th.root+s[((deg%n)+n)%n]+12*Math.floor(deg/n)};
 
-  /* Pasos donde suena el «comping» (acordes de acompañamiento) según el estilo */
-  const COMP={charleston:[0,6],offbeat:[4,12],oompah:[4,12],strum:[0,6,10],arp:[],none:[]};
+  /* ---------- Batería: cada «groove» es una lista de pasos (0-15) por instrumento ---------- */
+  const kick=(t,v)=>{const o=AC.createOscillator(),g=AC.createGain(),q=AC.createBiquadFilter();q.type='lowpass';q.frequency.value=240;
+    o.frequency.setValueAtTime(135,t);o.frequency.exponentialRampToValueAtTime(48,t+.09);
+    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+.2);
+    o.connect(q);q.connect(g);g.connect(bus);o.start(t);o.stop(t+.22)};
+  const snare=(t,v)=>{noise(t,.13,v,1900,'bandpass');osc('triangle',190,t,.07,v*.7,.002)};
+  const rim=(t,v)=>{noise(t,.03,v,2600,'bandpass');osc('triangle',950,t,.02,v*.5,.001)};
+  const conga=(t,v,f=330)=>osc('sine',f,t,.1,v,.002,1200);
+  const GROOVES={
+    pop:    {k:[0,8],         s:[4,12],       h:[0,2,4,6,8,10,12,14]},
+    polka:  {k:[0,8],         s:[4,12],       tm:[2,6,10,14],h:[0,4,8,12]},
+    latin:  {k:[0,6,8,14],    rim:[0,3,6,10,12], cg:[2,4,10,14],sh:[0,2,4,6,8,10,12,14]},
+    shuffle:{k:[0,8],         s:[4,12],       tm:[0,2,4,6,8,10,12,14]},
+    disco:  {k:[0,4,8,12],    s:[4,12],       oh:[2,6,10,14],h:[0,1,3,4,5,7,8,9,11,12,13,15]},
+    soft:   {k:[0,10],        rim:[4,12],     sh:[0,2,4,6,8,10,12,14]},
+    bossa:  {k:[0,6,8,14],    rim:[0,3,6,10,12], sh:[0,2,4,6,8,10,12,14]},
+    march:  {k:[0,3,8,11],    s:[4,12,14],    h:[0,2,4,6,8,10,12,14]},
+    chill:  {k:[0,10],        s:[4,12],       h:[0,2,4,6,8,10,12,14],rd:[0,6]},
+    bigband:{k:[0,4,8,12],    s:[10],         rd:[0,4,6,8,12,14]},
+    drive:  {k:[0,4,8,12],    s:[4,12],       h:[0,2,3,4,6,7,8,10,11,12,14,15]},
+  };
+  const KV={k:.085,s:.055,rim:.03,h:.013,oh:.022,sh:.01,tm:.02,rd:.013,cg:.05};
+  function drums(th,st,t,bar,E){
+    const g=GROOVES[th.groove]||GROOVES.pop,has=a=>a&&a.includes(st);
+    const fill=bar%4===3&&st>=13;                                  // redoble al final de cada frase
+    if(has(g.k)&&!(fill&&st>=14))kick(t,P?.11:KV.k);
+    if(has(g.s)&&!(fill&&st>=13))snare(t,KV.s);
+    if(fill)snare(t,.03+.012*(st-13));
+    if(has(g.rim))rim(t,KV.rim);
+    if(has(g.h))noise(t,.035,st%4===2?KV.h*1.3:KV.h,7000);
+    if(has(g.oh))noise(t,.16,KV.oh,6000);
+    if(has(g.sh))noise(t,.05,st%4===2?KV.sh*1.5:KV.sh,5200);
+    if(has(g.tm)){noise(t,.09,KV.tm,8000);noise(t,.07,KV.tm*.6,5500,'bandpass')}
+    if(has(g.rd)||(g.rd&&st%2===0&&false))noise(t,.25,KV.rd,5200);
+    if(has(g.cg))conga(t,KV.cg,st%4===2?260:330);
+    if(st===0&&bar%8===0&&bar>0)noise(t,1.2,.02+.004*E,3800);     // platillo al empezar cada sección
+  }
+
+  /* Riffs de bajo: [paso, intervalo]. r=fundamental, 3, 5, 7, 8=octava. El bajo siempre suena en 40-52 (se oye hasta en el móvil). */
+  const RIFFS={
+    pop:   [[0,'r'],[3,'r'],[6,'5'],[8,'r'],[11,'r'],[14,'3']],
+    funk:  [[0,'r'],[3,'8'],[6,'r'],[8,'5'],[10,'7'],[11,'8'],[14,'5']],
+    tumbao:[[0,'5'],[3,'r'],[6,'r'],[8,'5'],[11,'r'],[14,'3']],
+    bossa: [[0,'r'],[6,'5'],[8,'r'],[14,'5']],
+    gallop:[[0,'r'],[2,'r'],[3,'r'],[4,'5'],[6,'r'],[8,'r'],[10,'r'],[11,'r'],[12,'5'],[14,'r']],
+    oompah:[[0,'r'],[8,'5']],
+  };
+  const bassReg=m=>{while(m>52)m-=12;while(m<40)m+=12;return m};
+  const IV={r:0,'3':1,'5':2,'7':3};
+
+  /* Pasos del acompañamiento (acordes cortos) según el estilo */
+  const COMP={charleston:[0,6],offbeat:[4,12],oompah:[4,12],strum:[0,6,10],chop16:[0,3,6,8,11,14],skank:[2,6,10,14],montuno:[3,6,10,12,14],pump:[0,2,4,6,8,10,12,14],arp:[],none:[]};
 
   function play(s,t){
     const th=theme,bar=Math.floor(s/16),st=s%16,sd=60/bpm()/4,E=th.epic||0;
@@ -89,60 +143,51 @@ export const Music=(()=>{
     const nextRoot=chordMidi(th,entryAt(th,bar+1,0))[0];
     const beat=st%4===0;
 
-    // colchón suave de acordes (cuerdas largas con epic ≥ 1; si no, un pad muy leve al inicio del compás)
-    if(st===0){
-      if(E>=1)firstOfBar.slice(0,3).forEach(m=>voice('strings',m+12,t,sd*15,.0085));
-      else firstOfBar.slice(0,3).forEach((m,i)=>osc(th.padW,hz(m+12),t,sd*16,th.padV,.5,1800,i*4));
-    }
+    // colchón suave de acordes (cuerdas largas)
+    if(st===0)firstOfBar.slice(0,3).forEach(m=>voice('strings',m+12,t,sd*15,.0085));
 
-    // bajo: caminante (negras con nota de aproximación), oom-pah o pedal
+    // bajo: caminante (jazz) o riff sincopado según el estilo
     let bn=null;
     if(th.bassPat==='walk'){
-      if(st===0)bn=firstOfBar[0]-12;
-      else if(st===4)bn=firstOfBar[2]-12;
-      else if(st===8)bn=chord[0]-12;
-      else if(st===12)bn=nextRoot-12+(nextRoot%2?-1:1);                       // medio tono hacia la siguiente fundamental
-    }else if(th.bassPat==='oompah'){
-      if(st===0)bn=chord[0]-12;else if(st===8)bn=chord[2]-12;
-    }else if(st===0||st===8)bn=chord[0]-12;
-    if(P&&bn===null&&st%4===2)bn=chord[0]-12;
-    if(bn!==null)voice('upright',bn,t,.3,P?.085:th.bassV);
+      if(st===0)bn=firstOfBar[0];
+      else if(st===4)bn=firstOfBar[2];
+      else if(st===8)bn=chord[0];
+      else if(st===12)bn=nextRoot+(nextRoot%2?-1:1);                          // medio tono hacia la siguiente fundamental
+    }else{
+      const hit=(RIFFS[th.bassPat]||RIFFS.pop).find(r=>r[0]===st);
+      if(hit)bn=hit[1]==='8'?chord[0]+12:chord[IV[hit[1]]];
+    }
+    if(P&&bn===null&&st%4===2)bn=chord[0];
+    if(bn!==null)voice('upright',bassReg(bn),t,.26,P?.09:th.bassV);
 
     // acompañamiento
     if((COMP[th.comp]||[]).includes(st)){
       const notes=th.comp==='strum'?chord.slice(0,4):chord.slice(1,4);
-      notes.forEach((m,i)=>voice(th.compVoice,m+12,t+i*.012,.22,th.compV));
+      notes.forEach((m,i)=>voice(th.compVoice,m+12,t+i*.01,.13,th.compV));
     }
-    // arpegio suave (temas «de cristal»)
+    // arpegio suave
     if(th.arpVoice){
       const every=th.arpEvery||2,pat=th.arpPat||[0,1,2,1];
-      if(st%every===0)voice(th.arpVoice,chord[pat[(st/every)%pat.length]%chord.length]+12,t,Math.max(.23,sd*2),P?.03:th.arpV);
+      if(st%every===0)voice(th.arpVoice,chord[pat[(st/every)%pat.length]%chord.length]+12,t,Math.max(.2,sd*2),P?.03:th.arpV);
     }
 
-    // percusión de escobillas: shaker en corcheas y toque de aro en 2 y 4
-    const pc=th.perc||'none';
-    if(pc!=='none'||P||T>.5){
-      if(st%2===0)noise(t,.05,st%4===2?.0085:.005,6200);
-      if(pc==='brush'&&(st===4||st===12))noise(t,.04,.011,2300,'bandpass');
-      if((P||T>.6)&&st%2===1)noise(t,.04,.006,6800);
-    }
+    // batería
+    drums(th,st,t,bar,E);
     if(P&&beat){osc('sine',58,t,.22,.025,.04);voice('bell',noteOf(th,st%8===0?7:9),t,.12,.009)}   // latido y alarma de pánico
+    if(T>.55&&st%2===1)noise(t,.03,.006,6800);                                  // más tensión → más hats
 
-    // capa épica: timbal, caja y platillo
+    // capa épica: timbal en las frases y metales que refuerzan la melodía
     if(E>=2){
-      if(st===0||st===8)timpani(t,chord[0]-24,P?.075:.055);
-      if(bar%4===3&&st>=12&&st%2===0)timpani(t,chord[2]-24,.03+.004*(st-12));  // redoble antes de cambiar de frase
-    }
-    if(E>=3){
-      if(st===4||st===12)noise(t,.09,.016,1800,'bandpass');
-      if(bar%16===0&&st===0)noise(t,1.4,.02,4200);
+      if(st===0&&bar%4===0)timpani(t,chord[0]-24,P?.075:.055);
+      if(bar%4===3&&st>=12&&st%2===0)timpani(t,chord[2]-24,.03+.004*(st-12));
     }
 
-    // melodía del tema (con refuerzo grave/agudo de metales si es épico)
+    // melodía del tema (con refuerzo de metales y eco rítmico si el tema lo pide)
     for(const [at,deg,dur] of th.tune[bar%th.tune.length])if(at===st){
       voice(th.leadVoice,noteOf(th,deg)+12,t,dur*sd,th.leadV);
       if(E>=2)voice('brass',noteOf(th,deg),t,dur*sd,th.leadV*.5);
       if(E>=3)voice('brass',noteOf(th,deg)+24,t,dur*sd*.9,th.leadV*.22);
+      if(th.echo&&dur>=2)voice('pizz',noteOf(th,deg)+12,t+sd*3,.1,th.leadV*.3);   // eco a una corchea con puntillo
     }
   }
   function loop(){
@@ -172,6 +217,8 @@ export const Music=(()=>{
     background(){clearInterval(timer);timer=0},
     recover(){if(!playing||muted||document.hidden||audioPageHidden)return false;init();return armSequencer()},
     setLevel(n){useTheme(THEMES[zoneIdx(n)])},
+    /** Toca un tema concreto desde el principio (lo usa melodies.html). */
+    playTheme(th){T=0;P=false;duckLv=1;muffled=false;theme=th;baseBpm=th.bpm;tempoNow=th.bpm;step=0;if(playing){playing=false;clearInterval(timer);timer=0}this.start()},
     /** Música fuera de partida: 'menu' (menú principal) o 'heroes' (elección de héroe). Arranca si hace falta. */
     scene(name){
       T=0;P=false;

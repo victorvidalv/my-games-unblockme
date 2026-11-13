@@ -26,7 +26,7 @@ export const heroOf=(id=S.run?.hero)=>heroById(id);
 /** Deshacer gratis que le quedan al héroe activo en el nivel (solo Jean). */
 export const undosLeft=(level=S.run?.level)=>freeUndosLeft(heroOf().id,S.run,level);
 /** Puntos que dan `moves` movimientos en el tablero actual (incluye racha y bono de ruta aventurera). */
-export const gainNow=(moves=S.G.moves)=>gainFor(S.G.rate,moves,S.G.opt,S.run.streak||0,{brave:S.run.mode!=='p'&&S.run.route==='brave'});
+export const gainNow=(moves=S.G.moves)=>gainFor(S.G.rate,moves,S.G.opt,S.run.streak||0,{brave:S.run.mode!=='p'&&S.run.route==='brave',boss:!!S.G.boss&&S.run.mode!=='p'});
 function mergeRecords(a,b){                              // conserva el máximo de cada registro (p. ej. con dos pestañas abiertas)
   const out={...a};
   for(const k in b){const x=out[k]||{score:0,level:0,runs:0},y=b[k]||{};

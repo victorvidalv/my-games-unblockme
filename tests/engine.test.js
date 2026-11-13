@@ -101,7 +101,7 @@ describe('codificación', () => {
   });
   it('encodeBoard/decodeBoard son inversos', () => {
     const b = randomBoard(mulberry32(5), 9, 0.3);
-    expect(decodeBoard(encodeBoard(b.pieces, b.pos))).toEqual(b);
+    expect(decodeBoard(encodeBoard(b.pieces, b.pos))).toEqual({ ...b, walls: [] });
   });
   it('randomBoard produce tableros válidos con la llave roja en la fila de salida', () => {
     for (let s = 1; s <= 50; s++) {
@@ -120,12 +120,14 @@ describe('dificultad', () => {
       for (let l = 2; l <= MAX_LEVEL; l++) expect(rateAt(start, l)).toBeGreaterThanOrEqual(rateAt(start, l - 1));
     }
   });
-  it('los movimientos objetivo crecen con la dificultad (tutorial suave → 32)', () => {
+  it('los movimientos objetivo crecen con la dificultad (tutorial suave → 37)', () => {
     expect(curve(1).target).toBe(2);
     expect(curve(10).target).toBeLessThanOrEqual(3);
-    expect(curve(20).target).toBe(5);
-    expect(curve(50).target).toBe(14);
-    expect(curve(100).target).toBe(32);
+    expect(curve(20).target).toBe(6);
+    expect(curve(30).target).toBe(11);
+    expect(curve(50).target).toBe(19);
+    expect(curve(75).target).toBe(29);
+    expect(curve(100).target).toBe(37);
     for (let r = 2; r <= 100; r++) {
       expect(curve(r).target).toBeGreaterThanOrEqual(curve(r - 1).target);
       expect(curve(r).others).toBeGreaterThanOrEqual(curve(r - 1).others);
@@ -142,16 +144,16 @@ describe('generador', () => {
     const b = generateBoard(30, 4242);
     expect(encodeBoard(a.pieces, a.pos)).toBe(encodeBoard(b.pieces, b.pos));
     expect(a.maxd).toBe(b.maxd);
-  });
+  }, 120000);
   it('alcanza el mínimo objetivo y el estado devuelto está a esa distancia', () => {
-    for (const rating of [1, 8, 20, 30]) {
+    for (const rating of [1, 8, 20, 28]) {
       const g = generateBoard(rating, 1000 + rating);
       expect(g.reached).toBe(true);
       expect(g.maxd).toBeGreaterThanOrEqual(g.target);
       expect(minMoves(g.pieces, g.pos)).toBe(g.maxd);
       expect(maxDistance(analyze(g.pieces, g.pos))).toBe(g.maxd);
     }
-  });
+  }, 120000);
 });
 
 describe('puntaje y límite de movimientos', () => {

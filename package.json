@@ -10,7 +10,11 @@
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "eslint .",
-    "levels": "node scripts/generate-levels.mjs"
+    "levels": "node scripts/generate-levels.mjs",
+    "levels:decorate": "node scripts/decorate-levels.mjs",
+    "levels:walls": "node scripts/generate-walls.mjs",
+    "levels:special": "npm run levels:walls && npm run levels:decorate",
+    "levels:all": "npm run levels && npm run levels:special"
   },
   "devDependencies": {
     "eslint": "^10.14.0",

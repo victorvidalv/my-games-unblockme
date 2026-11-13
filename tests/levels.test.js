@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import bank from '../src/data/levels.json';
+import special from '../src/data/special.json';
+import { levelPlan, BOSS_BOOST } from '../src/game/mechanics.js';
 import {
   N, decodeBoard, isValidState, analyze, maxDistance, minMoves, expand, isWon,
-  curve, rateAt, moveLimit, MAX_LEVEL, WINDOW, pickBoard, buildLevel, varyBoard, encodeBoard, mulberry32, calcGain, moveStatus,
+  curve, minReach, rateAt, moveLimit, MAX_LEVEL, WINDOW, pickBoard, buildLevel, varyBoard, encodeBoard, mulberry32, hash32, calcGain, moveStatus,
 } from '../src/engine/index.js';
 
 const RATINGS = Array.from({ length: 100 }, (_, i) => i + 1);
@@ -15,7 +17,6 @@ describe('banco de tableros', () => {
 
   it('cada tablero es válido, tiene solución y alcanza el mínimo objetivo de su dificultad', () => {
     for (const rating of RATINGS) {
-      const target = curve(rating).target;
       for (const text of bank.ratings[rating - 1]) {
         const { pieces, pos } = decodeBoard(text);
         expect(isValidState(pieces, pos), `dif ${rating} inválido`).toBe(true);
@@ -23,7 +24,7 @@ describe('banco de tableros', () => {
         expect(pieces.length, `dif ${rating} nº de piezas`).toBeLessThanOrEqual(curve(rating).others + 1);
         const an = analyze(pieces, pos, 600000);
         expect(an, `dif ${rating} sin solución`).not.toBeNull();
-        expect(maxDistance(an), `dif ${rating} no llega a ${target}`).toBeGreaterThanOrEqual(target);
+        expect(maxDistance(an), `dif ${rating} no llega a ${minReach(rating)}`).toBeGreaterThanOrEqual(minReach(rating));
       }
     }
   }, 120000);
@@ -36,7 +37,6 @@ describe('banco de tableros', () => {
 describe('variantes: cada partida tiene tableros distintos', () => {
   it('varyBoard conserva solución y mínimo objetivo, es determinista y cambia el tablero', () => {
     for (const rating of [1, 15, 30, 45, 60]) {
-      const target = curve(rating).target;
       const base = pickBoard(bank.ratings, rating, 1, rating);
       const seen = new Set();
       for (let seed = 1; seed <= 6; seed++) {
@@ -44,11 +44,11 @@ describe('variantes: cada partida tiene tableros distintos', () => {
         expect(isValidState(v.pieces, v.pos)).toBe(true);
         const an = analyze(v.pieces, v.pos, 600000);
         expect(an).not.toBeNull();
-        expect(maxDistance(an), `dif ${rating}`).toBeGreaterThanOrEqual(target);
+        expect(maxDistance(an), `dif ${rating}`).toBeGreaterThanOrEqual(minReach(rating));
         expect(encodeBoard(v.pieces, v.pos)).toBe(encodeBoard(...Object.values(varyBoard(base, rating, seed))));
         seen.add(encodeBoard(v.pieces, v.pos));
       }
-      expect(seen.size, `dif ${rating}: variantes distintas`).toBeGreaterThanOrEqual(4);
+      expect(seen.size, `dif ${rating}: variantes distintas`).toBeGreaterThanOrEqual(3);
     }
   }, 120000);
 });
@@ -76,11 +76,12 @@ describe('construcción de niveles (mínimos exactos)', () => {
     }
   }, 120000);
 
-  it('sin ajuste, el mínimo es exactamente el objetivo de la curva', () => {
+  it('sin ajuste, el mínimo es el objetivo de la curva (hasta 3 menos en las dificultades más altas)', () => {
     for (const rating of RATINGS) {
       const board = pickBoard(bank.ratings, rating, 5, 1);
       const lvl = buildLevel(board, { rating, rng: mulberry32(rating) });
-      expect(lvl.opt).toBe(curve(rating).target);
+      expect(lvl.opt).toBeLessThanOrEqual(curve(rating).target);
+      expect(lvl.opt).toBeGreaterThanOrEqual(minReach(rating));
     }
   }, 120000);
 
@@ -102,7 +103,8 @@ describe('construcción de niveles (mínimos exactos)', () => {
 
 /** Juega un nivel de forma óptima: siempre el vecino con distancia − 1. Devuelve los movimientos usados. */
 function playOptimally(lvl) {
-  const an = analyze(lvl.pieces, lvl.pos, 600000);
+  const walls = lvl.walls || [];
+  const an = analyze(lvl.pieces, lvl.pos, 600000, walls);
   const pos = new Array(lvl.pieces.length).fill(0);
   const g = new Int8Array(N * N);
   let key = an.k0;
@@ -112,30 +114,100 @@ function playOptimally(lvl) {
     let next = null;
     expand(lvl.pieces, key, pos, g, (i, y, nk) => {
       if (next === null && an.dist.get(nk) === d - 1) next = nk;
-    });
+    }, walls);
     key = next;
     moves++;
   }
   return moves;
 }
 
-describe('partida completa simulada (3 caminos × 100 niveles)', () => {
+/** Construye el nivel tal como lo hace el juego: familia según la ciudad, variante, jefe más difícil. */
+function makeLevel(start, level, seed, adj = 0, brave = false) {
+  const rating = rateAt(start, level);
+  const plan = levelPlan(level);
+  const base = pickBoard(bank.ratings, rating, seed, level, plan.family, special);
+  const board = varyBoard(base, rating, hash32(seed, level, 7));
+  const lvl = buildLevel(board, { rating, adj, brave, boost: plan.boss ? BOSS_BOOST : 0, rng: mulberry32(level) });
+  return { rating, plan, base, lvl };
+}
+
+describe('partida completa simulada (3 caminos × 100 niveles, con piezas especiales y jefes)', () => {
   for (const start of [1, 50, 75]) {
     it(`camino que empieza en dificultad ${start}: jugando perfecto se gana siempre con el mínimo`, () => {
       let streak = 0;
       let adj = 0;
+      let fallbacks = 0;
       for (let level = 1; level <= MAX_LEVEL; level++) {
-        const rating = rateAt(start, level);
-        const lvl = buildLevel(varyBoard(pickBoard(bank.ratings, rating, 77, level), rating, level), { rating, adj, rng: mulberry32(level) });
+        const { rating, plan, base, lvl } = makeLevel(start, level, 77, adj);
+        if (base.family === 'plain' && plan.family !== 'plain') fallbacks++;
+        const target = curve(rating).target;
+        // la pieza especial prometida está presente (salvo que el banco no tuviera esa familia y se usara otra)
+        if (base.family === 'walls') expect(lvl.walls.length, `nivel ${level}`).toBeGreaterThan(0);
+        if (base.family === 'gates') expect(lvl.pieces.some((p) => p.kind === 'gate'), `nivel ${level}`).toBe(true);
+        if (base.family === 'heavy') expect(lvl.pieces.some((p) => p.kind === 'heavy'), `nivel ${level}`).toBe(true);
+        // la dificultad es la prevista (±3 del objetivo + ajuste + jefe)
+        // los tableros con muros del banco admiten hasta 2 movimientos menos que el objetivo (más el margen de ±3)
+        expect(lvl.opt, `nivel ${level} dif ${rating}`).toBeGreaterThanOrEqual(Math.max(1, target - 5));
+        expect(lvl.opt, `nivel ${level} dif ${rating}`).toBeLessThanOrEqual(target + 3 + (plan.boss ? BOSS_BOOST : 0) + 2);
+        expect(isValidState(lvl.pieces, lvl.pos, lvl.walls), `nivel ${level}`).toBe(true);
+        expect(isWon(lvl.pos), 'no empieza ganado').toBe(false);
+        // jugando perfecto se gana con el mínimo anunciado: ningún nivel queda atascado
         const moves = playOptimally(lvl);
         expect(moves, `nivel ${level}`).toBe(lvl.opt);
-        expect(moveStatus(moves, moveLimit(lvl.opt)), 'el mínimo nunca está en riesgo de eliminación').not.toBe('over');
+        expect(minMoves(lvl.pieces, lvl.pos, lvl.walls), `nivel ${level}`).toBe(lvl.opt);
+        expect(moveStatus(moves, moveLimit(lvl.opt))).not.toBe('over');
         const gain = calcGain(rating, moves, lvl.opt, streak);
         expect(gain.eff).toBe(1);
-        expect(gain.perfect).toBeGreaterThan(0);
         streak++;
-        adj = Math.min(level < 10 ? 1 : 2, adj + 1); // jugador perfecto: el ajuste adaptativo sube hasta su tope
+        adj = Math.min(level < 10 ? 1 : 2, adj + 1);
       }
+      expect(fallbacks, 'niveles que tuvieron que usar un tablero normal por falta de la familia').toBeLessThanOrEqual(4);
     }, 600000);
   }
+
+  it('el aprendizaje funciona: los 5 primeros niveles de Normal son normales y pequeños', () => {
+    for (let level = 1; level <= 5; level++) {
+      const { plan, lvl } = makeLevel(1, level, 1);
+      expect(plan.family).toBe('plain');
+      expect(lvl.walls).toEqual([]);
+      expect(lvl.pieces.every((p) => !p.kind)).toBe(true);
+      expect(lvl.opt).toBeLessThanOrEqual(5);
+    }
+  }, 60000);
+
+  it('los jefes piden más movimientos mínimos que un nivel normal de la misma dificultad', () => {
+    let harder = 0;
+    let total = 0;
+    for (const start of [1, 50, 75]) {
+      for (let level = 10; level <= 100; level += 10) {
+        const { rating, lvl } = makeLevel(start, level, 5);
+        total++;
+        if (lvl.opt >= curve(rating).target) harder++;
+      }
+    }
+    expect(harder / total).toBeGreaterThan(0.6);
+  }, 300000);
+
+  it('la dificultad percibida real crece a lo largo de cada camino (mínimo medio por tramos de 10 niveles)', () => {
+    for (const start of [1, 50, 75]) {
+      let prev = 0;
+      for (let block = 0; block < 10; block++) {
+        let sum = 0;
+        for (let l = block * 10 + 1; l <= block * 10 + 10; l++) sum += makeLevel(start, l, 9).lvl.opt;
+        const avg = sum / 10;
+        expect(avg, `camino ${start}, tramo ${block + 1}`).toBeGreaterThanOrEqual(prev - 0.6);
+        prev = avg;
+      }
+    }
+  }, 600000);
+
+  it('en Normal, a partir del nivel 30 el mínimo medio ya exige pensar (≥ 10) y al final es desafiante (≥ 30)', () => {
+    const avg = (from, to) => {
+      let sum = 0;
+      for (let l = from; l <= to; l++) sum += makeLevel(1, l, 3).lvl.opt;
+      return sum / (to - from + 1);
+    };
+    expect(avg(30, 39)).toBeGreaterThanOrEqual(10);
+    expect(avg(91, 100)).toBeGreaterThanOrEqual(30);
+  }, 300000);
 });

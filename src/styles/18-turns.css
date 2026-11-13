@@ -1,0 +1,53 @@
+/* ---------- Turnos comprados (hielo), rehacer y saltar ---------- */
+.mrow span:last-child{white-space:nowrap}
+.bought{display:flex;align-items:center;gap:8px;margin:2px 0 5px;padding:4px 8px;border-radius:9px;
+  background:linear-gradient(90deg,#9fe6ff22,#6fb7ff14);border:1px solid #9fe6ff55;box-shadow:inset 0 0 12px #9fe6ff22;font-size:10px;letter-spacing:.1em;color:#bfefff}
+.bought[hidden]{display:none}
+.bought .bl{font-weight:800;white-space:nowrap}
+.bought .bq{margin-left:auto;white-space:nowrap}.bought .bq b{font-size:15px;color:#fff;text-shadow:0 0 8px #7fd8ff;font-variant-numeric:tabular-nums}
+.bought .pips{display:flex;gap:4px;flex:1;justify-content:center}
+.bought .pips i{width:13px;height:15px;clip-path:polygon(50% 0,100% 30%,85% 100%,15% 100%,0 30%);
+  background:linear-gradient(160deg,#fff,#9fe6ff 45%,#4aa8ff);filter:drop-shadow(0 0 4px #7fd8ff);animation:pip-in .45s cubic-bezier(.2,1.6,.4,1) both}
+.bought .pips i:nth-child(2){animation-delay:.08s}.bought .pips i:nth-child(3){animation-delay:.16s}.bought .pips i:nth-child(4){animation-delay:.24s}.bought .pips i:nth-child(5){animation-delay:.32s}
+@keyframes pip-in{from{transform:scale(0) rotate(-90deg);opacity:0}}
+.bought .pips i.used{background:#ffffff1c;filter:none;opacity:.45}
+.bought .pips i.melt{animation:pip-melt .8s ease-out both}
+@keyframes pip-melt{0%{background:linear-gradient(160deg,#fff,#9fe6ff 45%,#4aa8ff);filter:drop-shadow(0 0 12px #fff);transform:scale(1.5)}60%{transform:scale(.8,1.2) translateY(3px)}100%{transform:none}}
+.bought.burning{border-color:#ffd98a99;box-shadow:inset 0 0 12px #ffb30033,0 0 10px #ffb30033}
+.bought.spend{animation:spend .9s ease-out}
+@keyframes spend{0%{box-shadow:0 0 0 0 #7fd8ffcc}40%{box-shadow:0 0 0 8px #7fd8ff00,0 0 22px #7fd8ff;transform:scale(1.04)}100%{transform:none}}
+.bought.arrive{animation:arrive-ice 1.2s ease-out}
+@keyframes arrive-ice{0%{transform:translateY(-8px) scale(.9);opacity:0;filter:brightness(2)}30%{opacity:1;transform:scale(1.06)}100%{transform:none;filter:none}}
+/* barra: el tramo comprado se ve como hielo al final */
+.bar::after{content:'';position:absolute;right:0;top:0;bottom:0;width:var(--bought,0%);pointer-events:none;
+  background:repeating-linear-gradient(115deg,#bfefff55 0 6px,#7fd8ff33 6px 12px);border-left:2px solid #bfefffcc;box-shadow:inset 0 0 8px #bfefff88}
+.meter:not([style*="--bought"]) .bar::after{display:none}
+.meter.ice-buy{animation:ice-buy 1.5s ease-out;position:relative}
+.meter.ice-buy::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(circle at 50% 50%,#ffffffcc,#9fe6ff66 40%,#0000 70%);animation:frost 1.5s ease-out forwards}
+@keyframes ice-buy{0%{box-shadow:0 0 0 0 #9fe6ff}30%{box-shadow:0 0 0 3px #bfefff,0 0 40px 8px #7fd8ffaa}100%{box-shadow:none}}
+@keyframes frost{0%{opacity:0;transform:scale(.3)}25%{opacity:1}100%{opacity:0;transform:scale(1.5)}}
+
+/* Rehacer: rebobinado */
+#board.rewinding .piece{transition-duration:.7s,.7s;filter:hue-rotate(-30deg) brightness(1.25) saturate(.85)}
+#board.rewinding{animation:rewind-board .9s ease-in-out}
+@keyframes rewind-board{0%,100%{filter:none}35%{filter:sepia(.6) hue-rotate(150deg) brightness(1.2)}}
+#rewindFx{position:fixed;inset:0;z-index:57;display:none;align-items:center;justify-content:center;pointer-events:none}
+#rewindFx.go{display:flex}
+#rewindFx span{font-size:min(60vw,280px);color:#bfefff;text-shadow:0 0 40px #7fd8ff;opacity:0;animation:rewind-spin 1.1s ease-in-out forwards}
+@keyframes rewind-spin{0%{opacity:0;transform:rotate(0) scale(.3)}25%{opacity:.85}100%{opacity:0;transform:rotate(-540deg) scale(1.2)}}
+#rewindFx i{position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,#0000,#bfefff,#0000);animation:scan 1s ease-in-out forwards;opacity:.9}
+@keyframes scan{from{top:100%}to{top:0}}
+
+/* Saltar nivel */
+#board.skipping .piece{animation:fly-away .8s cubic-bezier(.5,0,.9,.4) forwards}
+#board.skipping .piece:nth-child(odd){animation-delay:.05s}
+@keyframes fly-away{to{transform:translateX(140vw) rotate(12deg);opacity:0}}
+#skipFx{position:fixed;inset:0;z-index:57;display:none;flex-direction:column;align-items:center;justify-content:center;gap:6px;pointer-events:none;background:radial-gradient(ellipse at center,#0a141c99,#0a141ccc)}
+#skipFx.go{display:flex;animation:fade .15s}
+#skipFx .chev{display:flex;gap:2px;font-size:min(30vw,150px);line-height:1;color:#ffd24a;text-shadow:0 0 30px #ffb300}
+#skipFx .chev b{opacity:0;animation:chev .9s ease-out forwards}
+#skipFx .chev b:nth-child(2){animation-delay:.12s}#skipFx .chev b:nth-child(3){animation-delay:.24s}
+@keyframes chev{0%{opacity:0;transform:translateX(-60vw)}40%{opacity:1}100%{opacity:0;transform:translateX(60vw)}}
+#skipFx strong{font-size:clamp(24px,8vw,44px);font-weight:900;letter-spacing:.08em;color:#fff;text-shadow:0 3px 0 #8f4509,0 0 24px #ffb300;animation:restitle .5s cubic-bezier(.2,1.6,.4,1)}
+#skipFx small{color:#c9bd9d;letter-spacing:.14em}
+@media(prefers-reduced-motion:reduce){#rewindFx span,#skipFx .chev b,.meter.ice-buy,.bought.arrive{animation:none}}

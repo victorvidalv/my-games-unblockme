@@ -83,8 +83,6 @@ $('pQuit').onclick=()=>{
  $('pause').classList.remove('show');Music.stop(.2);setTensionFx(0,false);openMenu();
 };
 $('pSound').onclick=toggleSound;
-$('bHowMenu').onclick=()=>$('how').classList.add('show');
-$('howOk').onclick=()=>$('how').classList.remove('show');
 export function openMenu(){
   syncRouteStyle();
   renderPaths();

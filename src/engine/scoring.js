@@ -15,10 +15,15 @@ export function calcGain(rating, moves, opt, streak) {
   return { base, eff, pts, perfect, mult, total, lost: Math.round(base * (1 - eff)) };
 }
 
-/** Igual que calcGain, más el +10% de la ruta aventurera (no cuenta en Práctica). */
-export function gainFor(rating, moves, opt, streak, { brave = false } = {}) {
+/** Los jefes de ciudad dan un 50 % más de puntos. */
+export const BOSS_POINTS = 1.5;
+
+/** Igual que calcGain, más el +10% de la ruta aventurera y el bono de jefe (no cuentan en Práctica). */
+export function gainFor(rating, moves, opt, streak, { brave = false, boss = false } = {}) {
   const gain = calcGain(rating, moves, opt, streak);
   gain.routeBonus = brave ? Math.round(gain.total * 0.1) : 0;
   gain.total += gain.routeBonus;
+  gain.bossBonus = boss ? Math.round(gain.total * (BOSS_POINTS - 1)) : 0;
+  gain.total += gain.bossBonus;
   return gain;
 }
