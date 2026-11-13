@@ -688,6 +688,15 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:li
  #over .ending-lore,#finale .ending-lore{font-size:14px!important}
  #over .stats{text-align:center}#finale .fchal{text-align:left;font-size:12px}
 }
+
+.audio-recover{position:fixed;z-index:67;left:50%;bottom:calc(env(safe-area-inset-bottom) + 16px);transform:translateX(-50%);padding:10px 16px;white-space:nowrap;border-radius:22px;font-size:12px;background:#243658f5;border:1px solid #e4ce9580;box-shadow:0 6px 24px #0009}
+.audio-recover[hidden]{display:none}.audio-recover:active{transform:translate(-50%,2px)}
+.hero-choice.selected img{animation:heroReady .42s ease-out}
+@keyframes heroReady{from{opacity:.55;transform:scale(.98) translateY(8px)}to{opacity:1;transform:scale(1.035)}}
+@media(prefers-reduced-motion:reduce){.hero-choice.selected img{animation:none}}
+
+.book-copy{font-family:Georgia,serif;font-size:20px;line-height:1.65;margin:8px 0 24px}.book-action{font-family:Georgia,serif;font-style:italic;font-size:16px;line-height:1.7;color:#735537;margin-bottom:24px}.book-quote[hidden]{display:none}
+@media(max-width:620px){.book-copy{font-size:19px;line-height:1.65}.book-action{font-size:15px;line-height:1.65}}
 </style>
 </head>
 <body>
@@ -738,10 +747,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:li
 
 
 <div class="modal" id="storyBook" role="dialog" aria-modal="true" aria-labelledby="storyTitle"><article class="storybook">
- <div class="book-illustration"><img class="book-scenery" id="storyScene" alt=""><div class="book-series"><small>LAS CRÓNICAS DE LA LLAVE ROJA</small>El Faro<br>del Alba</div><img class="book-portrait" id="storyPortrait" alt=""></div>
+ <div class="book-illustration"><img class="book-scenery" id="storyScene" alt=""><div class="book-series"><small>LAS CRÓNICAS DE LA LLAVE ROJA</small>El Faro<br>del Alba<small style="margin-top:10px">LA SOMBRA DE TRI</small></div><img class="book-portrait" id="storyPortrait" alt=""></div>
  <div class="book-leaf"><div class="book-chapter" id="storyChapter"></div><h2 id="storyTitle"></h2><p class="book-copy" id="storyBody"></p><p class="book-action" id="storyAction"></p><blockquote class="book-quote" id="storyQuote"></blockquote><div class="book-seal" id="storySeal"></div><div class="book-track" id="storyTrack"></div><button class="primary book-play" id="storyPlay">Abrir el camino ➜</button><nav class="book-pagination" aria-label="Páginas de la aventura"><button id="storyPrevious" aria-label="Página anterior">←</button><span id="storyPage"></span><button id="storyNext" aria-label="Página siguiente">→</button></nav></div>
 </article></div>
 
+<button class="audio-recover" id="audioRecover" hidden>🔊 Toca para recuperar el sonido</button>
 <canvas id="fx"></canvas>
 <div id="journey">
   <div class="mtag" id="mTag"></div>
@@ -1046,11 +1056,23 @@ function calcGain(n,moves,opt,streak){
 const pointsFor=(moves,opt)=>gainFor(G.rate,moves,opt,run.streak||0).total;
 
 /* ============================ Sonido y vibración ============================ */
-let AC=null;
-function ctx(){ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended') AC.resume(); return AC; }
+let AC=null,audioNeedsRecovery=false,audioRecoveryTimer=0,audioPageHidden=false;
+function ctx(){
+ if(!AC||AC.state==='closed'){
+  const previous=AC,owner=AC=new (window.AudioContext||window.webkitAudioContext)();
+  if(previous)audioNeedsRecovery=true;
+  if(owner.state==='running')queueMicrotask(()=>completeAudioRecovery(owner));
+  owner.addEventListener('statechange',()=>handleAudioState(owner));
+ }
+ if(!document.hidden&&!audioPageHidden&&(AC.state==='suspended'||AC.state==='interrupted')){
+  audioNeedsRecovery=true;const owner=AC;
+  try{Promise.resolve(owner.resume()).then(()=>completeAudioRecovery(owner)).catch(()=>queueAudioRecoveryHint())}catch(_){}
+ }
+ return AC;
+}
 let muted=localStorage.getItem('desbloquea.mute')==='1';
 function tone(f,d=.1,type='sine',v=.12,delay=0,slide=0){
-  if(muted) return;
+  if(muted||document.hidden||audioPageHidden) return;
   try{
     ctx();
     const t=AC.currentTime+delay,o=AC.createOscillator(),g=AC.createGain();
@@ -1128,13 +1150,14 @@ const Music=(()=>{
   SC.pent=[0,2,4,7,9];
   THEMES.forEach((th,i)=>{Object.assign(th,CITY_SCORES[i]);th.padW='sine';th.padV=.018;th.pad1=1;th.bassW='sine';th.bassF=480;th.arpEvery=i===5||i===8?4:2;th.arpV=.028;th.leadV=.032;th.motifLow=1;th.hat=i===5||i===6||i===8?'none':'e8';th.motif=[...th.motif,...th.motif.map((ph,k)=>ph.map(([at,n,d])=>[at,n+(k?0:2),d]))]});
 
-  let bus=null,flt=null,noiseBuf=null,timer=0,playing=false,step=0,next=0,duckLv=1;
+  let bus=null,flt=null,noiseBuf=null,timer=0,playing=false,step=0,next=0,duckLv=1,audioOwner=null,muffled=false;
   let level=1,T=0,P=false,theme=THEMES[0],I=1,baseBpm=96,lead=4,hold=0,tempoNow=96;
   const hz=m=>440*Math.pow(2,(m-69)/12);
   const hash=n=>{n=Math.imul(n^n>>>15,0x2c1b3c6d);n=Math.imul(n^n>>>12,0x297a2d39);return((n^n>>>15)>>>0)/4294967296};
   function init(){
-    if(bus) return; ctx();
-    bus=AC.createGain();flt=AC.createBiquadFilter();flt.type='lowpass';flt.frequency.value=9000;
+    ctx();if(bus&&audioOwner===AC)return;
+    if(bus){try{bus.disconnect()}catch(_){}}audioOwner=AC;
+    bus=AC.createGain();flt=AC.createBiquadFilter();flt.type='lowpass';flt.frequency.value=muffled?900:9000;
     bus.gain.value=0;bus.connect(flt);flt.connect(AC.destination);
     noiseBuf=AC.createBuffer(1,AC.sampleRate*.5,AC.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
   }
@@ -1205,23 +1228,29 @@ const Music=(()=>{
     if(P&&beat) voice('bell',nt(st%8===0?7:9),t,.12,.009);
   }
   function loop(){
-    if(!playing||!AC) return;
+    if(!playing||!AC||document.hidden||audioPageHidden||AC.state!=='running') return;
     tempoNow+=(targetBpm()-tempoNow)*.07;
     const lookahead=.14;
     if(next<AC.currentTime) next=AC.currentTime+.05;
     while(next<AC.currentTime+lookahead){ const sd=60/bpm()/4; play(step,next+(step%2?(theme.swing||0)*sd:0)); next+=sd; step++; }
   }
+  function armSequencer(){
+    if(muted||document.hidden||audioPageHidden||!playing||AC.state!=='running')return false;
+    clearInterval(timer);next=AC.currentTime+.08;
+    bus.gain.cancelScheduledValues(AC.currentTime);bus.gain.setValueAtTime(0,AC.currentTime);bus.gain.setTargetAtTime(vol(),AC.currentTime,.12);
+    timer=setInterval(loop,25);return true;
+  }
   return {
-    start(){ if(muted) return; init(); if(playing){bus.gain.setTargetAtTime(vol(),AC.currentTime,.3);return}
-      tempoNow=targetBpm();playing=true;step=0;next=AC.currentTime+.08;bus.gain.cancelScheduledValues(AC.currentTime);bus.gain.setTargetAtTime(vol(),AC.currentTime,.4);timer=setInterval(loop,25) },
-    stop(fade=.5){ if(!playing) return; playing=false;clearInterval(timer);
-      if(bus) bus.gain.setTargetAtTime(0,AC.currentTime,fade/3) },
+    start(){if(muted)return;init();if(playing){if(!timer)armSequencer();bus.gain.setTargetAtTime(vol(),AC.currentTime,.3);return}tempoNow=targetBpm();playing=true;step=0;armSequencer()},
+    stop(fade=.5){clearAudioRecoveryHint();playing=false;clearInterval(timer);timer=0;if(bus&&audioOwner.state!=='closed')bus.gain.setTargetAtTime(0,audioOwner.currentTime,fade/3)},
+    background(){clearInterval(timer);timer=0},
+    recover(){if(!playing||muted||document.hidden||audioPageHidden)return false;init();return armSequencer()},
     setLevel(n,r){ r=r||n;level=n;const nt=THEMES[zoneIdx(n)];
       if(nt!==theme&&playing) step=Math.ceil(step/16)*16;          // al cambiar de zona la música nueva entra al inicio de un compás
       theme=nt;I=Math.min(3,2+Math.floor(zoneIdx(n)/5));baseBpm=theme.bpm;if(!playing)tempoNow=baseBpm;lead=4 },
     setTension(t,p){ T=Math.max(0,Math.min(1,t));P=!!p;if(!playing)tempoNow=targetBpm() },
     duck(v){ duckLv=v; if(bus&&playing) bus.gain.setTargetAtTime(vol(),AC.currentTime,.25) },
-    muffle(on){ if(flt) flt.frequency.setTargetAtTime(on?900:9000,AC.currentTime,.15) },
+    muffle(on){ muffled=!!on;if(flt) flt.frequency.setTargetAtTime(on?900:9000,AC.currentTime,.15) },
     refresh(){ if(muted) this.stop(.2); else if(bus&&playing) bus.gain.setTargetAtTime(vol(),AC.currentTime,.1) },
     bpm,targetBpm,get themeName(){return theme.name},get playing(){return playing}
   };
@@ -1235,7 +1264,7 @@ function setTensionFx(t,panic){
 /* Aplausos sintetizados: cientos de palmadas de ruido filtrado con una envolvente que sube y baja */
 let clapBuf=null;
 function applause(ms=6500){
-  if(muted) return;
+  if(muted||document.hidden||audioPageHidden) return;
   try{
     ctx();if(!clapBuf){clapBuf=AC.createBuffer(1,AC.sampleRate*.2,AC.sampleRate);const d=clapBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
     const dur=ms/1000,t0=AC.currentTime+.15;
@@ -1343,154 +1372,93 @@ const HEROES=[
  {id:'van',name:'Van',role:'Tejedora de ideas',icon:'✦',color:'#c5a2ff',power:'Dos luces en el camino',short:'+2 pistas cada 10 niveles',detail:'Al completar los niveles 10, 20, 30… recibes dos pistas adicionales. Se suman a los premios normales y a los minijuegos.',quote:'«Toda gran aventura empieza con una pequeña idea.»'}
 ];
 function heroOf(id=run?.hero){return HEROES.find(h=>h.id===id)||HEROES[0]}
-/* The ten fragments form a complete story. Each city has ten short, distinct beats. */
+/* The ten fragments form a complete story. Each city has one brief chapter. */
 const CHAPTERS=[
- {seal:'Corazón',title:'La llave que despertó',end:'El fragmento del Corazón vuelve a latir. El valle recupera su luz.',beats:[
-  'El Faro del Alba se ha apagado. Una llave roja despierta: diez ciudades guardan la luz necesaria para encenderlo.',
-  'Una luciérnaga señala un arco cubierto de raíces. La llave brilla cuando te acercas.',
-  'Tras el arco, una campana suena sin viento. Alguien lleva mucho tiempo esperando ayuda.',
-  'El guardián del puente perdió su farol. Un pequeño destello sigue vivo entre las piedras.',
-  'El farol vuelve a encenderse. Su luz dibuja un camino que antes nadie podía ver.',
-  'El sendero llega a un jardín dormido. Cada puerta abierta despierta una flor.',
-  'Una sombra cubre la última escalera. La llave roja tiembla, pero no se apaga.',
-  'Al otro lado se escucha un latido. La primera luz del Faro sigue viva.',
-  'Una estatua abre las manos. Dentro descansa el fragmento del Corazón.',
-  'Solo queda una puerta. Si la cruzas, el valle volverá a ver las estrellas.'
- ]},
- {seal:'Marea',title:'Las velas sin viento',end:'El fragmento de la Marea despierta. Las velas vuelven a hincharse.',beats:[
-  'El puerto está en silencio. Sus barcos esperan un viento que desapareció cuando el Faro se apagó.',
-  'Una barca de papel avanza contra la corriente. En su interior hay una diminuta estrella.',
-  'La estrella señala el muelle más antiguo. Bajo sus tablas se oye cantar al mar.',
-  'Un farero ofrece una brújula rota. Su aguja solo responde a la llave roja.',
-  'La brújula despierta. Apunta hacia una torre que emerge entre las olas.',
-  'El puente hasta la torre está oculto. El reflejo de la luna revela sus peldaños.',
-  'Las olas intentan borrar el camino. Una luz permanece firme al otro lado.',
-  'En la torre, una concha guarda el último soplo de viento del puerto.',
-  'La concha se abre. El fragmento de la Marea gira como una pequeña vela.',
-  'La última puerta mira al océano. Detrás espera el viento de todos los barcos.'
- ]},
- {seal:'Agua',title:'El pozo de las estrellas',end:'El fragmento del Agua vuelve al cielo. El oasis renace bajo la arena.',beats:[
-  'El oasis se está secando. Dicen que una estrella cayó en su pozo y olvidó cómo volver al cielo.',
-  'Un zorro de arena deja huellas luminosas. Solo aparecen cuando das un paso con calma.',
-  'Las huellas llegan a una fuente vacía. En el fondo hay un mapa hecho de gotas.',
-  'El mapa muestra tres arcos iguales. La llave reconoce el único que tiene sombra.',
-  'Tras el arco correcto, una gota flota en el aire. Dentro se refleja un cielo distinto.',
-  'La gota guía el camino hasta un palacio enterrado. Sus puertas aún conservan el frescor.',
-  'Una tormenta cubre el palacio. El pequeño cielo de la gota sigue despejado.',
-  'El pozo aparece bajo la cúpula. Una estrella cansada duerme en su fondo.',
-  'La estrella se convierte en el fragmento del Agua. Espera que alguien abra la cúpula.',
-  'La última puerta sostiene el techo del pozo. Ábrela y la estrella podrá regresar.'
- ]},
- {seal:'Memoria',title:'El árbol que olvidó su nombre',end:'El fragmento de la Memoria vuelve a cantar. La aldea recuerda su nombre.',beats:[
-  'En la aldea, las hojas caen con palabras borradas. El árbol más antiguo ha olvidado su nombre.',
-  'Una hoja conserva una sola letra. Cuando la recoges, se enciende una ventana.',
-  'Tras la ventana, una abuela recuerda una canción. Le falta su última palabra.',
-  'La canción lleva hasta un puente de madera. Cada tabla guarda una voz distinta.',
-  'Al cruzar, las voces se unen. Pronuncian el comienzo del nombre perdido.',
-  'El resto del nombre está en una casa cubierta de enredaderas. Su puerta escucha.',
-  'La casa abre un ojo de luz. Solo deja pasar a quien no olvida a sus compañeros.',
-  'Dentro, una semilla guarda el recuerdo de todas las primaveras.',
-  'La semilla revela el fragmento de la Memoria. El árbol empieza a reconocer su voz.',
-  'La última puerta protege sus raíces. Al abrirla, el nombre volverá a la aldea.'
- ]},
- {seal:'Chispa',title:'La ciudad sin mañana',end:'El fragmento de la Chispa despierta los relojes. La ciudad vuelve a avanzar.',beats:[
-  'Los relojes de la ciudad marcan la misma hora. Nadie recuerda cuándo fue el último amanecer.',
-  'Un anuncio de neón parpadea para ti. Entre sus luces aparece una flecha roja.',
-  'La flecha conduce a un ascensor dormido. Una chispa salta al tocar la llave.',
-  'El ascensor despierta y sube hasta un jardín sobre las nubes.',
-  'En el jardín, un pájaro mecánico intenta cantar. Su canción necesita una nota.',
-  'La nota perdida está en el gran reloj. Sus agujas forman una escalera.',
-  'Las agujas quieren retroceder. El pájaro sostiene la nota para que no desaparezca.',
-  'En el centro del reloj brilla una chispa que nunca se ha rendido.',
-  'La chispa revela su forma de estrella. Es otro fragmento del Faro.',
-  'La última puerta detiene el reloj. Ábrela y la ciudad volverá a tener un mañana.'
- ]},
- {seal:'Valor',title:'La canción bajo el hielo',end:'El fragmento del Valor rompe el silencio. Las campanas vuelven a sonar.',beats:[
-  'Una canción duerme bajo el hielo. Sin ella, las campanas del refugio han dejado de sonar.',
-  'Un copo cae hacia arriba. Te invita a seguirlo hasta una senda entre las montañas.',
-  'La senda termina en una cueva azul. El hielo repite tus pasos como un tambor.',
-  'Un pequeño farol espera a la entrada. Lleva encendido más inviernos de los que nadie recuerda.',
-  'Con su luz, aparecen notas musicales atrapadas en la pared.',
-  'Las notas señalan un lago helado. En su centro descansa una campana diminuta.',
-  'El viento se levanta. El farol apenas brilla, pero todavía marca el camino.',
-  'La campana vibra al acercarse la llave. La canción empieza a recordar su ritmo.',
-  'Dentro de la campana está el fragmento del Valor. Su luz no siente frío.',
-  'La última puerta cubre la salida de la cueva. Abre el paso y libera la canción.'
- ]},
- {seal:'Vida',title:'La primavera detenida',end:'El fragmento de la Vida despierta el jardín. Los pétalos vuelven a bailar.',beats:[
-  'Los pétalos llevan días quietos en el aire. La primavera espera un permiso que nadie sabe dar.',
-  'Una mariposa de papel consigue moverse. En sus alas hay una promesa escrita.',
-  'La promesa habla de un árbol que solo florece cuando alguien regresa.',
-  'Al seguir a la mariposa, aparece un puente lleno de faroles apagados.',
-  'Un farol se enciende por cada puerta que abres. El jardín empieza a respirar.',
-  'En el estanque, un pez de luz protege una flor cerrada.',
-  'La flor tiembla al ver la llave. Dentro guarda el primer día de la primavera.',
-  'La mariposa se posa en sus hojas. La promesa ya puede cumplirse.',
-  'La flor abre un pétalo. El fragmento de la Vida ilumina el estanque.',
-  'La última puerta retiene la brisa. Ábrela y deja que la primavera vuelva a caminar.'
- ]},
- {seal:'Fuego',title:'La fragua del volcán',end:'El fragmento del Fuego vuelve a la llave. El volcán protege de nuevo al puerto.',beats:[
-  'El volcán ya no calienta los hogares. Toda su llama se ha encerrado en una fragua olvidada.',
-  'Una brasa salta del suelo sin quemar. Parece reconocer la llave roja.',
-  'La brasa ilumina una escalera de piedra. El aire se vuelve cálido a cada paso.',
-  'Un herrero de ceniza espera junto a un yunque. Le falta la última chispa para despertar.',
-  'La llave toca el yunque. Por primera vez en años, suena un golpe de forja.',
-  'El golpe abre una grieta luminosa. Al fondo aparece la puerta de la fragua.',
-  'La lava rodea el camino. La pequeña brasa abre un sendero seguro.',
-  'En la fragua arde una llama azul. No destruye: guarda el calor de los hogares.',
-  'La llama revela el fragmento del Fuego. El herrero inclina la cabeza en señal de confianza.',
-  'La última puerta retiene el calor. Ábrela para que vuelva a las ventanas del puerto.'
- ]},
- {seal:'Cielo',title:'El puente entre las estrellas',end:'El fragmento del Cielo une las islas. La ruta al castillo vuelve a existir.',beats:[
-  'Las islas de la Ciudad Celeste se están separando. Su puente de estrellas ha perdido una pieza.',
-  'Un pez transparente nada entre las nubes. En su vientre se ve el camino al castillo.',
-  'El pez se detiene ante un arco vacío. Alguien borró sus primeros peldaños.',
-  'La llave dibuja un escalón de luz. El vacío ya no parece tan grande.',
-  'Cada paso acerca dos islas. Sus habitantes vuelven a verse desde las ventanas.',
-  'Un observatorio aparece entre las nubes. Su telescopio mira hacia dentro.',
-  'En su lente se refleja la llave, rodeada por las luces que ya has recuperado.',
-  'Una estrella baja hasta tu mano. Ha guardado el último camino durante toda la noche.',
-  'La estrella es el fragmento del Cielo. A lo lejos, el Castillo Dorado enciende una ventana.',
-  'La última puerta está suspendida en el aire. Tras ella comienza el camino al Faro.'
- ]},
- {seal:'Alba',title:'La puerta del amanecer',end:'Los diez fragmentos se unen. El Faro del Alba vuelve a iluminar las diez ciudades.',beats:[
-  'El castillo abre sus puertas. El Faro sigue oscuro, pero reconoce las luces que traes contigo.',
-  'En el vestíbulo esperan diez pedestales. Cada uno tiene el nombre de una ciudad.',
-  'Las luces encuentran su lugar. Una escalera dorada aparece en el centro de la sala.',
-  'Al subir, escuchas las voces de quienes te ayudaron. Ninguna se ha perdido.',
-  'La torre tiembla. La oscuridad intenta convencerte de que el viaje no ha servido de nada.',
-  'La llave responde con las luces del valle, del mar y del desierto. El camino sigue ahí.',
-  'Las demás ciudades responden también. Sus destellos llegan por las ventanas de la torre.',
-  'En lo más alto espera el fragmento del Alba. Siempre estuvo guardando un lugar para ti.',
-  'Los diez fragmentos rodean la llave. Solo queda abrir la puerta que separa la noche del día.',
-  'Esta es la última puerta. Detrás espera el amanecer que prometiste devolver.'
- ]}
+ {
+  "seal": "Corazón",
+  "title": "La llave que despertó",
+  "end": "El fragmento del Corazón vuelve a latir. El valle recupera su luz.",
+  "opening": "Tri apagó el Faro; la llave aún recuerda el alba."
+ },
+ {
+  "seal": "Marea",
+  "title": "Las velas sin viento",
+  "end": "El fragmento de la Marea despierta. Las velas vuelven a hincharse.",
+  "opening": "Tri encadenó el viento bajo un mar que ya no duerme."
+ },
+ {
+  "seal": "Agua",
+  "title": "El pozo de las estrellas",
+  "end": "El fragmento del Agua vuelve al cielo. El oasis renace bajo la arena.",
+  "opening": "Tri enterró una estrella; el agua olvidó el camino."
+ },
+ {
+  "seal": "Memoria",
+  "title": "El árbol que olvidó su nombre",
+  "end": "El fragmento de la Memoria vuelve a cantar. La aldea recuerda su nombre.",
+  "opening": "Tri robó los nombres, pero las raíces siguen susurrando."
+ },
+ {
+  "seal": "Chispa",
+  "title": "La ciudad sin mañana",
+  "end": "El fragmento de la Chispa despierta los relojes. La ciudad vuelve a avanzar.",
+  "opening": "Tri detuvo los relojes; alguien permanece al otro lado del mañana."
+ },
+ {
+  "seal": "Valor",
+  "title": "La canción bajo el hielo",
+  "end": "El fragmento del Valor rompe el silencio. Las campanas vuelven a sonar.",
+  "opening": "Tri selló la canción bajo un hielo que respira."
+ },
+ {
+  "seal": "Vida",
+  "title": "La primavera detenida",
+  "end": "El fragmento de la Vida despierta el jardín. Los pétalos vuelven a bailar.",
+  "opening": "Tri negó la primavera; un pétalo todavía espera caer."
+ },
+ {
+  "seal": "Fuego",
+  "title": "La fragua del volcán",
+  "end": "El fragmento del Fuego vuelve a la llave. El volcán protege de nuevo al puerto.",
+  "opening": "Tri encerró el fuego; las cenizas conservan su juramento."
+ },
+ {
+  "seal": "Cielo",
+  "title": "El puente entre las estrellas",
+  "end": "El fragmento del Cielo une las islas. La ruta al castillo vuelve a existir.",
+  "opening": "Tri quebró el puente; las estrellas recuerdan dónde estaban sus pasos."
+ },
+ {
+  "seal": "Alba",
+  "title": "La puerta del amanecer",
+  "end": "Los diez fragmentos se unen. El Faro del Alba vuelve a iluminar las diez ciudades.",
+  "opening": "Tri guarda la última puerta, pero ya no es dueño del alba."
+ }
 ];
 const HERO_LORE={
- lia:{actions:['Lía protege la llave contra su pecho. Esta vez nadie recorrerá la oscuridad a solas.','Lía presta su luz al camino. Una pequeña llama también puede guiar a muchos.','Lía escucha antes de avanzar. Hasta el silencio tiene algo que contar.','Lía ofrece su mano. El valor crece cuando alguien lo comparte.','El cristal de Lía late con fuerza. La esperanza ha encontrado otra casa.','Lía recoge el destello más pequeño. Ninguna luz merece quedarse atrás.','Lía da un paso al frente. Tiene miedo, pero su promesa es más fuerte.','Lía sonríe al ver la señal. El camino empieza a confiar en ella.','Lía alza su cristal. Las luces reconocen a quien las ha cuidado.','Lía sujeta la llave con ambas manos. Cumplirá su promesa, una puerta más.'],quote:'«Mientras quede una luz, seguiremos.»',thanksWin:'«Gracias por caminar conmigo. Hoy devolvimos la luz a diez ciudades. ¿Buscamos juntos otro amanecer?»',thanksLoss:'«Gracias por no soltar mi mano. Mi luz necesita descansar, pero nuestra historia puede empezar otra vez. ¿Volvemos a intentarlo?»'},
- jean:{actions:['Jean escucha su reloj. En algún lugar, el tiempo todavía guarda un amanecer.','Jean observa el instante exacto. A veces una pausa permite ver lo invisible.','Jean sigue un eco del pasado. Los caminos recuerdan a quienes los cruzaron.','Jean gira su reloj de arena. Todavía hay tiempo para ayudar.','Una vuelta de luz rodea a Jean. El futuro empieza a moverse de nuevo.','Jean guarda ese instante en su memoria. Puede ser la clave de la siguiente puerta.','Jean respira y espera. La prisa nunca ha sido más fuerte que la paciencia.','Jean reconoce una señal que antes pasó por alto. Esta vez está preparado.','Jean levanta su reloj. Un segundo de valor puede cambiar una historia entera.','Jean abre la mano y deja correr la arena. Ha llegado la hora de avanzar.'],quote:'«El futuro aún puede cambiar.»',thanksWin:'«Gracias por darme tu tiempo. Juntos encontramos un mañana para estas ciudades. ¿Qué futuro descubriremos en la próxima aventura?»',thanksLoss:'«Gracias por cada intento. Este reloj se ha detenido, pero todavía quedan otros futuros. ¿Me acompañas a buscar uno más?»'},
- van:{actions:['Van abre su libro. La primera página asegura que toda oscuridad tiene una salida.','Van descubre una señal entre los detalles. Las respuestas suelen hablar muy bajito.','Van ilumina el camino con dos pequeñas luces. Ninguna pregunta tendrá que hacerse a oscuras.','Van escribe lo que ha aprendido. Una buena idea merece viajar con nosotros.','El libro de Van dibuja una puerta. Las leyendas también pueden señalar caminos reales.','Van escucha y después pregunta. Comprender el problema es empezar a resolverlo.','Van protege las páginas del viento. Una historia compartida puede sostener la esperanza.','Van encuentra una frase que antes parecía vacía. Ahora sabe lo que significa.','Las dos luces de Van se acercan a la llave. El libro está a punto de revelar su secreto.','Van deja una página en blanco. Lo que ocurra después lo escribiréis juntos.'],quote:'«Siempre queda una página por escribir.»',thanksWin:'«Gracias por escribir esta leyenda conmigo. Las diez ciudades recordarán nuestro viaje. ¿Abrimos el libro de una aventura nueva?»',thanksLoss:'«Gracias por llegar hasta aquí conmigo. Hoy cerramos el libro para descansar. Cuando quieras, abriremos juntos una página nueva.»'}
+ lia:{chapterLines:["Mi corazón late por una luz que todavía no veo.", "Juré traer de vuelta a quienes no llegaron al puerto.", "Una promesa aún arde bajo esta arena.", "Aunque olvide mi nombre, reconoceré a quien necesita mi mano.", "Mi cristal conserva un latido que Tri no pudo detener.", "Hay manos que siguen buscando calor al otro lado del hielo.", "Guardaré esta flor hasta que el viento se atreva a volver.", "La llama no distingue entre una herida y un hogar.", "Daré el primer paso, aunque el vacío no me devuelva la mirada.", "No he traído una espada, sino las luces que dejaste atrás."],quote:'«Mientras quede una luz, seguiremos.»',thanksWin:'«Gracias por caminar conmigo. Hoy devolvimos la luz a diez ciudades. ¿Buscamos juntos otro amanecer?»',thanksLoss:'«Gracias por no soltar mi mano. Mi luz necesita descansar, pero nuestra historia puede empezar otra vez. ¿Volvemos a intentarlo?»'},
+ jean:{chapterLines:["Mi reloj se detuvo antes de que naciera la noche.", "La marea regresa; mis horas perdidas, no.", "La arena siempre cae, incluso donde el tiempo fue enterrado.", "Una voz sin nombre todavía sabe cuándo debo regresar.", "He visto esta hora antes, pero nunca su final.", "El invierno guarda un segundo que todavía no he vivido.", "Algunos instantes florecen solo después de perderlos.", "Mi reloj cuenta golpes de forja, no latidos.", "Un paso que aún no he dado ya me espera en la otra orilla.", "Tri olvidó que hasta la noche debe llegar tarde alguna vez."],quote:'«El futuro aún puede cambiar.»',thanksWin:'«Gracias por darme tu tiempo. Juntos encontramos un mañana para estas ciudades. ¿Qué futuro descubriremos en la próxima aventura?»',thanksLoss:'«Gracias por cada intento. Este reloj se ha detenido, pero todavía quedan otros futuros. ¿Me acompañas a buscar uno más?»'},
+ van:{chapterLines:["En mi libro falta la página donde Tri aprendió su nombre.", "Dos luces bastan para leer lo que el mar se tragó.", "La estrella cayó sobre una palabra que nadie se atreve a pronunciar.", "Las hojas vacías pesan más que los libros cerrados.", "Alguien escribió el mañana con tinta que aún no existe.", "No toda canción necesita una voz para seguir esperando.", "El último pétalo guarda una historia que todavía no termina.", "Entre las cenizas, una letra sigue encendida.", "El cielo dejó un margen para quien no encontrara el puente.", "La última página está vacía porque Tri nunca pudo escribir nuestro final."],quote:'«Siempre queda una página por escribir.»',thanksWin:'«Gracias por escribir esta leyenda conmigo. Las diez ciudades recordarán nuestro viaje. ¿Abrimos el libro de una aventura nueva?»',thanksLoss:'«Gracias por llegar hasta aquí conmigo. Hoy cerramos el libro para descansar. Cuando quieras, abriremos juntos una página nueva.»'}
 };
-const STORY_HEADINGS=['Un nuevo horizonte','La primera señal','Lo que guarda el silencio','Una mano en el camino','Una pequeña luz','Más allá de la puerta','Cuando llega la sombra','La promesa sigue viva','El fragmento perdido','Una puerta para el alba'];
 function heroArt(id,pose='start'){return pose==='start'?`heroes/${id}.webp`:`heroes/${id}-${pose}.webp`}
-function storyFor(id,level){const i=zoneIdx(level),step=zoneStep(level)-1,c=CHAPTERS[i],h=heroOf(id),l=HERO_LORE[h.id];return {chapter:i+1,level,city:ZONES[i].n,title:step===0?c.title:STORY_HEADINGS[step],body:c.beats[step],action:l.actions[step],quote:l.quote,seal:c.seal}}
+function storyFor(id,level){const i=zoneIdx(level),c=CHAPTERS[i],h=heroOf(id),l=HERO_LORE[h.id];return {chapter:i+1,level:i*10+1,city:ZONES[i].n,title:c.title,body:c.opening,action:l.chapterLines[i],quote:l.quote,seal:c.seal}}
 function showStoryPage(level=run.level,revisit=false){
  return new Promise(resolve=>{
-  const modal=$('storyBook'),session=run,wasBusy=busy;busy=true;let page=level;const h=heroOf();Music.duck(.22);
+  const modal=$('storyBook'),session=run,wasBusy=busy;busy=true;const lastPage=zoneIdx(level)*10+1;let page=lastPage;const h=heroOf();Music.duck(.22);
   function render(){const s=storyFor(h.id,page);$('storyScene').src=`backgrounds/zone-${s.chapter}.webp`;$('storyPortrait').src=heroArt(h.id,'story');$('storyPortrait').alt=`${h.name} cuenta su aventura`;
-   $('storyChapter').textContent=`CAPÍTULO ${s.chapter} · ${s.city.toUpperCase()}`;$('storyTitle').textContent=s.title;$('storyBody').textContent=s.body;$('storyAction').textContent=s.action;$('storyQuote').textContent=`${h.name}: ${s.quote}`;$('storyPage').textContent=`${page} / 100`;$('storySeal').textContent=`Fragmento · ${s.seal}`;
-   $('storyTrack').textContent=page===level?`♫ ${Music.themeName}`:'Crónicas del camino';$('storyPrevious').disabled=page<=1;$('storyNext').disabled=page>=level;
-   $('storyPlay').textContent=revisit?'Volver al tablero ➜':`Abrir el camino · Nivel ${level} ➜`;
+   $('storyChapter').textContent=`CAPÍTULO ${s.chapter} · ${s.city.toUpperCase()}`;$('storyTitle').textContent=s.title;$('storyBody').textContent=s.body;$('storyAction').textContent=`${h.name}: «${s.action}»`;$('storyQuote').textContent=`${h.name}: ${s.quote}`;$('storyQuote').hidden=true;$('storyPage').textContent=`CAPÍTULO ${s.chapter} / 10`;$('storySeal').textContent=`Fragmento · ${s.seal}`;
+   $('storyTrack').textContent=page===lastPage?`♫ ${Music.themeName}`:'Crónicas del camino';$('storyPrevious').disabled=page<=1;$('storyNext').disabled=page>=lastPage;
+   $('storyPlay').textContent=revisit?'Volver al tablero ➜':`Entrar en ${ZONES[zoneIdx(level)].n} ➜`;
    modal.classList.remove('page-turn');void modal.offsetWidth;modal.classList.add('page-turn');
   }
   const close=()=>{if(run!==session){modal.classList.remove('show');resolve();return}modal.classList.remove('show');modal.removeEventListener('keydown',keys);busy=wasBusy;Music.duck(1);resolve()};
   const keys=e=>{if(e.key==='Escape'){e.preventDefault();close()}else if(e.key==='Tab'){const buttons=[...modal.querySelectorAll('button')].filter(b=>!b.disabled);if(e.shiftKey&&document.activeElement===buttons[0]){e.preventDefault();buttons.at(-1).focus()}else if(!e.shiftKey&&document.activeElement===buttons.at(-1)){e.preventDefault();buttons[0].focus()}}};
-  $('storyPlay').onclick=close;$('storyPrevious').onclick=()=>{if(page>1){page--;render()}};$('storyNext').onclick=()=>{if(page<level){page++;render()}};
+  $('storyPlay').onclick=close;$('storyPrevious').onclick=()=>{if(page>1){page-=10;render()}};$('storyNext').onclick=()=>{if(page<lastPage){page+=10;render()}};
   render();modal.classList.add('show');modal.addEventListener('keydown',keys);$('storyPlay').focus();
  });
 }
 function endingStory(victory,id,level){const h=heroOf(id),l=HERO_LORE[h.id],prefix=victory?'f':'over';$(prefix+'Portrait').parentElement.style.setProperty('--ending-scene',`url("backgrounds/zone-${zoneIdx(level)+1}.webp")`);$(prefix+'Portrait').src=heroArt(h.id,victory?'victory':'defeat');$(prefix+'Portrait').alt=victory?`${h.name} celebra el regreso del amanecer`:`${h.name} descansa tras la aventura`;
- $(prefix+'Lore').textContent=victory?'Los diez fragmentos se unen. El Faro del Alba despierta y su luz alcanza cada ciudad que ayudaste a salvar.':`La llave pierde su brillo a las puertas de ${ZONES[zoneIdx(level)].n}. ${h.name} cae de rodillas, sin fuerzas. La noche gana este intento; la esperanza sigue esperando.`;
+ $(prefix+'Lore').textContent=victory?'Tri pierde su dominio. Los diez fragmentos se unen y el Faro del Alba devuelve la luz a todas las ciudades que ayudaste a salvar.':`Tri cierra el camino a ${ZONES[zoneIdx(level)].n}. La llave pierde su brillo. ${h.name} cae de rodillas, sin fuerzas. La noche gana este intento; la esperanza sigue esperando.`;
  $(prefix+'Thanks').textContent=`${h.name}: ${victory?l.thanksWin:l.thanksLoss}`;
 }
 
@@ -1501,7 +1469,7 @@ function chooseHero(start,mode){
   const modal=$('heroSelect'),cards=$('heroCards');let selected=heroOf(store.heroChoice||run?.hero).id;
   $('heroPath').textContent=`${pathOf(start).n.toUpperCase()} · AVENTURA`;
   const render=()=>{const h=heroOf(selected);modal.style.setProperty('--chosen',h.color);modal.style.setProperty('--hero-scene',`url("heroes/${h.id}.webp")`);
-   cards.innerHTML=HEROES.map(v=>`<button class="hero-choice ${v.id===selected?'selected':''}" role="radio" aria-checked="${v.id===selected}" tabindex="${v.id===selected?0:-1}" data-hero="${v.id}" style="--accent:${v.color}" aria-label="${v.name}: ${v.short}"><img src="heroes/${v.id}.webp" alt="${v.name}, ${v.role}" width="360" height="720"><span class="hero-choice-name">${v.name}<small>${v.role}</small></span><span class="hero-check" aria-hidden="true">✓</span></button>`).join('');
+   cards.innerHTML=HEROES.map(v=>`<button class="hero-choice ${v.id===selected?'selected':''}" role="radio" aria-checked="${v.id===selected}" tabindex="${v.id===selected?0:-1}" data-hero="${v.id}" style="--accent:${v.color}" aria-label="${v.name}: ${v.short}"><img src="${heroArt(v.id,v.id===selected?'ready':'start')}" alt="${v.name}, ${v.role}" width="360" height="720"><span class="hero-choice-name">${v.name}<small>${v.role}</small></span><span class="hero-check" aria-hidden="true">✓</span></button>`).join('');
    $('heroPowerIcon').textContent=h.icon;$('heroPowerTitle').textContent=h.power;$('heroPowerShort').textContent=h.short;$('heroPowerDetail').textContent=h.detail;$('heroQuote').textContent=h.quote;
    $('heroConfirm').textContent=`Comenzar con ${h.name} ➜`;
    cards.querySelectorAll('button').forEach(b=>b.onclick=()=>{selected=b.dataset.hero;render();cards.querySelector(`[data-hero="${selected}"]`).focus()});
@@ -1690,7 +1658,7 @@ async function startLevel(){
   buildPieces();updateHud();sfx.start();busy=true;
   fitBoard();Music.setLevel(G.n,G.rate);setTensionFx(0,false);Music.duck(1);Music.muffle(false);Music.start();
   if(run.rescue){showRescue();return}
-  const storySession=run;if(run.storySeen!==G.n){boardEl.classList.add('board-lock');await showStoryPage(G.n);if(run!==storySession)return;run.storySeen=G.n;saveRun()}
+  const storySession=run;if(zoneStep(G.n)===1&&run.storyChapterSeen!==zoneIdx(G.n)&&run.storySeen!==G.n){boardEl.classList.add('board-lock');await showStoryPage(G.n);if(run!==storySession)return;run.storySeen=G.n;run.storyChapterSeen=zoneIdx(G.n);saveRun()}
   busy=false;boardEl.classList.remove('board-lock');banner();
   if(!store.tutorial&&G.n===1){                      // primera vez: señala el primer movimiento
     store.tutorial=true;persist();const g0=G;
@@ -1865,6 +1833,7 @@ function win(){
     ring.style.setProperty('--c',eff>=.9?'#43e0c1':eff>=.5?'#ffc65a':'#ff6a6a');
     ring.style.setProperty('--p',0);$('ringTxt').textContent='0%';
     $('winTxt').textContent=`${G.moves} movimientos de ${G.opt} mínimos`+(G.moves===G.opt?' · ¡PERFECTO!':'')+(bonusHint?' · +1 💡 pista':'')+(heroHintBonus?' · Van: +2 💡 pistas':'');
+    $('winStory').hidden=G.n%10!==0;
     $('winStory').textContent=G.n%10===0?CHAPTERS[zoneIdx(G.n)].end:`${heroOf().name}: ${HERO_LORE[heroOf().id].quote}`;
     $('breakdown').innerHTML=prac?`<div><span>Eficiencia ${pc}%</span><b>${G.moves} / ${G.opt}</b></div><div><span>Modo práctica</span><b>sin puntaje</b></div>`:
       `<div><span>Base del nivel</span><b>${cgw.base.toLocaleString('de-DE')}</b></div>`+
@@ -2178,7 +2147,7 @@ openMenu();
 /* ============================ PWA ============================ */
 // El récord y la partida en curso viven en localStorage; pedimos al navegador que no los borre
 if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{});
-const APP_VERSION='34';                      // debe coincidir con VERSION de sw.js (desbloquea-vNN)
+const APP_VERSION='35';                      // debe coincidir con VERSION de sw.js (desbloquea-vNN)
 $('ver').textContent='Versión '+APP_VERSION;
 let pendingWorker=null,updating=false;
 function showUpdate(w){pendingWorker=w;$('upd').classList.add('show');sfx.hint()}
@@ -2212,14 +2181,53 @@ const showInstall=v=>document.querySelectorAll('.install').forEach(b=>b.style.di
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;showInstall(true)});
 document.querySelectorAll('.install').forEach(b=>b.onclick=async()=>{if(!deferredInstall)return;deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;showInstall(false)});
 addEventListener('appinstalled',()=>showInstall(false));
-// guarda al salir o cambiar de app (por si el móvil cierra la pestaña)
-addEventListener('pagehide',()=>{if(run)saveRun();else persist()});
-document.addEventListener('visibilitychange',()=>{
-  if(document.hidden){if(run)saveRun();if(AC&&AC.state==='running')AC.suspend()}
-  else if(AC&&AC.state==='suspended'&&!muted)AC.resume();
-});
-// los navegadores móviles exigen un gesto del usuario para activar el audio
-addEventListener('pointerdown',()=>{if(!muted)ctx()},{once:true});
+/* Safari may return from background as "interrupted", not just "suspended".
+   Retry resume directly inside every trusted gesture; never await before it. */
+function clearAudioRecoveryHint(){clearTimeout(audioRecoveryTimer);audioRecoveryTimer=0;const hint=$('audioRecover');if(hint)hint.hidden=true}
+function queueAudioRecoveryHint(){
+ if(audioRecoveryTimer||document.hidden||audioPageHidden||muted||!Music.playing)return;
+ audioRecoveryTimer=setTimeout(()=>{audioRecoveryTimer=0;if(audioNeedsRecovery&&!document.hidden&&!audioPageHidden&&!muted&&Music.playing)$('audioRecover').hidden=false},700);
+}
+function completeAudioRecovery(owner=AC){
+ if(owner!==AC||!owner||owner.state!=='running'||document.hidden||audioPageHidden||muted)return;
+ const needed=audioNeedsRecovery;audioNeedsRecovery=false;clearAudioRecoveryHint();
+ if(needed&&Music.playing)Music.recover();
+}
+function handleAudioState(owner){
+ if(owner!==AC)return;
+ if(owner.state==='running'){completeAudioRecovery(owner);return}
+ audioNeedsRecovery=true;Music.background();
+ if(!document.hidden&&!audioPageHidden&&!muted&&owner.state!=='closed')recoverPageAudio();
+}
+function recoverPageAudio(fromGesture=false){
+ if(fromGesture&&!document.hidden)audioPageHidden=false;
+ if(document.hidden||audioPageHidden||muted){clearAudioRecoveryHint();return}
+ if(!AC){if(!fromGesture)return;try{ctx()}catch(_){return}}
+ if(AC.state==='running'&&!audioNeedsRecovery)return;
+ audioNeedsRecovery=true;
+ try{
+  if(AC.state==='closed')ctx();
+  const owner=AC;
+  if(owner.state==='running'){completeAudioRecovery(owner);return}
+  // Must be called synchronously from touch/pointer/key handlers on iOS.
+  Promise.resolve(owner.resume()).then(()=>completeAudioRecovery(owner)).catch(()=>queueAudioRecoveryHint());
+ }catch(_){queueAudioRecoveryHint()}
+ queueAudioRecoveryHint();
+}
+function suspendPageAudio(){
+ audioPageHidden=true;
+ if(run)saveRun();else persist();
+ clearAudioRecoveryHint();Music.background();
+ if(!AC)return;audioNeedsRecovery=true;
+ if(AC.state==='running'){try{Promise.resolve(AC.suspend()).catch(()=>{})}catch(_){}}
+}
+addEventListener('pagehide',suspendPageAudio);
+addEventListener('pageshow',()=>{audioPageHidden=false;recoverPageAudio()});
+addEventListener('focus',()=>{if(!document.hidden)audioPageHidden=false;recoverPageAudio()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)suspendPageAudio();else{audioPageHidden=false;recoverPageAudio()}});
+for(const event of ['pointerdown','touchend','keydown'])addEventListener(event,()=>recoverPageAudio(true),{capture:true,passive:true});
+$('audioRecover').onclick=()=>recoverPageAudio(true);
+
 // evita zoom por gestos y menú contextual al mantener pulsado
 document.addEventListener('gesturestart',e=>e.preventDefault());
 document.addEventListener('contextmenu',e=>e.preventDefault());
