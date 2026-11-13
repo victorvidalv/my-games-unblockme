@@ -644,6 +644,16 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:li
 @media(max-height:660px){.hero-choice{height:150px}.hero-selector{padding:16px!important}.hero-selector h2{font-size:24px}.hero-selector .hero-subtitle{margin-bottom:10px}.hero-power{margin-top:10px;padding:10px}#heroQuote{margin:9px 0}.entry-portrait{width:100px;height:130px}.entry-content{padding:16px}.entry-token{width:48px;height:50px}#entryTitle{margin:15px 0}}
 @media(prefers-reduced-motion:reduce){.entry-glow,.entry-token,.entry-portrait,.rescue-heart{animation:none!important}#bonusIntro.show,#bonusIntro.leaving{animation-duration:.01s}}
 
+
+/* The chosen route remains visible throughout its ten-level stretch. */
+.route-status{display:flex;align-items:center;gap:7px;padding:7px 9px;margin:0 0 9px;border-radius:10px;border:1px solid #ffffff18;background:#0b142744;color:#cbd8e7;font-size:10px;line-height:1.25}
+.route-status strong{font-size:10px;letter-spacing:.06em;flex:1}.route-status small{font-size:9px;opacity:.8;white-space:nowrap}.route-reward{font-size:10px;font-weight:900;border-radius:6px;padding:3px 6px;background:#ffffff0b;white-space:nowrap}
+.adventure-route .route-status{color:#ffe4ac;border-color:#f2cd795c;background:linear-gradient(110deg,#bc863d24,#76542113);box-shadow:inset 0 1px 0 #ffe4ac16}
+.adventure-route .route-reward{background:#f6ce7e;color:#382c22;box-shadow:0 0 12px #e8bc5e25}
+.adventure-route .frame{outline:1px solid #f8d18b99;outline-offset:3px}
+.adventure-route #board .face{outline:2px solid #ffe0a0c4;outline-offset:-2px}
+.adventure-route #board .red .face{outline-color:#ffecb7}
+
 </style>
 </head>
 <body>
@@ -661,6 +671,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:li
 
   <div class="meter" id="meter">
     <div class="hero-hud"><img id="heroHudImg" alt="" width="30" height="34"><b id="heroHudName"></b><span id="heroHudPower"></span></div>
+    <div class="route-status" id="routeStatus"><span id="routeIcon" aria-hidden="true">🌿</span><strong id="routeName">RUTA TRANQUILA</strong><small id="routeScope">NIV. 1–10</small><span class="route-reward" id="routeReward">Normal</span></div>
     <div class="mrow"><span>MOVIMIENTOS <b id="mv">0</b></span><span>Mín <b id="mn" style="font-size:14px">–</b> · Límite <b id="lim" style="font-size:14px">–</b></span></div>
     <div class="bar"><i id="fill"></i><u></u></div>
     <div class="pot"><span>Base <b id="base">0</b></span><span>Ganarías ahora <b id="pot">+0</b></span></div>
@@ -1431,7 +1442,7 @@ async function startRun(start,mode){
   const seed=menuSeed; menuSeed=Math.floor(Math.random()*2**31);
   Object.keys(packs).forEach(k=>{if(!k.startsWith(seed+':'))delete packs[k]});
   run={seed,level:1,start,mode,hero:chosen,lifeUsed:false,undoUsedAt:0,vanAwardedAt:0,score:0,hints:3+Math.floor(start/25),adj:0,streak:0,recBroken:false};
-  syncHero();applyZone(0);saveRun();getPack(run.level);                     // se genera el nivel mientras se muestra el mapa
+  syncHero();syncRouteStyle();applyZone(0);saveRun();getPack(run.level);                     // se genera el nivel mientras se muestra el mapa
   travelDialog(true).then(()=>showMap(zoneIdx(run.level),zoneIdx(run.level))).then(startLevel);
 }
 async function startLevel(){
@@ -1574,7 +1585,7 @@ function fitScores(){                 // reduce la cifra si no cabe en su cuadro
 }
 function recLine(){            // refresca camino, puntaje actual y máximo del camino en juego
   const prac=run.mode==='p',rec=store.paths[rkey()]||{score:0,level:0},p=pathOf(run.start);
-  $('pchip').textContent=p.n.toUpperCase()+(run.route==='brave'?(run.mode==='p'?' · AVENTURERA':' · RUTA +10%'):'');$('pchip').style.color=p.c;
+  $('pchip').textContent=p.n.toUpperCase();$('pchip').style.color=p.c;
   if(prac){
     $('scoreLbl').textContent='MODO';$('score').textContent='Práctica';
     $('maxLbl').textContent='NIVEL MÁX.';$('scoreMax').textContent=Math.max(rec.level,run.level);
@@ -1586,7 +1597,16 @@ function recLine(){            // refresca camino, puntaje actual y máximo del 
   $('scMax').classList.toggle('broken',!!run.recBroken);
   fitScores();
 }
+function syncRouteStyle(){
+ const brave=!!run&&run.route==='brave';document.body.classList.toggle('adventure-route',brave);
+ const level=run?.level||1,first=Math.floor((level-1)/10)*10+1,last=Math.min(100,first+9),practice=run?.mode==='p';
+ $('routeName').textContent=brave?'RUTA AVENTURERA':'RUTA TRANQUILA';$('routeIcon').textContent=brave?'✦':'🌿';
+ $('routeScope').textContent=`NIV. ${first}–${last}`;$('routeReward').textContent=brave?(practice?'Más reto':'+10 % puntos'):'Normal';
+ $('routeStatus').setAttribute('aria-label',brave?`Ruta aventurera, niveles ${first} a ${last}. Puzles algo más difíciles${practice?', sin puntos en Práctica.':' y diez por ciento más de puntos.'}`:`Ruta tranquila, niveles ${first} a ${last}. Dificultad habitual.`);
+}
+
 function updateHud(){
+  syncRouteStyle();
   updateHeroHud();
   $('mv').textContent=G.moves;
   const f=$('fill'),pct=Math.min(100,G.moves/G.limit*100);
@@ -1911,6 +1931,7 @@ $('pHow').onclick=()=>$('how').classList.add('show');
 $('bHowMenu').onclick=()=>$('how').classList.add('show');
 $('howOk').onclick=()=>$('how').classList.remove('show');
 function openMenu(){
+  syncRouteStyle();
   renderPaths();prefetchMenu();
   const active=run&&G&&!G.done, canCont=!!store.run&&!active;
   const b=$('bContinue');b.style.display=canCont?'':'none';
@@ -1933,7 +1954,7 @@ openMenu();
 /* ============================ PWA ============================ */
 // El récord y la partida en curso viven en localStorage; pedimos al navegador que no los borre
 if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{});
-const APP_VERSION='32';                      // debe coincidir con VERSION de sw.js (desbloquea-vNN)
+const APP_VERSION='33';                      // debe coincidir con VERSION de sw.js (desbloquea-vNN)
 $('ver').textContent='Versión '+APP_VERSION;
 let pendingWorker=null,updating=false;
 function showUpdate(w){pendingWorker=w;$('upd').classList.add('show');sfx.hint()}
