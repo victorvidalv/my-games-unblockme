@@ -38,18 +38,25 @@ addEventListener('resize',fitBoard);addEventListener('orientationchange',()=>set
 if(window.visualViewport)visualViewport.addEventListener('resize',fitBoard);
 const LOCK_SVG='<svg class="lk shut" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><circle cx="12" cy="16" r="1.6" class="hole"/></svg>'
   +'<svg class="lk free" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/><circle cx="12" cy="16" r="1.6" class="hole"/></svg>';
-const HEAVY_MARK='<span class="mk heavy" title="Pesada: 1 casilla"><b>1</b><i>⇄</i></span>';
+const HEAVY_MARK='<span class="mk heavy" title="Pesada: 1 casilla"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14.6" fill="#2b323a" stroke="#1c1208" stroke-width="1.4"/><circle cx="16" cy="16" r="12.6" fill="none" stroke="#f1e6c8" stroke-width="1.8"/><text x="16" y="19.6" text-anchor="middle" font-family="Georgia,serif" font-weight="900" font-size="17" fill="#fff3d0">1</text><path d="M8.2 25.4h5M10.6 23.6l-2.4 1.8 2.4 1.8M23.8 25.4h-5M21.4 23.6l2.4 1.8-2.4 1.8" fill="none" stroke="#ffd98a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+const STRAPS='<span class="strap h"></span><span class="strap v"></span>';
 export function buildPieces(){
-  boardEl.querySelectorAll('.piece,.wall,.plate').forEach(e=>e.remove());
+  boardEl.querySelectorAll('.piece,.wall,.plate,.links').forEach(e=>e.remove());
   boardEl.dataset.city=zoneIdx(S.G.n);
   S.G.gateLocked={};
   S.G.wallEls=(S.G.walls||[]).map(()=>{const el=document.createElement('div');el.className='wall';el.innerHTML='<i></i>';boardEl.appendChild(el);return el});
   S.G.plateEls=S.G.pieces.map(p=>{if(p.kind!=='gate')return null;const el=document.createElement('div');el.className='plate';el.innerHTML='<i></i>';boardEl.appendChild(el);return el});
+  S.G.linkEls={};
+  if(S.G.plateEls.some(Boolean)){                // un hilo punteado une cada candado con su placa: se ve qué abre qué
+    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('class','links');svg.setAttribute('aria-hidden','true');
+    S.G.pieces.forEach((p,i)=>{if(p.kind!=='gate')return;const ln=document.createElementNS('http://www.w3.org/2000/svg','line');ln.setAttribute('class','link');svg.appendChild(ln);S.G.linkEls[i]=ln});
+    boardEl.appendChild(svg);
+  }
   S.G.els=S.G.pieces.map((p,i)=>{
     const el=document.createElement('div');
     el.className='piece enter '+p.o+' '+(i===0?'red':'c'+S.G.colors[i%8])+(p.kind?' '+p.kind:'');
     el.style.setProperty('--dl',(i*18)+'ms');
-    el.innerHTML='<div class="face"></div>'+(p.kind==='gate'?'<span class="mk gate">'+LOCK_SVG+'</span>':p.kind==='heavy'?HEAVY_MARK:'');
+    el.innerHTML='<div class="face"></div>'+(p.kind==='gate'?STRAPS+'<span class="mk gate">'+LOCK_SVG+'</span>':p.kind==='heavy'?HEAVY_MARK:'');
     el.addEventListener('animationend',e=>{if(e.animationName==='enter')el.classList.remove('enter')});
     boardEl.appendChild(el);attach(el,i);return el;
   });
@@ -67,6 +74,16 @@ function placeStatic(){
 }
 const flashEl=(el,cls,ms)=>{el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);setTimeout(()=>el.classList.remove(cls),ms)};
 /** Candados: se cierran o se abren según la placa; al abrirse suena y brilla. */
+/** Redibuja el hilo que une cada candado con su placa (sigue al candado cuando se mueve). */
+export function updateLinks(){
+  const G=S.G;if(!G||!G.linkEls)return;const s=cellPx();
+  for(const i in G.linkEls){
+    const p=G.pieces[i],x=G.pos[i],ln=G.linkEls[i];
+    const gx=(p.o==='h'?x+p.len/2:p.fix+.5)*s,gy=(p.o==='h'?p.fix+.5:x+p.len/2)*s;
+    ln.setAttribute('x1',gx);ln.setAttribute('y1',gy);ln.setAttribute('x2',(p.plate[1]+.5)*s);ln.setAttribute('y2',(p.plate[0]+.5)*s);
+    ln.classList.toggle('open',!G.gateLocked?.[i]);
+  }
+}
 export function syncSpecials(animate=true){
   const G=S.G;if(!G||!G.plateEls)return;
   G.pieces.forEach((p,i)=>{
@@ -80,7 +97,7 @@ export function syncSpecials(animate=true){
     }
   });
 }
-export const layout=()=>{if(!S.G)return;S.G.els.forEach((_,i)=>place(i));placeStatic();syncSpecials(false)};
+export const layout=()=>{if(!S.G)return;S.G.els.forEach((_,i)=>place(i));placeStatic();syncSpecials(false);updateLinks()};
 
 
 let activeDrag=null;                           // arrastre en curso: solo puede haber uno (evita dos dedos a la vez)
@@ -109,7 +126,7 @@ function attach(el,i){
       el.classList.remove('drag');
       const x=commit&&S.G&&!S.G.done?snapDrag(x0,lo,hi,delta):x0;
       if(x!==x0){S.G.hist.push(S.G.pos.slice());S.G.pos[i]=x;S.G.moves++;(p.kind==='heavy'?sfx.heavyMove:p.kind==='gate'?sfx.gateMove:sfx.move)();$('bUndo').disabled=false}
-      if(S.G&&S.G.els[i]===el){place(i);syncSpecials()}
+      if(S.G&&S.G.els[i]===el){place(i);syncSpecials();updateLinks()}
       if(x!==x0) afterMove();
     };
     const handlers={pointermove:move,pointerup:ev=>{if(ev.pointerId===e.pointerId)end(true)},pointercancel:()=>end(true),lostpointercapture:()=>end(true)};

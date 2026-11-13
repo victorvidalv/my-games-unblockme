@@ -36,8 +36,16 @@
 
 /* Candado: la pieza lleva rayas y un candado; cerrado se ve apagada */
 .piece .mk{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;pointer-events:none;display:grid;place-items:center}
-.piece.gate .face{background-image:repeating-linear-gradient(135deg,#0000002e 0 7px,#0000 7px 14px)}
-.piece.gate.locked .face{filter:saturate(.35) brightness(.78)}
+.piece.gate .face{background-image:repeating-linear-gradient(135deg,#00000026 0 7px,#0000 7px 14px),linear-gradient(165deg,var(--a),var(--b))}
+.piece.gate.locked .face{filter:saturate(.45) brightness(.8)}
+.piece.gate .strap{position:absolute;z-index:2;pointer-events:none;transition:opacity .35s,transform .35s;
+  background:radial-gradient(circle,#1c1208 0 1.5px,#0000 2px) 0 0/15px 100% repeat-x,linear-gradient(#a28a62,#6a563c 55%,#a28a62);
+  box-shadow:0 0 0 2px #1c1208,0 2px 4px #0008}
+.piece.gate .strap.h{left:calc(var(--gap) - 3px);right:calc(var(--gap) - 3px);top:50%;height:calc(var(--cell)*.17);margin-top:calc(var(--cell)*-.085)}
+.piece.gate .strap.v{top:calc(var(--gap) - 3px);bottom:calc(var(--gap) - 3px);left:50%;width:calc(var(--cell)*.17);margin-left:calc(var(--cell)*-.085);
+  background:radial-gradient(circle,#1c1208 0 1.5px,#0000 2px) 0 0/100% 15px repeat-y,linear-gradient(90deg,#a28a62,#6a563c 55%,#a28a62)}
+.piece.gate.open .strap{opacity:0;transform:scale(.7)}
+.piece.gate.locked{filter:drop-shadow(0 0 0 #0000)}
 .piece.gate .mk{width:calc(var(--cell)*.52);height:calc(var(--cell)*.52);border-radius:50%;background:#1b2731cc;border:2px solid #ffd98a;box-shadow:0 2px 6px #000a}
 .piece.gate .lk{width:68%;height:68%;fill:#ffd98a;stroke:#ffd98a;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
 .piece.gate .lk path{fill:none;stroke-width:2.4}.piece.gate .lk .hole{fill:#1b2731;stroke:none}
@@ -49,17 +57,22 @@
 .piece.just-open .face{animation:just-open .9s ease-out}
 @keyframes just-open{0%{filter:brightness(2) saturate(1.6);transform:scale(1.04)}100%{filter:none;transform:none}}
 
-/* Pieza pesada: remaches de hierro y una insignia «1 casilla» */
-.piece.heavy .face{box-shadow:0 5px 0 var(--d),0 9px 12px #0009,inset 0 2px 0 #ffffff77,inset 0 -3px 5px #0004,inset 0 0 0 3px #cfd6dd88;
-  background-image:radial-gradient(circle at 10% 20%,#0006 0 3px,#0000 4px),radial-gradient(circle at 90% 20%,#0006 0 3px,#0000 4px),radial-gradient(circle at 10% 80%,#0006 0 3px,#0000 4px),radial-gradient(circle at 90% 80%,#0006 0 3px,#0000 4px)}
-.piece .mk.heavy{width:calc(var(--cell)*.5);height:calc(var(--cell)*.5);border-radius:50%;background:#262c33;border:2px solid #e6ddc4;color:#fff;font-weight:900;box-shadow:0 2px 6px #000a}
-.piece .mk.heavy b{font-size:calc(var(--cell)*.27);line-height:1}
-.piece .mk.heavy i{position:absolute;bottom:-.55em;font-size:calc(var(--cell)*.2);font-style:normal;color:#ffd98a;text-shadow:0 1px 2px #000}
+/* Pieza pesada: del MISMO color que las demás, con marco y remaches de hierro y la insignia «1» encima */
+.piece.heavy .face{
+  background-image:
+    radial-gradient(circle at 11% 17%,#1c1208 0 2.4px,#efe5c9 2.7px 4.1px,#0000 4.4px),
+    radial-gradient(circle at 89% 17%,#1c1208 0 2.4px,#efe5c9 2.7px 4.1px,#0000 4.4px),
+    radial-gradient(circle at 11% 83%,#1c1208 0 2.4px,#efe5c9 2.7px 4.1px,#0000 4.4px),
+    radial-gradient(circle at 89% 83%,#1c1208 0 2.4px,#efe5c9 2.7px 4.1px,#0000 4.4px),
+    linear-gradient(165deg,var(--a),var(--b));
+  box-shadow:0 3px 0 var(--d),0 5px 6px #0004,inset 0 0 0 3px #d5dce2cc,inset 0 0 0 5px #4a525a55,inset 0 1px 0 #ffffff55}
+.piece .mk.heavy{width:calc(var(--cell)*.58);height:calc(var(--cell)*.58);filter:drop-shadow(0 3px 3px #000a)}
+.piece .mk.heavy svg{width:100%;height:100%;display:block}
 
 /* Leyenda bajo el tablero */
-.legend{display:flex;flex-wrap:nowrap;gap:5px;justify-content:center;width:calc(var(--cell)*6 + 28px);max-width:100%;margin-top:-4px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 5px;justify-content:center;width:calc(var(--cell)*6 + 28px);max-width:100%;margin-top:-4px}
 .legend[hidden]{display:none}
-.chip{font-size:10.5px;padding:2px 8px;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;border-radius:99px;background:#ffffff12;border:1px solid #ffffff26;color:#e9ddc3;white-space:nowrap}
+.chip{line-height:1.45;font-size:10.5px;padding:2px 8px;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;border-radius:99px;background:#ffffff12;border:1px solid #ffffff26;color:#e9ddc3;white-space:nowrap}
 .chip i{font-style:normal;margin-right:4px}
 .chip.boss{background:#ffd24a22;border-color:#ffd24a88;color:#ffe6a0}
 
@@ -95,7 +108,7 @@
 @keyframes demo-shut{0%,36%{opacity:1}40%,75%{opacity:0}100%{opacity:1}}
 @keyframes demo-free{0%,36%{opacity:0}40%,75%{opacity:1}100%{opacity:0}}
 @keyframes demo-gate{0%,45%{left:92px}65%,75%{left:150px}100%{left:92px}}
-.heavy-demo .heavy-p{left:20px;background:linear-gradient(#9aa3ad,#5f6872);display:grid;place-items:center;font-weight:900;color:#fff;font-size:22px;animation:demo-heavy 3s ease-in-out infinite}
+.heavy-demo .heavy-p{left:20px;background:linear-gradient(#7fb4e6,#4a82b8);box-shadow:0 4px 0 #0006,inset 0 0 0 3px #d5dce2cc;display:grid;place-items:center;font-weight:900;color:#fff;font-size:22px;animation:demo-heavy 3s ease-in-out infinite}
 .heavy-demo .steps{position:absolute;left:84px;top:22px;font-size:26px;letter-spacing:6px;color:#ffd98a;animation:demo-steps 3s infinite}
 @keyframes demo-heavy{0%,20%{left:20px}40%,60%{left:76px}100%{left:20px}}
 @keyframes demo-steps{0%,20%{opacity:.3}45%{opacity:1}100%{opacity:.3}}
@@ -111,3 +124,10 @@
 .boss-demo{display:grid;place-items:center;font-size:56px;animation:boss-pulse 1.4s ease-in-out infinite;background:radial-gradient(circle,#ffd24a33,#0c1820 70%)}
 @keyframes boss-pulse{50%{transform:scale(1.12);filter:drop-shadow(0 0 14px #ffd24a)}}
 @media(prefers-reduced-motion:reduce){.mini *,.plate.hint i,.coach-glow{animation:none!important}}
+
+/* Hilo candado ↔ placa, y placa activa por encima de la pieza que la cubre */
+.links{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:visible}
+.link{stroke:#ffd98a99;stroke-width:3;stroke-dasharray:2 9;stroke-linecap:round;transition:stroke .3s}
+.link.open{stroke:#7dffb0;stroke-dasharray:none;stroke-width:3.5;filter:drop-shadow(0 0 6px #7dffb0)}
+.plate.on{z-index:4}
+.plate.on i{background:none;box-shadow:0 0 14px #ffd24acc,inset 0 0 10px #ffd24aaa}

@@ -11,7 +11,9 @@ import { icon } from '../ui/icons.js';
 import { buildLevel, pickBoard, varyBoard } from '../engine/levels.js';
 import levelBank from '../data/levels.json';
 import specialBank from '../data/special.json';
-import { BOSS_BOOST, BOSS_HINTS, BOSS_NAMES, levelPlan } from './mechanics.js';
+import { BOSS_BOOST, BOSS_HINTS, BOSS_NAMES, levelPlan, tutorialFor } from './mechanics.js';
+import { decodeBoard } from '../engine/board.js';
+import { minMoves } from '../engine/solver.js';
 import { baseScore } from '../engine/scoring.js';
 import { canRescue, clearRewards, useRescue } from './heroes.js';
 import { S, gainNow, heroOf, persist, rkey, store, undosLeft } from '../state.js';
@@ -25,7 +27,7 @@ import { openMenu } from '../ui/menu.js';
 import { heroArt, storyFor } from '../ui/story.js';
 export function saveRun(){
  if(S.run&&S.G&&!S.G.done&&S.G.n===S.run.level&&!S.run.pendingClear&&!S.run.rescue){
-  S.run.board={level:S.G.n,rate:S.G.rate,pieces:S.G.pieces.map(p=>({...p})),walls:(S.G.walls||[]).map(w=>w.slice()),pos:S.G.pos.slice(),start:S.G.start.slice(),opt:S.G.opt,limit:S.G.limit,bought:S.G.bought||0,moves:S.G.moves,hist:S.G.hist.map(p=>p.slice()),colors:S.G.colors?.slice()};
+  S.run.board={level:S.G.n,rate:S.G.rate,pieces:S.G.pieces.map(p=>({...p})),walls:(S.G.walls||[]).map(w=>w.slice()),pos:S.G.pos.slice(),start:S.G.start.slice(),opt:S.G.opt,limit:S.G.limit,bought:S.G.bought||0,tutorial:S.G.tutorial||null,moves:S.G.moves,hist:S.G.hist.map(p=>p.slice()),colors:S.G.colors?.slice()};
  }
  store.run=S.run&&{...S.run};persist();
 }
@@ -44,14 +46,21 @@ export async function startLevel(){
   const rate=rateAt(S.run.start,S.run.level);
   // Tablero precalculado para esta dificultad; el objetivo se desplaza según tu eficiencia (adaptativo)
   const plan=levelPlan(S.run.level);                               // ¿normal, con muros, candados, pesadas o jefe?
-  const base=pickBoard(levelBank.ratings,rate,S.run.seed,S.run.level,plan.family,specialBank);
-  const board=varyBoard(base,rate,hash32(S.run.seed,S.run.level,7));   // variante propia de cada partida
-  const lvl=buildLevel(board,{rating:rate,adj:S.run.adj,brave:S.run.route==='brave',boost:plan.boss?BOSS_BOOST:0});
-  S.G={n:S.run.level,rate,pieces:lvl.pieces,pos:lvl.pos,walls:lvl.walls||[],start:lvl.pos.slice(),opt:lvl.opt,limit:moveLimit(lvl.opt),moves:0,hist:[],done:false,els:[],boss:plan.boss,plan,family:base.family};
+  const tut=S.run.mode==='p'?null:tutorialFor(S.run.level,store.tips);       // primera vez de una pieza: tablero de aprendizaje
+  let base,lvl;
+  if(tut){
+   const b=decodeBoard(tut.board);base={...b,family:plan.family};
+   lvl={pieces:b.pieces,pos:b.pos,walls:b.walls,opt:minMoves(b.pieces,b.pos,b.walls)};
+  }else{
+   base=pickBoard(levelBank.ratings,rate,S.run.seed,S.run.level,plan.family,specialBank);
+   const board=varyBoard(base,rate,hash32(S.run.seed,S.run.level,7));   // variante propia de cada partida
+   lvl=buildLevel(board,{rating:rate,adj:S.run.adj,brave:S.run.route==='brave',boost:plan.boss?BOSS_BOOST:0});
+  }
+  S.G={n:S.run.level,rate,pieces:lvl.pieces,pos:lvl.pos,walls:lvl.walls||[],start:lvl.pos.slice(),opt:lvl.opt,limit:moveLimit(lvl.opt),moves:0,hist:[],done:false,els:[],boss:plan.boss&&!tut,plan,family:base.family,tutorial:tut?tut.mech:null};
   if(S.run.rescue&&S.run.rescue.level===S.run.level){const r=S.run.rescue;S.G={...S.G,rate:r.rate,pieces:r.pieces,walls:(r.walls||[]).map(w=>w.slice()),pos:r.start.slice(),start:r.start.slice(),opt:r.opt,limit:moveLimit(r.opt)}}
   const saved=S.run.board;
   if(!S.run.rescue&&saved?.level===S.run.level&&saved.pieces?.length===saved.pos?.length&&saved.start?.length===saved.pos.length){
-   S.G={...S.G,rate:saved.rate,pieces:saved.pieces.map(p=>({...p})),walls:(saved.walls||[]).map(w=>w.slice()),pos:saved.pos.slice(),start:saved.start.slice(),opt:saved.opt,limit:saved.limit,bought:saved.bought||0,moves:saved.moves||0,hist:(saved.hist||[]).map(p=>p.slice())};
+   S.G={...S.G,rate:saved.rate,pieces:saved.pieces.map(p=>({...p})),walls:(saved.walls||[]).map(w=>w.slice()),pos:saved.pos.slice(),start:saved.start.slice(),opt:saved.opt,limit:saved.limit,bought:saved.bought||0,tutorial:saved.tutorial||null,moves:saved.moves||0,hist:(saved.hist||[]).map(p=>p.slice())};
   }
   S.G.colors=saved?.level===S.run.level&&saved.colors?saved.colors.slice():[0,1,2,3,4,5,6,7].sort(()=>Math.random()-.5);
   $('lvl').textContent=S.G.n;$('mn').textContent=S.G.opt;$('base').textContent=S.run.mode==='p'?'—':baseScore(S.G.rate);

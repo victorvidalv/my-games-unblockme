@@ -1,7 +1,7 @@
 import { sfx } from '../audio/sound.js';
 import { $ } from '../dom.js';
 import { hintMove } from '../engine/solver.js';
-import { BOSS_BOOST, BOSS_HINTS, BOSS_NAMES, MECHANICS } from '../game/mechanics.js';
+import { BOSS_BOOST, BOSS_HINTS, BOSS_NAMES, MECHANICS, TUTORIALS } from '../game/mechanics.js';
 import { BOSS_POINTS } from '../engine/scoring.js';
 import { zoneIdx } from '../data/zones.js';
 import { S, heroOf, persist, store } from '../state.js';
@@ -26,10 +26,11 @@ export function mechanicsPresent(G) {
 export function renderLegend() {
   const el = $('legend');
   const G = S.G;
-  const chips = G ? mechanicsPresent(G).map((m) => `<span class="chip ${m}"><i>${icon(MECHANICS[m].icon)}</i>${MECHANICS[m].chip}</span>`) : [];
+  const chips = G ? mechanicsPresent(G).map((m) => `<span class="chip chip-${m}"><i>${icon(MECHANICS[m].icon)}</i>${MECHANICS[m].chip}</span>`) : [];
   if (G?.boss) chips.push(`<span class="chip boss"><i>${icon('crown')}</i>Jefe +${Math.round((BOSS_POINTS - 1) * 100)} % · ${BOSS_HINTS} pistas</span>`);
   el.innerHTML = chips.join('');
   el.hidden = !chips.length;
+  dispatchEvent(new Event('resize'));            // la leyenda ocupa sitio: el tablero se reajusta para no taparla
 }
 
 const DEMO = {
@@ -84,7 +85,7 @@ function show(ids, done) {
 }
 
 /** Marca el siguiente mejor movimiento con un brillo y lo describe (solo en el nivel de aprendizaje). */
-function pointAtNextMove(prefix = '') {
+function pointAtNextMove(prefix = '', custom = null) {
   const G = S.G;
   if (!G || G.done) return;
   const h = hintMove(G.pieces, G.pos, G.walls);
@@ -93,7 +94,17 @@ function pointAtNextMove(prefix = '') {
   const dir = p.o === 'h' ? (h.to > h.from ? 'derecha' : 'izquierda') : (h.to > h.from ? 'abajo' : 'arriba');
   G.els.forEach((e) => e.classList.remove('hint'));
   G.els[h.i].classList.add('hint');
-  $('msg').textContent = `${prefix}Arrastra el bloque que brilla hacia ${dir}.`;
+  $('msg').textContent = custom ?? `${prefix}Arrastra el bloque que brilla hacia ${dir}.`;
+}
+
+/** Guía del nivel de aprendizaje: señala el siguiente movimiento y explica el paso. */
+function guide() {
+  const G = S.G;
+  if (!G || G.done) return;
+  if (G.tutorial && TUTORIALS[G.tutorial]) {
+    const steps = TUTORIALS[G.tutorial].steps;
+    pointAtNextMove('', steps[Math.min(G.moves, steps.length - 1)]);
+  } else if (G.n === 1 && !G.moves) pointAtNextMove();
 }
 
 /** Se llama al empezar cada nivel. */
@@ -111,21 +122,22 @@ export function startCoach() {
   queue.push(...mechanicsPresent(G));
   if (G.boss) queue.push('boss');
   const todo = queue.filter((id) => !store.tips[id]);
-  if (!todo.length) { if (G.n === 1 && !G.moves) pointAtNextMove(); return; }
+  if (!todo.length) { guide(); return; }
   showing = true;
   const wasBusy = S.busy;
   S.busy = true;
   show(todo, () => {
     showing = false;
     S.busy = wasBusy;
-    if (G.n === 1 && !G.moves) pointAtNextMove();
+    guide();
   });
 }
 
 /** Tras cada movimiento del nivel 1 se sigue señalando el siguiente (aprendizaje guiado). */
 export function coachOnMove() {
   const G = S.G;
-  if (!G || G.n !== 1 || G.done || S.run?.mode === 'p' || !G.moves) return;
-  if (G.pos[0] === 4) return;
+  if (!G || G.done || S.run?.mode === 'p' || !G.moves || G.pos[0] === 4) return;
+  if (G.tutorial) { guide(); return; }
+  if (G.n !== 1) return;
   pointAtNextMove('¡Muy bien! ');
 }
