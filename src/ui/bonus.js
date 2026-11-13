@@ -1,7 +1,7 @@
 import { sfx, tone, vib } from '../audio/sound.js';
 import { HERO_TALK } from '../data/story.js';
 import { ZONES, zoneIdx } from '../data/zones.js';
-import { $ } from '../dom.js';
+import { $, cssUrl } from '../dom.js';
 import { saveRun } from '../game/session.js';
 import { S, heroOf } from '../state.js';
 import { catchPrize, pickBonusKind } from '../game/minigames.js';
@@ -38,7 +38,7 @@ export async function showBonus(){
   const m=$('bonus'),stage=$('bStage'),go=$('bGo'),action=$('bAction'),result=$('bRes');
   const titles={cards:'Las cartas del umbral',wheel:'La rueda de los sellos',slots:'El altar de los ecos',catch:'Las luciérnagas del camino'};
   const lines={cards:'Busca tres símbolos iguales. El primer trío decide tu premio.',wheel:'Gira una vez. La marca roja señala tu premio en pistas.',slots:'Tres amuletos iguales: +3 pistas. Dos iguales: +1. Todos distintos: 0.',catch:'Toca las luciérnagas antes de que se escapen. ¡Las doradas valen 3!'};
-  const zone=zoneIdx(Math.max(1,S.run.level-1));m.style.setProperty('--bonus-scene',`url("backgrounds/zone-${zone+1}.webp")`);m.dataset.game=plan.kind;
+  const zone=zoneIdx(Math.max(1,S.run.level-1));m.style.setProperty('--bonus-scene',cssUrl(`backgrounds/zone-${zone+1}.webp`));m.dataset.game=plan.kind;
   $('bTag').textContent=`UN DESCANSO · ${ZONES[zone].n.toUpperCase()}`;
   $('bTitle').textContent=titles[plan.kind];$('bSub').textContent=lines[plan.kind];
   $('bHero').innerHTML=heroMarkup(heroOf(),'story');$('bSpeech').textContent=HERO_TALK[heroOf().id].bonus[plan.kind];

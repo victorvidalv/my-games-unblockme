@@ -1,6 +1,6 @@
 /* One material language: ink, painted wood, paper and worn brass. */
 :root{--ink:#18262f;--paper:#e9ddc3;--brass:#bd9b65;--key:#bd6954}
-body{background:#111e29;color:#e4dfd2}body::before{background:linear-gradient(#10202b99,#10202bd6),var(--scene) center/cover}
+body{background:#111e29;color:#e4dfd2}body::before{background:radial-gradient(ellipse at 50% 55%,#10202b1f 0,#10202b66 100%),var(--scene) center/cover}   /* el fondo de la ciudad se ve; solo se oscurece en los bordes */
 button{border-radius:9px;background:#2b3b46;box-shadow:0 2px 0 #0b1821,inset 0 1px 0 #ffffff12;font-weight:650;transition:background .15s,transform .1s}
 button.primary{background:#b66a53;color:#fff5e3;box-shadow:0 2px 0 #704439,inset 0 1px 0 #ffe2b52b;text-shadow:none}
 button:active,button.primary:active{transform:translateY(1px);box-shadow:none}
@@ -53,3 +53,6 @@ button:active,button.primary:active{transform:translateY(1px);box-shadow:none}
 .map-close[hidden]{display:none}.map-close:active{transform:translate(-50%,1px)}#journey[aria-modal=true]{padding-bottom:calc(env(safe-area-inset-bottom) + 75px)}#journey[aria-modal=true] .mcap p{font-size:13px;color:#d7d6c8}
 
 #journey[aria-modal=true]{background:#142631}
+
+/* Con el fondo de la ciudad a la vista, los textos sueltos llevan sombra para leerse sobre cualquier paisaje */
+.hint-text,.legend,.rec-line{text-shadow:0 1px 3px #000d,0 0 10px #000b}

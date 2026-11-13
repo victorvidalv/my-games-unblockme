@@ -2,13 +2,13 @@ import { Music } from '../audio/music.js';
 import { sfx } from '../audio/sound.js';
 import { CHAPTERS, HERO_LORE } from '../data/story.js';
 import { ZONES, zoneOf, zoneStep } from '../data/zones.js';
-import { $ } from '../dom.js';
+import { $, cssUrl } from '../dom.js';
 import { S, heroOf } from '../state.js';
 import { heroMarkup } from './heroes.js';
 let curZone=-1;
 
 function paintScenery(i){
- document.documentElement.style.setProperty('--scene',`url("backgrounds/zone-${i+1}.webp")`);
+ document.documentElement.style.setProperty('--scene',cssUrl(`backgrounds/zone-${i+1}.webp`));
 }
 export function applyZone(i){
   paintScenery(i);
@@ -66,7 +66,7 @@ export function showMap(fromI,toI,{travel=false,overview=false}={}){
   const hero=mk('g',{class:'atlas-traveler'});hero.innerHTML=heroMarkup(heroOf(),'map');
   const art=hero.firstElementChild;art.style.width='44px';art.style.height='64px';art.setAttribute('width','44');art.setAttribute('height','64');art.setAttribute('x','-22');art.setAttribute('y','-70');
   const place=(x,y)=>hero.setAttribute('transform',`translate(${x} ${y-27})`);place(...pts[open]);
-  el.style.setProperty('--atlas-scene',`url("backgrounds/zone-${toI+1}.webp")`);
+  el.style.setProperty('--atlas-scene',cssUrl(`backgrounds/zone-${toI+1}.webp`));
   $('mTag').textContent=travel?`EL ATLAS DE ${heroOf().name.toUpperCase()} · UN NUEVO HORIZONTE`:`EL ATLAS DE ${heroOf().name.toUpperCase()} · CIUDAD ${toI+1} DE 10`;
   $('mName').textContent=travel?`Hasta pronto, ${ZONES[fromI].n}`:ZONES[toI].n;
   $('mSub').textContent=overview?`Nivel actual ${S.run.level} de 100 · Tramo ${zoneStep(S.run.level)} de 10 en esta ciudad`:travel?CHAPTERS[fromI].end:`Diez puzles, una ciudad y un nuevo capítulo. Nivel ${S.run.level} de 100.`;

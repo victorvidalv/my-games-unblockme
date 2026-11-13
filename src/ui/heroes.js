@@ -1,6 +1,6 @@
 import { Music, setTensionFx } from '../audio/music.js';
 import { sfx } from '../audio/sound.js';
-import { $ } from '../dom.js';
+import { $, cssUrl } from '../dom.js';
 import { saveRun } from '../game/session.js';
 import { HEROES } from '../game/heroes.js';
 import { S, undosLeft, heroOf, pathOf, persist, store } from '../state.js';
@@ -12,7 +12,7 @@ export function chooseHero(start,mode){
  return new Promise(resolve=>{
   const modal=$('heroSelect'),cards=$('heroCards');let selected=heroOf(store.heroChoice||S.run?.hero).id;
   $('heroPath').textContent=`${pathOf(start).n.toUpperCase()} · AVENTURA`;
-  const render=()=>{const h=heroOf(selected);modal.style.setProperty('--chosen',h.color);modal.style.setProperty('--hero-scene',`url("heroes/${h.id}.webp")`);
+  const render=()=>{const h=heroOf(selected);modal.style.setProperty('--chosen',h.color);modal.style.setProperty('--hero-scene',cssUrl(`heroes/${h.id}.webp`));
    cards.innerHTML=HEROES.map(v=>`<button class="hero-choice ${v.id===selected?'selected':''}" role="radio" aria-checked="${v.id===selected}" tabindex="${v.id===selected?0:-1}" data-hero="${v.id}" style="--accent:${v.color}" aria-label="${v.name}: ${v.short}"><img src="${heroArt(v.id,v.id===selected?'ready':'start')}" alt="${v.name}, ${v.role}" width="360" height="720"><span class="hero-choice-name">${v.name}<small>${v.role}</small></span><span class="hero-check" aria-hidden="true">✓</span></button>`).join('');
    $('heroPowerIcon').textContent=h.icon;$('heroPowerTitle').textContent=h.power;$('heroPowerShort').textContent=h.short;$('heroPowerDetail').textContent=h.detail;$('heroQuote').textContent=h.quote;
    $('heroConfirm').textContent=`Comenzar con ${h.name} ➜`;
