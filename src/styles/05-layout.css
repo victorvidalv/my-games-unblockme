@@ -1,0 +1,30 @@
+/* ---------- Adaptación móvil ---------- */
+html{touch-action:manipulation;-webkit-text-size-adjust:100%}
+body{position:fixed;inset:0;width:100%}
+.card{max-height:94dvh;overflow-y:auto;overscroll-behavior:contain}
+button{min-height:44px}
+@media (max-height:740px){
+  #app{gap:7px;padding-top:calc(env(safe-area-inset-top) + 4px);padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
+  .lv b,.score b{font-size:26px}.top small{font-size:9px}.ico{width:36px;height:36px;font-size:15px}
+  .meter{padding:7px 12px 8px}.mrow b{font-size:19px}.bar{height:11px;margin:5px 0 4px}.pot{font-size:11px}
+  .hint-text{height:30px;font-size:12px}
+  button{min-height:42px}.controls button{padding:9px 6px;font-size:13px}
+  .frame{padding:12px;border-radius:22px}
+}
+@media (max-width:359px){ .controls em{display:none}.pot{font-size:10.5px}.mrow{font-size:11px}.rec-line{font-size:9px;letter-spacing:.02em} }
+/* Pantalla apaisada (móvil horizontal, iPad, PC): panel a la izquierda, tablero grande a la derecha */
+@media (min-aspect-ratio:13/10){
+  #app{max-width:none;display:grid;grid-template-columns:minmax(240px,380px) auto;justify-content:center;align-content:center;align-items:center;column-gap:26px;row-gap:9px;
+       padding:calc(env(safe-area-inset-top) + 8px) calc(env(safe-area-inset-right) + 40px) calc(env(safe-area-inset-bottom) + 8px) calc(env(safe-area-inset-left) + 18px)}
+  .top,.prog,.meter,.hint-text,.controls{grid-column:1;width:100%;max-width:none;justify-self:stretch}
+  .frame{grid-column:2;grid-row:1/7}
+}
+/* Tablet y escritorio: más aire y letra más grande */
+@media (min-width:700px) and (max-aspect-ratio:13/10){ #app{max-width:760px} }
+@media (min-width:700px) and (min-height:700px){
+  .lv b,.score b{font-size:40px}.top small{font-size:11px}.ico{width:46px;height:46px;font-size:20px}
+  .mrow{font-size:14px}.mrow b{font-size:28px}.pot{font-size:14px}.pot b{font-size:17px}.bar{height:16px}
+  .hint-text{font-size:15px;height:42px;max-width:520px}button{font-size:16px;min-height:50px}.rec-line{font-size:12px}
+  .meter{padding:13px 18px 14px}
+}
+.install{display:none}

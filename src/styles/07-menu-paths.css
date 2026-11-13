@@ -1,0 +1,73 @@
+/* ---------- Selector de camino ---------- */
+#menu .card{max-width:420px;padding:22px 16px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 6px}
+.seg button{padding:10px 6px;font-size:14px;background:#ffffff12;box-shadow:none;border:2px solid #ffffff1f;line-height:1.2}
+.seg button small{display:block;font-size:11px;opacity:.7;font-weight:600}
+.seg button.on{background:linear-gradient(180deg,#ffb35c,#f07a1c);border-color:#ffd9a2;box-shadow:0 4px 0 #8f4509}
+.seg button:active{transform:none}
+.modeinfo{font-size:12.5px;opacity:.75;margin:4px 4px 12px!important;min-height:34px}
+.paths{display:flex;flex-direction:column;gap:11px;margin-bottom:10px;text-align:left}
+.path{--pc:#43e0c1;border-radius:18px;padding:11px 12px 10px;cursor:pointer;background:linear-gradient(180deg,#ffffff14,#ffffff08);
+  border:1px solid #ffffff22;border-left:6px solid var(--pc);box-shadow:0 5px 0 #0004;transition:transform .1s,filter .15s}
+.path:active{transform:translateY(3px);box-shadow:0 1px 0 #0004}
+.ptop{display:flex;align-items:center;gap:11px}
+.pemo{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex:none;
+  background:linear-gradient(150deg,var(--pc),#0004);box-shadow:inset 0 2px 0 #fff5,0 3px 8px #0006}
+.pinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.pinfo b{font-size:18px;color:#fff}
+.pinfo span{font-size:12.5px;opacity:.85}.pinfo span i{font-style:normal;color:var(--pc);font-weight:900}
+.pinfo small{font-size:11px;opacity:.6}
+.pgo{font-size:20px;color:var(--pc);flex:none}
+.pach{margin-top:9px;padding-top:8px;border-top:1px dashed #ffffff22;display:flex;flex-direction:column;gap:5px;font-size:12px}
+.pach span{opacity:.85}
+.pbar{height:7px;border-radius:5px;background:#0006;overflow:hidden}
+.pbar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--pc),#fff8)}
+.cont{width:100%;margin-bottom:12px}
+.how{font-size:12.5px;text-align:left;opacity:.85;margin-top:6px}
+.how summary{cursor:pointer;text-align:center;font-weight:700;padding:6px}
+.how .rules{margin:8px 0 0}
+/* Menú en dos columnas en pantallas apaisadas */
+@media (min-aspect-ratio:13/10){
+  #menu .card{max-width:min(880px,96vw);display:grid;grid-template-columns:minmax(250px,320px) 1fr;column-gap:22px;align-items:start;text-align:left;padding:18px 20px}
+  #menu .card>*{grid-column:1}
+  #menu .card .paths{grid-column:2;grid-row:1/12;margin:0}
+  #menu .card .tag,#menu .card .logo{text-align:center}
+  #menu .card .how{grid-column:1}
+}
+@media (min-aspect-ratio:13/10) and (max-height:520px){ #menu .card .how{display:none}.modeinfo{min-height:0;font-size:11.5px}.pinfo small{display:none}.path{padding:8px 10px}.pach{margin-top:6px;padding-top:6px}.logo{font-size:30px!important} }
+@media (min-aspect-ratio:13/10) and (max-height:420px){
+  #menu .card{padding:10px 16px}#menu .card .tag{font-size:10px}.logo{font-size:26px!important}.cont{margin-bottom:6px}
+  .seg{margin:6px 0 4px}.seg button{padding:6px}.path{padding:6px 10px}.pemo{width:38px;height:38px;font-size:20px;border-radius:11px}
+  .pinfo b{font-size:15px}.pinfo span{font-size:11.5px}.pach{margin-top:5px;padding-top:5px;gap:3px}.pach span{font-size:11px}.pbar{height:5px}.paths{gap:7px}
+}
+
+/* ---------- HUD: nivel / puntos actual y máximo / botón Menú ---------- */
+.top{align-items:center;gap:8px}
+.lv{flex:none;min-width:58px}
+.pchip{margin-top:3px;font-size:9px;font-weight:900;letter-spacing:.14em}
+.scores{flex:1;min-width:0;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sc{min-width:0;text-align:center;padding:5px 4px 6px;border-radius:13px;background:linear-gradient(180deg,#ffffff1c,#ffffff0a);
+  border:1px solid #ffffff24;box-shadow:inset 0 1px 0 #ffffff22,0 4px 10px #0004}
+.sc small{display:block;font-size:9px;letter-spacing:.12em;opacity:.6;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc b{display:block;font-size:22px;line-height:1.15;font-weight:900;font-variant-numeric:tabular-nums;white-space:nowrap;
+  background:linear-gradient(180deg,#fff,#b9c3ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sc.max b{background:linear-gradient(180deg,#fff3b0,#ffb300);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sc.max.broken{border-color:#ffd24a;box-shadow:0 0 18px #ffb30088,inset 0 1px 0 #ffffff33;animation:glowbox 1.2s ease-in-out infinite alternate}
+.sc.max.broken small{color:#ffd24a;opacity:1}
+@keyframes glowbox{to{box-shadow:0 0 28px #ffb300cc,inset 0 1px 0 #ffffff33}}
+.sc b.bump{animation:bump .5s}
+.menubtn{flex:none;width:60px;height:52px;padding:0;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  background:linear-gradient(180deg,#ffb35c,#f07a1c);box-shadow:0 5px 0 #8f4509,0 10px 16px #0007,inset 0 1px 0 #fff6}
+.menubtn:active{box-shadow:0 1px 0 #8f4509,0 4px 8px #0007}
+.menubtn span{font-size:22px;line-height:1}
+.menubtn em{font-style:normal;font-size:10px;letter-spacing:.1em;font-weight:900;text-transform:uppercase}
+@media (max-width:359px){.sc b{font-size:17px}.menubtn{width:52px}.sc small{font-size:8px;letter-spacing:.06em}}
+@media (min-width:700px) and (min-height:700px){.sc b{font-size:30px}.sc small{font-size:11px}.menubtn{width:74px;height:62px}.menubtn span{font-size:28px}.menubtn em{font-size:12px}.pchip{font-size:11px}}
+
+/* ---------- Tarjetas de camino: puntaje destacado ---------- */
+.pscore{flex:none;text-align:right;min-width:72px}
+.pscore small{display:block;font-size:9px;letter-spacing:.14em;opacity:.6;font-weight:800}
+.pscore b{display:block;font-size:24px;line-height:1.1;font-weight:900;font-variant-numeric:tabular-nums;color:var(--gold);text-shadow:0 0 16px #ffcf6b55}
+.linkbtn{background:none;box-shadow:none;border:0;opacity:.8;font-size:13px;text-decoration:underline;text-underline-offset:3px;margin-top:4px;padding:8px;min-height:0}
+.linkbtn:active{transform:none;box-shadow:none}
+.optb{display:none;align-items:center;justify-content:center;gap:8px}

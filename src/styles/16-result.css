@@ -1,0 +1,22 @@
+/* ---------- Puntaje rápido al terminar un nivel ---------- */
+#result{position:fixed;inset:0;z-index:57;display:none;align-items:center;justify-content:center;padding:20px;
+  background:radial-gradient(ellipse at 50% 45%,#0a141c40,#0a141ca8)}
+#result.show{display:flex;animation:fade .18s}
+.res-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:min(86vw,320px);padding:20px 26px 16px;overflow:hidden;
+  border-radius:16px;background:#12222ce6;border:1px solid #c6b28c55;box-shadow:0 18px 50px #000a;animation:resin .34s cubic-bezier(.2,1.4,.4,1)}
+@keyframes resin{from{transform:translateY(24px) scale(.8);opacity:0}}
+.res-card small{font-size:11px;letter-spacing:.16em;color:#c9bd9d}
+.res-card b{font-size:clamp(40px,13vw,58px);font-weight:900;color:#ffd98a;text-shadow:0 3px 0 #6a4a14,0 0 24px #ffb30055;font-variant-numeric:tabular-nums}
+.res-card span{font-size:13px;color:#e4dfd2;text-align:center}
+.res-card em{font-style:normal;font-size:14px;font-weight:800;color:#43e0c1}
+.res-skip{margin-top:4px;opacity:.5}
+.res-bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:#ffffff12}
+.res-bar u{display:block;height:100%;width:0;background:linear-gradient(90deg,#43e0c1,#ffd98a);animation:resbar linear forwards}
+#result.show .res-bar u{animation-name:resbar}
+@keyframes resbar{from{width:0}to{width:100%}}
+#result.perfect .res-card{border-color:#ffd24a;box-shadow:0 0 0 2px #ffd24a66,0 0 50px #ffb30077,0 18px 50px #000a}
+#result.perfect .res-card b{animation:shine 1s ease-in-out 2;background:linear-gradient(100deg,#ff9a3c 0%,#ffe27a 30%,#fff 45%,#ffe27a 60%,#ff9a3c 100%) 130% 0/250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 3px 0 #8f4509)}
+@media(prefers-reduced-motion:reduce){.res-card,#result.show{animation:none}}
+#resTitle{display:none;font-size:clamp(22px,7vw,30px);font-weight:900;letter-spacing:.06em;color:#ffe27a;text-shadow:0 2px 0 #8f4509,0 0 18px #ffb300}
+#result.perfect #resTitle{display:block;animation:restitle .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes restitle{from{transform:scale(.3);opacity:0}}

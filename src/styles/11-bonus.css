@@ -1,0 +1,56 @@
+/* ---------- Fase bonus (cartas) ---------- */
+#bonus{z-index:57;background:radial-gradient(ellipse at 50% 30%,var(--t1),transparent 65%),radial-gradient(ellipse at 50% 100%,var(--t2),transparent 60%),#070a1ae6}
+.bonuscard{max-width:400px;border-color:#ffd24a66;box-shadow:0 30px 80px #000c,0 0 50px #ffb30033,inset 0 1px 0 #ffffff33}
+.btag{display:inline-block;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:900;letter-spacing:.16em;color:#3a1a00;background:linear-gradient(90deg,#ffe29a,#ffb35c)}
+.bonuscard h2{margin:10px 0 2px;font-size:26px}
+.bonuscard p{margin:0 0 10px;font-size:13px}
+.blegend{display:flex;gap:6px;justify-content:center;margin-bottom:12px}
+.lg{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 2px;border-radius:12px;background:#0004;border:1px solid #ffffff18}
+.lg b{font-size:20px;line-height:1.1}.lg span{font-size:10.5px;font-weight:800;letter-spacing:.03em}
+.lg.one span{color:#43e0c1}.lg.three span{color:#ffd24a}.lg.foe span{color:#ff7a8a}
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:min(100%,330px);margin:0 auto 12px}
+.bcard{--pc:#ffd24a;aspect-ratio:1;padding:0;border:0;background:none;box-shadow:none;perspective:700px;min-height:0;cursor:pointer;
+  animation:cardin .5s cubic-bezier(.2,1.6,.4,1) both;animation-delay:calc(var(--i)*60ms)}
+@keyframes cardin{from{transform:translateY(24px) scale(.6);opacity:0}}
+.bcard:active{transform:scale(.96);box-shadow:none}
+.bin{position:relative;display:block;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.3,1.5,.5,1)}
+.bcard.on .bin{transform:rotateY(180deg)}
+.bb,.bf{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.bb{background:radial-gradient(circle at 30% 25%,#ffe29a,#f0a030 45%,#a35a10);box-shadow:0 6px 0 #6b3a08,0 10px 16px #0008,inset 0 2px 0 #fff8,inset 0 0 0 3px #ffffff30}
+.bb::before{content:"";position:absolute;inset:8px;border-radius:11px;border:2px dashed #ffffff66}
+.bb i{font-style:normal;font-size:34px;font-weight:900;color:#7a3a00;text-shadow:0 2px 0 #fff6;position:relative}
+.bcard:not(.on) .bb{animation:cardshine 3.4s ease-in-out infinite;animation-delay:calc(var(--i)*.25s)}
+@keyframes cardshine{50%{filter:brightness(1.22)}}
+.bf{transform:rotateY(180deg);background:linear-gradient(160deg,#2a3170,#151a42);box-shadow:0 6px 0 #0a0d25,0 10px 16px #0008,inset 0 0 0 3px var(--pc),0 0 18px color-mix(in srgb,var(--pc) 45%,transparent);gap:2px}
+.bf b{font-size:38px;line-height:1}.bf small{font-size:10.5px;font-weight:900;letter-spacing:.04em;color:var(--pc);text-transform:uppercase}
+.bcard.winc .bf{animation:wincard .9s ease-in-out infinite alternate}
+@keyframes wincard{from{transform:rotateY(180deg) scale(1)}to{transform:rotateY(180deg) scale(1.08);filter:brightness(1.25)}}
+.bcard.dim{opacity:.45;transition:opacity .5s;pointer-events:none}
+.bres{min-height:0;margin-bottom:10px;text-align:center}
+.bres b{display:block;font-size:26px;font-weight:900}.bres span{font-size:13px;opacity:.85}
+.bres.good b{color:#ffd24a;text-shadow:0 0 20px #ffb300aa;animation:bump .6s}
+.bres.bad b{color:#ff7a8a;animation:shake .5s}
+@media (max-height:640px) and (max-aspect-ratio:13/10){.bonuscard h2{font-size:21px;margin-top:6px}.bonuscard p{margin-bottom:6px;font-size:12px}.blegend{margin-bottom:8px}.lg b{font-size:16px}.bgrid{gap:7px;width:min(100%,250px)}.bb i{font-size:26px}.bf b{font-size:28px}.bf small{font-size:9.5px}.bres b{font-size:20px}}
+@media (min-aspect-ratio:13/10) and (max-height:520px){
+  .bonuscard{display:grid!important;grid-template-columns:1fr auto;column-gap:22px;align-items:center;max-width:min(780px,96vw)!important;text-align:center}
+  .bonuscard>*{grid-column:1}.bonuscard .bgrid{grid-column:2;grid-row:1/8;width:calc(100dvh - 40px);max-width:300px;margin:0;gap:7px}
+  .bonuscard h2{font-size:20px;margin:6px 0 0}.bonuscard p{font-size:12px;margin:0 0 6px}.blegend{margin-bottom:6px}.lg{padding:4px 2px}.lg b{font-size:15px}.lg span{font-size:10px}
+  .bb i{font-size:24px}.bf b{font-size:26px}.bf small{font-size:10px}.bres b{font-size:19px}.bres{margin-bottom:6px}
+}
+
+/* ---------- Bonus: premios animados ---------- */
+.bgrid{position:relative}
+#bHints{display:inline-block;min-width:28px;padding:1px 9px;border-radius:12px;background:linear-gradient(180deg,#ffe29a,#ffb300);color:#3a1a00;font-weight:900;font-size:15px;box-shadow:0 2px 0 #8f4509}
+#bHints.tick{animation:bump .5s}
+.fly{position:fixed;z-index:70;font-size:30px;pointer-events:none;filter:drop-shadow(0 0 10px #ffd24a)}
+.bcard.pair .bf{animation:pairpulse .8s ease-in-out infinite alternate}
+@keyframes pairpulse{from{transform:rotateY(180deg) scale(1)}to{transform:rotateY(180deg) scale(1.07);filter:brightness(1.2)}}
+.hintline{font-weight:800;color:#ffe29a;font-size:14px}
+.bpop{position:absolute;inset:-6px;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;border-radius:20px;
+  background:radial-gradient(circle,#0a0d25ee 20%,#0a0d2500 72%);animation:bpop 1.5s ease-out forwards}
+.bpop b{font-size:84px;line-height:1;filter:drop-shadow(0 0 22px currentColor)}
+.bpop span{font-size:44px;font-weight:900;color:#ffd24a;text-shadow:0 0 24px #ffb300,0 3px 0 #7a4a00;margin-top:-4px}
+.bpop.bad span{color:#ff7a8a;text-shadow:0 0 24px #ff2d4a}
+@keyframes bpop{0%{opacity:0;transform:scale(.2) rotate(-20deg)}22%{opacity:1;transform:scale(1.25) rotate(4deg)}36%{transform:scale(1) rotate(0)}78%{opacity:1}100%{opacity:0;transform:scale(1.15) translateY(-30px)}}
+#bGo.pulse{animation:gopulse 1.2s ease-in-out infinite}
+@keyframes gopulse{50%{transform:scale(1.04);filter:brightness(1.15)}}

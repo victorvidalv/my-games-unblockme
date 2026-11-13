@@ -1,0 +1,48 @@
+/* ---------- Botones ---------- */
+button{font:inherit;font-weight:800;font-size:14px;color:#fff;border:0;cursor:pointer;padding:12px 18px;border-radius:15px;
+  background:linear-gradient(180deg,#5a63b3,#3a4285);box-shadow:0 5px 0 #20265a,0 10px 16px #0007,inset 0 1px 0 #ffffff44;transition:transform .08s,box-shadow .08s,filter .15s}
+button:active{transform:translateY(4px);box-shadow:0 1px 0 #20265a,0 4px 8px #0007}
+button:disabled{opacity:.4;pointer-events:none}
+button.primary{background:linear-gradient(180deg,#ffb35c,#f07a1c);box-shadow:0 5px 0 #8f4509,0 10px 16px #0007,inset 0 1px 0 #fff6}
+button.primary:active{box-shadow:0 1px 0 #8f4509,0 4px 8px #0007}
+button.danger{background:linear-gradient(180deg,#ff6a7a,#c92a45);box-shadow:0 5px 0 #6e1226,0 10px 16px #0007,inset 0 1px 0 #fff5}
+.controls{display:flex;gap:12px;width:calc(var(--cell)*6 + 28px);max-width:100%}
+.controls button{flex:1;min-width:0;position:relative;padding:12px 8px;white-space:nowrap}
+.controls em{font-style:normal;font-size:11px;opacity:.7;margin-left:4px;font-weight:700}
+.badge{position:absolute;top:-8px;right:-6px;background:var(--gold);color:#3a2300;border-radius:12px;min-width:24px;height:24px;font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px #0008}
+
+/* ---------- Modales ---------- */
+.modal{position:fixed;inset:0;background:#050714d9;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal.show{display:flex;animation:fade .25s}
+@keyframes fade{from{opacity:0}}
+.card{width:100%;max-width:380px;border-radius:28px;padding:26px 22px;text-align:center;background:linear-gradient(160deg,#2a3170,#161b42);
+  border:1px solid #ffffff2a;box-shadow:0 30px 80px #000c,inset 0 1px 0 #ffffff33;animation:pop .5s cubic-bezier(.2,1.5,.4,1)}
+@keyframes pop{from{transform:scale(.6) translateY(40px);opacity:0}}
+.card h2{margin:0 0 2px;font-size:28px;letter-spacing:.04em}
+.card .tag{font-size:12px;letter-spacing:.2em;opacity:.6;font-weight:800}
+.card p{margin:8px 0 14px;opacity:.78;font-size:14px;line-height:1.4}
+.logo{font-size:clamp(26px,9vw,38px);font-weight:900;letter-spacing:.08em;white-space:nowrap;margin:0;background:linear-gradient(90deg,#ffe29a,#ff8f6b 50%,#ff5f8f);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 24px #ff5f8f55)}
+.rules{text-align:left;font-size:13px;line-height:1.5;margin:14px 0;padding:12px 14px;border-radius:14px;background:#0004}
+.rules div{display:flex;gap:9px;margin:3px 0}
+.stats{display:flex;gap:10px;margin:12px 0}
+.stats div{flex:1;background:#0004;border-radius:14px;padding:9px 4px}
+.stats small{display:block;font-size:10px;letter-spacing:.15em;opacity:.6}
+.stats b{font-size:22px;font-variant-numeric:tabular-nums}
+.stack{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.ring{--p:0;width:116px;height:116px;border-radius:50%;margin:10px auto;display:flex;align-items:center;justify-content:center;
+  background:conic-gradient(var(--c,#43e0c1) calc(var(--p)*1%),#ffffff1a 0);position:relative}
+.ring::before{content:"";position:absolute;inset:10px;border-radius:50%;background:#1c2254}
+.ring b{position:relative;font-size:28px}
+.breakdown{margin:0 0 12px;font-size:13px;background:#0004;border-radius:14px;padding:8px 14px}
+.breakdown div{display:flex;justify-content:space-between;padding:3px 0}
+.breakdown .g{color:#ffd24a}.breakdown .r{color:#ff8a9a}
+.big{font-size:46px;font-weight:900;color:var(--gold);text-shadow:0 0 24px #ffcf6b88;font-variant-numeric:tabular-nums;line-height:1.1}
+.rec{display:inline-block;margin:4px 0;padding:4px 12px;border-radius:20px;background:linear-gradient(90deg,#ffcf6b,#ff8f6b);color:#3a1a00;font-weight:900;font-size:12px;letter-spacing:.1em;animation:bump .8s infinite alternate}
+
+.spin{width:44px;height:44px;border-radius:50%;border:5px solid #ffffff22;border-top-color:var(--gold);animation:rot .8s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+.float{position:fixed;z-index:65;font-weight:900;font-size:40px;color:var(--gold);text-shadow:0 0 22px #ffb300,0 3px 0 #7a4a00;pointer-events:none;animation:floatup 1.4s ease-out forwards;transform:translateX(-50%)}
+@keyframes floatup{from{transform:translate(-50%,0) scale(.4);opacity:0}15%{opacity:1;transform:translate(-50%,-20px) scale(1.2)}to{transform:translate(-50%,-110px) scale(1);opacity:0}}
+.bg-blocks{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:-1}

@@ -1,0 +1,48 @@
+/* ---------- Revisión de tamaños: tocables y letra mínima ---------- */
+.linkbtn{min-height:44px}
+.top small,.sc small,.pscore small,.pstat small,.pchip,.stats small{font-size:10px}
+@media (max-width:359px){.sc small{font-size:9.5px}}
+
+/* ---------- Móviles bajos en vertical (p. ej. 320×568): ventanas compactas ---------- */
+@media (max-height:640px) and (max-aspect-ratio:13/10){
+  .card{padding:16px 14px}.card h2{font-size:24px}.card p{margin:4px 0 10px;font-size:13px}
+  .big{font-size:36px}.ring{width:88px;height:88px;margin:4px auto}.ring::before{inset:8px}.ring b{font-size:22px}
+  .fico{width:56px;height:56px;font-size:30px;margin-bottom:6px}.finale h2{font-size:26px}.fchal{margin:6px 0 10px;padding:8px 10px;font-size:12.5px}
+  .stack{gap:8px}.opt{padding:10px 14px;font-size:14px}.big.primary,button.big{font-size:16px;padding:12px 14px}
+  .pstat{margin:4px 0 10px}.pstat div{padding:6px 2px}.pstat b{font-size:15px}
+  #pause .tag,#pause .ver{display:none}.breakdown{margin:0 0 8px;padding:6px 12px;font-size:12px}
+  #how .rules{margin:6px 0 10px;font-size:12px}.rules div{margin:2px 0}.stats{margin:8px 0}.stats div{padding:6px 2px}
+}
+
+/* ---------- Móvil horizontal (poca altura): ventanas en dos columnas ---------- */
+@media (min-aspect-ratio:13/10) and (max-height:520px){
+  .modal{padding:8px}.modal .card:not(#menu .card){max-width:min(760px,96vw);padding:12px 18px}
+  .card h2{font-size:22px;margin:0}.card p{margin:3px 0 6px;font-size:12.5px}.big{font-size:30px}
+  /* opciones: botones en 2 columnas */
+  #pause .tag,#pause .ver{display:none}#pause h2{margin-bottom:4px}
+  #pause .pstat{margin:2px 0 8px}#pause .pstat div{padding:5px 2px}
+  #pause .stack{display:grid;grid-template-columns:1fr 1fr;gap:8px}#pause .stack .big{grid-column:1/3;padding:11px}
+  #pause .opt{padding:9px 12px;font-size:13.5px}#pause .opt small{display:none}
+  /* nivel superado: anillo a la izquierda */
+  #win .card{display:grid;grid-template-columns:150px 1fr;column-gap:18px;align-items:center;text-align:center}
+  #win .tag{grid-column:1/3}#win .ring{grid-column:1;grid-row:2/6;width:104px;height:104px;margin:0 auto}
+  #win .card>*:not(.tag):not(.ring){grid-column:2}
+  /* fin de partida */
+  #over .card{display:grid;grid-template-columns:1fr 1fr;column-gap:20px;align-items:center}
+  #over .card>.tag:first-child,#over h2,#over p{grid-column:1}
+  #over .big,#over .tag:nth-of-type(2),#over #overRec,#over .stats,#over .stack{grid-column:2}
+  #over .stack{margin-top:4px}
+  /* final del camino */
+  #finale .card{display:grid;grid-template-columns:1fr 1.1fr;column-gap:20px;align-items:center}
+  #finale .fico{grid-column:1;width:54px;height:54px;font-size:28px;margin:0 auto 4px}
+  #finale .tag,#finale h2,#finale p,#finale .big,#finale #fRec{grid-column:1}
+  #finale .finale h2,#finale h2{font-size:24px}
+  #finale .fchal{grid-column:2;grid-row:1/4;margin:0;font-size:12.5px}#finale .stack{grid-column:2;grid-row:4/8;gap:8px}
+  /* ayuda en dos columnas */
+  #how .tag{display:none}#how .rules{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;margin:6px 0 10px;font-size:12px}
+}
+@media (min-aspect-ratio:13/10) and (max-height:400px){ .path{padding:5px 10px}.pach{margin-top:3px;padding-top:3px}.paths{gap:5px}.modeinfo{display:none}.tagline{display:none}.pemo{width:34px;height:34px;font-size:18px} }
+.cont{line-height:1.25}.cont small{display:block;font-size:12px;font-weight:700;opacity:.9;margin-top:1px}
+/* contraste de los botones naranjas */
+button.primary,.menubtn{background:linear-gradient(180deg,#f78d2b,#d8570f);text-shadow:0 1px 0 #7a3300,0 2px 5px #0005}
+.seg button.on{background:linear-gradient(180deg,#f78d2b,#d8570f);text-shadow:0 1px 0 #7a3300}

@@ -1,0 +1,30 @@
+/* ---------- HUD ---------- */
+.top{width:calc(var(--cell)*6 + 32px);display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.top small{display:block;font-size:10px;letter-spacing:.2em;opacity:.55;font-weight:700}
+.lv b{font-size:34px;font-weight:900;line-height:1;color:var(--gold);text-shadow:0 0 22px #ffcf6b66}
+.lv i{font-style:normal;opacity:.45;font-weight:700;font-size:14px;margin-left:3px}
+.score{text-align:center;flex:1;min-width:0}
+.score b{font-size:34px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;
+  background:linear-gradient(180deg,#fff,#a9b4ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.rec-line{font-size:10px;letter-spacing:.06em;opacity:.65;margin-top:3px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.rec-line.gold{color:var(--gold);opacity:1}
+.score b.bump{animation:bump .5s}
+@keyframes bump{40%{transform:scale(1.35);filter:drop-shadow(0 0 14px #fff)}}
+.icons{display:flex;gap:8px}
+.ico{width:40px;height:40px;padding:0;font-size:17px;border-radius:12px}
+.prog{width:calc(var(--cell)*6 + 32px);height:6px;border-radius:6px;background:#ffffff14;overflow:hidden;margin-top:-4px}
+.prog i{display:block;height:100%;width:1%;border-radius:6px;background:linear-gradient(90deg,#43e0c1,#ffc65a,#ff5f8f);transition:width .8s cubic-bezier(.2,1,.3,1)}
+
+.meter{width:calc(var(--cell)*6 + 32px);padding:10px 14px 11px;border-radius:18px;
+  background:linear-gradient(180deg,#ffffff16,#ffffff08);border:1px solid #ffffff1e;box-shadow:0 8px 22px #0006, inset 0 1px 0 #ffffff26}
+.mrow{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;opacity:.9;letter-spacing:.04em}
+.mrow b{font-size:22px;font-variant-numeric:tabular-nums}
+.mrow span:last-child{opacity:.7}
+.bar{position:relative;height:14px;border-radius:9px;margin:7px 0 6px;background:#0007;box-shadow:inset 0 2px 5px #000a;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:9px;background:hsl(140 80% 50%);transition:width .35s cubic-bezier(.3,1.5,.5,1),background .35s;
+  box-shadow:0 0 14px currentColor, inset 0 2px 0 #ffffff55}
+.bar u{position:absolute;left:50%;top:-2px;bottom:-2px;width:2px;background:#ffffffaa;box-shadow:0 0 6px #fff}
+.meter.danger .bar{animation:pulse .6s infinite}
+@keyframes pulse{50%{box-shadow:inset 0 2px 5px #000a,0 0 18px #ff2d4a}}
+.pot{font-size:12px;opacity:.8;display:flex;justify-content:space-between}
+.pot b{color:var(--gold);font-size:14px;font-variant-numeric:tabular-nums}

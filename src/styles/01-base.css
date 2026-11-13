@@ -1,0 +1,22 @@
+:root{
+  --cell: clamp(40px, min(calc((100vw - 52px)/6), calc((100dvh - 395px)/6)), 84px);
+  --gap:5px; --gold:#ffcf6b;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+html,body{margin:0;height:100%;overscroll-behavior:none}
+@property --t1{syntax:'<color>';inherits:true;initial-value:#4a35a066}
+@property --t2{syntax:'<color>';inherits:true;initial-value:#0e8a9a55}
+body{
+  font-family:"Avenir Next","Segoe UI",system-ui,sans-serif;color:#eef0ff;overflow:hidden;
+  background:
+    radial-gradient(700px 500px at 10% -10%, var(--t1), transparent 60%),
+    radial-gradient(700px 600px at 100% 105%, var(--t2), transparent 60%),
+    linear-gradient(165deg,#1b2347,#080b1c);
+}
+body.shake #app{animation:shake .6s}
+@keyframes shake{10%,50%,90%{transform:translateX(-9px)}30%,70%{transform:translateX(9px)}}
+body.flash::after{content:"";position:fixed;inset:0;background:radial-gradient(circle,#ff2d4a00 30%,#ff2d4acc);animation:flashout 1s forwards;pointer-events:none;z-index:40}
+@keyframes flashout{to{opacity:0}}
+
+#app{position:relative;z-index:1;height:100dvh;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;width:100%;max-width:520px;margin:0 auto;display:flex;flex-direction:column;align-items:center;justify-content:safe center;
+  gap:12px;padding:calc(env(safe-area-inset-top) + 8px) 14px calc(env(safe-area-inset-bottom) + 12px)}

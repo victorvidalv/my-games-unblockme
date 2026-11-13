@@ -1,0 +1,42 @@
+/* ---------- Pausa / opciones ---------- */
+.sheet{max-width:400px}
+.sheet h2{margin-bottom:10px}
+.pstat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 16px}
+.pstat div{background:#0004;border-radius:14px;padding:9px 4px;min-width:0}
+.pstat small{display:block;font-size:9px;letter-spacing:.14em;opacity:.6;font-weight:800}
+.pstat b{font-size:17px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stack{display:flex;flex-direction:column;gap:11px}
+.big{font-size:18px;padding:15px 18px}
+.opt{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;padding:14px 16px;font-size:15px;
+  background:linear-gradient(180deg,#4a54a8,#2c3270)}
+.opt small{font-size:11px;opacity:.7;font-weight:600;text-align:right}
+.opt.install{display:none}
+
+/* ---------- Confirmación personalizada ---------- */
+#ask{z-index:56}
+.askcard{max-width:340px;padding:26px 20px 20px;overflow:visible;margin-top:34px}
+.askico{width:70px;height:70px;margin:-52px auto 10px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:34px;
+  background:linear-gradient(150deg,#ffb35c,#e0502b);box-shadow:0 8px 24px #000a,inset 0 2px 0 #fff6,0 0 0 5px #161b42}
+.askcard h2{font-size:22px;margin:4px 0 6px}
+.askcard p{font-size:14px;line-height:1.45;margin:0 0 16px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row2 button{padding:13px 8px}
+#how .rules{margin:10px 0 16px}
+#how{z-index:55}
+
+/* ---------- Aviso de nueva versión ---------- */
+#upd{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 10px);z-index:57;width:min(94vw,440px);display:flex;align-items:center;gap:10px;
+  padding:10px 10px 10px 12px;border-radius:20px;transform:translate(-50%,-160%);opacity:0;pointer-events:none;
+  background:linear-gradient(150deg,#2f3a86f2,#171c49f2);border:1px solid #ffd24a88;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  box-shadow:0 14px 40px #000b,0 0 24px #ffb30044,inset 0 1px 0 #ffffff33;transition:transform .5s cubic-bezier(.2,1.4,.4,1),opacity .3s}
+#upd.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.updico{width:42px;height:42px;flex:none;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;
+  background:linear-gradient(150deg,#ffb35c,#f07a1c);box-shadow:inset 0 2px 0 #fff6,0 3px 8px #0006;animation:updbounce 1.4s ease-in-out infinite}
+@keyframes updbounce{50%{transform:translateY(-3px)}}
+.updt{flex:1;min-width:0;display:flex;flex-direction:column}
+.updt b{font-size:14px}.updt span{font-size:11.5px;opacity:.75;line-height:1.25}
+#upd .primary{flex:none;padding:10px 14px;min-height:40px;font-size:14px}
+.updx{flex:none;width:32px;height:32px;min-height:0;padding:0;border-radius:50%;font-size:13px;box-shadow:none;background:#ffffff1c}
+.updx:active{transform:none;box-shadow:none}
+.ver{margin-top:14px;font-size:11px;opacity:.45;letter-spacing:.08em}
+button.primary{text-shadow:0 1px 2px #5a2a0088}
