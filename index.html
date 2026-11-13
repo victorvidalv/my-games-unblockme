@@ -545,6 +545,28 @@ button.primary,.menubtn{background:linear-gradient(180deg,#f78d2b,#d8570f);text-
 @keyframes bpop{0%{opacity:0;transform:scale(.2) rotate(-20deg)}22%{opacity:1;transform:scale(1.25) rotate(4deg)}36%{transform:scale(1) rotate(0)}78%{opacity:1}100%{opacity:0;transform:scale(1.15) translateY(-30px)}}
 #bGo.pulse{animation:gopulse 1.2s ease-in-out infinite}
 @keyframes gopulse{50%{transform:scale(1.04);filter:brightness(1.15)}}
+
+/* Illustrated travel journal: scenery stays below pieces and grid. */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:linear-gradient(#080d24d9,#080d24f5),var(--scene) center/cover;z-index:0}
+#board{isolation:isolate;background-color:#131728}
+#board::before{content:'';position:absolute;inset:0;border-radius:inherit;z-index:-1;background:linear-gradient(#ffffff09 1px,transparent 1px) 0 0/var(--cell) var(--cell),linear-gradient(90deg,#ffffff09 1px,transparent 1px) 0 0/var(--cell) var(--cell),linear-gradient(#0a102bbd,#0a102bdd),var(--scene) center/cover;pointer-events:none}
+.slot-row{z-index:0}.piece{z-index:2}
+.travel-card{max-width:540px;text-align:left;padding:22px;background:linear-gradient(145deg,#252d59,#10172f)}
+.travel-card h2{font-size:25px;letter-spacing:0}.travel-card p{line-height:1.5}
+.traveler{display:flex;align-items:center;gap:14px}.hero-art{width:88px;height:122px;flex:none;filter:drop-shadow(0 8px 12px #0008)}
+.hero-art.walking{animation:heroWalk .5s ease-in-out infinite alternate}
+@keyframes heroWalk{to{transform:translateY(-5px) rotate(2deg)}}
+.route-map{display:block;width:100%;height:160px;border-radius:18px;background:linear-gradient(#12243a70,#142039d9),var(--scene) center/cover;margin:12px 0}
+.route-path{fill:none;stroke:#709a9a;stroke-width:9;stroke-linecap:round}.route-path.chosen{stroke:#ffcf6b;filter:drop-shadow(0 0 4px #ffcf6b)}
+.route-options{display:grid;grid-template-columns:1fr 1fr;gap:12px}.route-option{text-align:left;padding:13px;white-space:normal;border:2px solid transparent;background:#ffffff0d;box-shadow:none}
+.route-option[aria-pressed=true]{border-color:#ffcf6b;background:#ffcf6b16}
+.route-option strong,.route-option small{display:block}.route-option small{font-size:12px;font-weight:500;line-height:1.5;margin-top:6px;color:#d0d8ed}
+.route-explain{min-height:48px;font-size:13px!important}.travel-card .tag{letter-spacing:.12em;color:#ffcf6b}.travel-go{width:100%}
+.route-chip{font-size:10px;padding:3px 7px;border:1px solid #ffcf6b55;border-radius:8px;color:#ffcf6b;margin-left:7px;white-space:nowrap}
+#journey .map-hero{width:30px;height:42px;overflow:visible}
+@media(max-height:600px){.travel-card{padding:14px}.hero-art{height:75px;width:54px}.route-map{height:105px;margin:6px 0}.travel-card p{margin:6px 0}.route-option{padding:9px}}
+@media(prefers-reduced-motion:reduce){.hero-art.walking{animation:none}}
+
 </style>
 </head>
 <body>
@@ -579,6 +601,7 @@ button.primary,.menubtn{background:linear-gradient(180deg,#f78d2b,#d8570f);text-
   </div>
 </div>
 
+<div class="modal" id="travel" role="dialog" aria-modal="true" aria-labelledby="travelTitle"><div class="card travel-card"><div class="traveler"><svg class="hero-art" viewBox="0 0 100 145" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Lía, exploradora de cabello violeta y capa turquesa"><path d="M24 53Q9 1 48 5Q89 0 82 60L75 93H22Z" fill="#292342" stroke="#14192e" stroke-width="3"/><path d="M35 111L33 139H44L51 111M56 111L59 139H71L67 105" fill="#30334d" stroke="#171c32" stroke-width="3"/><path d="M31 136h15v7H27q-1-6 4-7M58 136h14l6 7H58Z" fill="#ae7859"/><path d="M34 69Q48 61 64 69L77 111Q49 123 23 111Z" fill="#43c9b5" stroke="#183d50" stroke-width="3"/><path d="M35 73L22 96l9 6 16-22M66 74l14 23-8 6-15-24" fill="#e6ae91" stroke="#563f51" stroke-width="2"/><path d="M29 72L47 83l21-14-7 28-15-12-15 11Z" fill="#203c56"/><ellipse cx="50" cy="43" rx="23" ry="27" fill="#f5c5a4"/><path d="M25 42L25 21Q48-4 75 22l4 29-13-22-9 7 2-14-21 20 1-12Z" fill="#635080" stroke="#292342" stroke-width="2"/><path d="M32 45q7-7 14 0M54 45q7-7 14 0" fill="none" stroke="#3a294b" stroke-width="3"/><ellipse cx="40" cy="48" rx="4" ry="6" fill="#32777c"/><ellipse cx="61" cy="48" rx="4" ry="6" fill="#32777c"/><circle cx="41" cy="46" r="1.8" fill="white"/><circle cx="62" cy="46" r="1.8" fill="white"/><path d="M46 60q5 4 10-1" fill="none" stroke="#b26570" stroke-width="2"/><path d="M22 23L53 7l28 16-5 6-54 1Z" fill="#2e716f" stroke="#203c56" stroke-width="3"/><path d="M54 11l4 12" stroke="#ffcf6b" stroke-width="4"/><path d="M47 80v10" stroke="#ffcf6b" stroke-width="2"/><circle cx="47" cy="91" r="4" fill="none" stroke="#ff667c" stroke-width="3"/><path d="M47 95v7h5" fill="none" stroke="#ff667c" stroke-width="3"/><path d="M33 101l36-5" stroke="#775b50" stroke-width="5"/><rect x="60" y="94" width="14" height="17" rx="4" fill="#c89557"/></svg><div><div class="tag" id="travelTag"></div><h2 id="travelTitle"></h2><p id="travelText"></p></div></div><svg class="route-map" id="routeMap" viewBox="0 0 440 160" aria-label="Dos caminos hacia la siguiente ciudad"><path d="M40 80Q120 -10 220 48T400 80" class="route-path" id="upperRoute"/><path d="M40 80Q120 170 220 112T400 80" class="route-path" id="lowerRoute"/><circle cx="40" cy="80" r="13" fill="#43e0c1"/><circle cx="400" cy="80" r="17" fill="#ffcf6b"/><text x="220" y="24" text-anchor="middle" fill="#ffcf6b" font-size="13">AVENTURERO · +10 %</text><text x="220" y="153" text-anchor="middle" fill="#d6f4ec" font-size="13">TRANQUILO</text><g id="routeWalker"></g></svg><div class="route-options" id="routeOptions"><button class="route-option" id="routeNormal" aria-pressed="true"><strong>🌿 Camino tranquilo</strong><small>Dificultad habitual.<br>Puntos habituales.</small></button><button class="route-option" id="routeBrave" aria-pressed="false"><strong>✨ Camino aventurero</strong><small>Un poco más difícil.<br>+10 % de puntos.</small></button></div><p class="route-explain" id="routeExplain"></p><button class="primary travel-go" id="travelGo"></button></div></div>
 <canvas id="fx"></canvas>
 <div id="journey">
   <div class="mtag" id="mTag"></div>
@@ -886,7 +909,7 @@ function calcGain(n,moves,opt,streak){
   const total=Math.round((pts+perfect)*mult);
   return {base,eff,pts,perfect,mult,total,lost:Math.round(base*(1-eff))};
 }
-const pointsFor=(moves,opt)=>calcGain(G.rate,moves,opt,run.streak||0).total;
+const pointsFor=(moves,opt)=>gainFor(G.rate,moves,opt,run.streak||0).total;
 
 /* ============================ Sonido y vibración ============================ */
 let AC=null;
@@ -1150,7 +1173,48 @@ const ZONES=[
 ZONES.forEach(z=>{ if(z.h){ z.t1=`hsl(${z.h[0]} ${z.s}% ${Math.max(30,z.l-16)}% / .42)`; z.t2=`hsl(${z.h[1]} ${z.s}% ${Math.max(30,z.l-16)}% / .32)`; z.cc=`hsl(${z.h[0]} 80% 64%)`; } });
 const zoneIdx=l=>Math.min(9,Math.floor((l-1)/10)), zoneStep=l=>((l-1)%10)+1, zoneOf=l=>ZONES[zoneIdx(l)];
 let curZone=-1;
+
+const HERO_MARKUP=document.querySelector('#travel .hero-art').outerHTML;
+function paintScenery(i){
+ document.documentElement.style.setProperty('--scene',`url("backgrounds/zone-${i+1}.webp")`);
+}
+function travelDialog(intro=false){
+ return new Promise(resolve=>{
+  const modal=$('travel'),go=$('travelGo'),options=$('routeOptions');let choice='normal';
+  const next=Math.min(9,Math.floor(run.level/10)),z=ZONES[intro?0:next];
+  $('travelTag').textContent=intro?'LÍA · LA VIAJERA DE LAS DIEZ CIUDADES':'ZONA COMPLETADA · ELIGE TU RUTA';
+  $('travelTitle').textContent=intro?'Una llave, diez destinos':`Rumbo a ${z.n}`;
+  $('travelText').textContent=intro?'Soy Lía. ¿Me ayudas a llegar al Castillo Dorado? Cada puzle nos acerca a la siguiente ciudad.':'¡Llegamos al cruce! Podemos seguir por abajo, o tomar la subida y ganar un poco más.';
+  options.hidden=intro;options.style.display=intro?'none':'grid';
+  $('routeBrave').querySelector('small').innerHTML=run.mode==='p'?'Un poco más difícil.<br>Sin puntos en Práctica.':'Un poco más difícil.<br>+10 % de puntos.';
+  $('routeMap').querySelector('text').textContent=run.mode==='p'?'AVENTURERO · MÁS RETO':'AVENTURERO · +10 %';$('routeMap').style.display=intro?'none':'block';
+  const select=v=>{choice=v;const brave=v==='brave';
+   $('routeNormal').setAttribute('aria-pressed',String(!brave));$('routeBrave').setAttribute('aria-pressed',String(brave));
+   $('upperRoute').classList.toggle('chosen',brave);$('lowerRoute').classList.toggle('chosen',!brave);
+   $('routeExplain').textContent=intro?'La aventura comienza en Pradera Esmeralda. Cada diez niveles elegiremos cómo seguir.':run.mode==='p'?'Durante los próximos 10 niveles: '+(brave?'puzles algo más difíciles.':'dificultad habitual.')+' En Práctica no hay puntos ni eliminación.':`Durante los próximos 10 niveles: ${brave?'puzles algo más difíciles y +10 % de puntos.':'dificultad y puntos habituales.'} Después podrás elegir de nuevo.`;
+   go.textContent=intro?'Comenzar la aventura ➜':`Seguir por el camino ${brave?'aventurero':'tranquilo'} ➜`;
+  };
+  $('routeNormal').onclick=()=>select('normal');$('routeBrave').onclick=()=>select('brave');
+  $('routeWalker').innerHTML=HERO_MARKUP;$('routeWalker').firstElementChild.style.width='30px';$('routeWalker').firstElementChild.style.height='44px';$('routeWalker').firstElementChild.setAttribute('width','30');$('routeWalker').firstElementChild.setAttribute('height','44');
+  $('routeWalker').setAttribute('transform','translate(25 36)');select('normal');modal.classList.add('show');
+  const oldFocus=document.activeElement;go.focus();
+  const trap=e=>{if(e.key!=='Tab')return;const buttons=[...modal.querySelectorAll('button')].filter(b=>b.getClientRects().length&&!b.disabled);const first=buttons[0],last=buttons.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}};
+  modal.addEventListener('keydown',trap);
+  go.onclick=async()=>{
+   go.disabled=true;options.querySelectorAll('button').forEach(b=>b.disabled=true);
+   if(!intro){run.route=choice;run.routeZone=next;saveRun();
+    const path=$(choice==='brave'?'upperRoute':'lowerRoute'),len=path.getTotalLength(),t0=performance.now(),dur=matchMedia('(prefers-reduced-motion: reduce)').matches?0:1200;
+    $('routeWalker').firstElementChild.classList.add('walking');
+    await new Promise(done=>{function step(t){const k=dur?Math.min(1,(t-t0)/dur):1,p=path.getPointAtLength(len*k);$('routeWalker').setAttribute('transform',`translate(${p.x-15} ${p.y-44})`);if(k<1)requestAnimationFrame(step);else done()}requestAnimationFrame(step)});
+   }
+   modal.classList.remove('show');modal.removeEventListener('keydown',trap);go.disabled=false;options.querySelectorAll('button').forEach(b=>b.disabled=false);if(oldFocus)oldFocus.focus();resolve();
+  };
+ });
+}
+function gainFor(n,moves,opt,streak){const gain=calcGain(n,moves,opt,streak);gain.routeBonus=run&&run.mode!=='p'&&run.route==='brave'?Math.round(gain.total*.1):0;gain.total+=gain.routeBonus;return gain}
+
 function applyZone(i){
+  paintScenery(i);
   if(curZone===i) return; curZone=i;
   const z=ZONES[i],r=document.documentElement.style;
   for(let k=0;k<8;k++){
@@ -1224,12 +1288,12 @@ function showMap(fromI,toI,{travel=false}={}){
       const lb=mk('text',{class:'mlabel',x:px+lw/2,y:ly+.5,'text-anchor':'middle','dominant-baseline':'central'},g);lb.textContent=i<=open?z.n:'???';
       return {g,em,lb,z,x,y,R};
     });
-    // ---- llave roja (ficha del jugador): flota sobre la parada
+    // Lía recorre el mapa entre ciudades.
     const key=mk('g',{class:'mkey'});
-    mk('rect',{x:-14,y:-8,width:28,height:16,rx:5,fill:'#e23a52',stroke:'#7d0f22','stroke-width':1.5},key);
-    mk('rect',{x:-12,y:-7,width:24,height:6,rx:3,fill:'#ffffff30'},key);
-    mk('polygon',{points:'-4,-4.5 -4,4.5 5.5,0',fill:'#fff'},key);
-    const setKey=(x,y,hop=0)=>key.setAttribute('transform',`translate(${x} ${y-32-hop}) scale(.92)`);
+    key.innerHTML=HERO_MARKUP;
+    const avatar=key.firstElementChild;
+    avatar.style.width='40px';avatar.style.height='58px';avatar.setAttribute('width','40');avatar.setAttribute('height','58');avatar.setAttribute('x','-20');avatar.setAttribute('y','-58');
+    const setKey=(x,y,hop=0)=>key.setAttribute('transform',`translate(${x} ${y-15-hop})`);
     setKey(pts[open][0],pts[open][1]);
     // ---- textos
     const cap=$('mName').parentNode,setCap=(tag,name,sub)=>{$('mTag').textContent=tag;$('mName').textContent=name;$('mSub').textContent=sub;cap.classList.remove('pop');void cap.offsetWidth;cap.classList.add('pop')};
@@ -1271,8 +1335,8 @@ function startRun(start,mode){
   const seed=menuSeed; menuSeed=Math.floor(Math.random()*2**31);
   Object.keys(packs).forEach(k=>{if(!k.startsWith(seed+':'))delete packs[k]});
   run={seed,level:1,start,mode,score:0,hints:3+Math.floor(start/25),adj:0,streak:0,recBroken:false};
-  saveRun();getPack(run.level);                     // se genera el nivel mientras se muestra el mapa
-  showMap(zoneIdx(run.level),zoneIdx(run.level)).then(startLevel);
+  applyZone(0);saveRun();getPack(run.level);                     // se genera el nivel mientras se muestra el mapa
+  travelDialog(true).then(()=>showMap(zoneIdx(run.level),zoneIdx(run.level))).then(startLevel);
 }
 async function startLevel(){
   busy=true;
@@ -1282,8 +1346,11 @@ async function startLevel(){
   if(run.level+1<MAXL) getPack(run.level+2);       // por adelantado, mientras juegas
   clearTimeout(ld);$('loading').classList.remove('show');
   // dificultad adaptativa: el objetivo se desplaza según tu eficiencia en los niveles anteriores
-  const rate=rateAt(run.start,run.level), want=Math.max(1,curve(rate).target+run.adj), ds=Object.keys(pack.cands).map(Number);
-  const d=ds.reduce((a,b)=>Math.abs(b-want)<Math.abs(a-want)||(Math.abs(b-want)===Math.abs(a-want)&&Math.random()<.5)?b:a);
+  const rate=rateAt(run.start,run.level), ds=Object.keys(pack.cands).map(Number);
+  const normalWant=Math.max(1,curve(rate).target+run.adj);
+  const normalD=ds.reduce((a,b)=>Math.abs(b-normalWant)<Math.abs(a-normalWant)?b:a);
+  const higher=ds.filter(v=>v>normalD);
+  const d=run.route==='brave'&&higher.length?Math.min(...higher):normalD;
   const arr=pack.cands[d], pos=arr[Math.floor(Math.random()*arr.length)].slice();
   G={n:run.level,rate,pieces:pack.pieces,pos,start:pos.slice(),opt:d,limit:d*2,moves:0,hist:[],done:false,els:[]};
   G.colors=[0,1,2,3,4,5,6,7].sort(()=>Math.random()-.5);
@@ -1408,7 +1475,7 @@ function fitScores(){                 // reduce la cifra si no cabe en su cuadro
 }
 function recLine(){            // refresca camino, puntaje actual y máximo del camino en juego
   const prac=run.mode==='p',rec=store.paths[rkey()]||{score:0,level:0},p=pathOf(run.start);
-  $('pchip').textContent=p.n.toUpperCase();$('pchip').style.color=p.c;
+  $('pchip').textContent=p.n.toUpperCase()+(run.route==='brave'?(run.mode==='p'?' · AVENTURERA':' · RUTA +10%'):'');$('pchip').style.color=p.c;
   if(prac){
     $('scoreLbl').textContent='MODO';$('score').textContent='Práctica';
     $('maxLbl').textContent='NIVEL MÁX.';$('scoreMax').textContent=Math.max(rec.level,run.level);
@@ -1426,7 +1493,7 @@ function updateHud(){
   f.style.width=pct+'%';
   const over=Math.max(0,G.moves-G.opt)/G.opt,hue=140*(1-Math.min(1,over));
   f.style.background=`hsl(${hue} 85% 52%)`;f.style.color=`hsl(${hue} 85% 52%)`;
-  const prac=run.mode==='p',cg=calcGain(G.rate,G.moves,G.opt,run.streak||0);
+  const prac=run.mode==='p',cg=gainFor(G.rate,G.moves,G.opt,run.streak||0);
   $('pot').textContent=prac?'sin puntaje':'+'+cg.total.toLocaleString('de-DE')+(cg.mult>1?' (×'+cg.mult.toFixed(1)+')':'');
   $('meter').classList.toggle('danger',!prac&&G.moves>=G.limit*.8);
   const panic=!prac&&!G.done&&G.moves>=G.limit&&G.pos[0]!==4, tn=(prac||G.done)?0:Math.max(0,Math.min(1,(G.moves/G.limit-.5)/.5));
@@ -1437,7 +1504,7 @@ function updateHud(){
 function win(){
   G.done=true;boardEl.classList.add('board-lock');
   const red=G.els[0],s=cellPx();red.classList.add('exit');red.style.left=7*s+'px';
-  const prac=run.mode==='p',cgw=calcGain(G.rate,G.moves,G.opt,run.streak||0),eff=cgw.eff,gain=prac?0:cgw.total,prev=run.score;
+  const prac=run.mode==='p',cgw=gainFor(G.rate,G.moves,G.opt,run.streak||0),eff=cgw.eff,gain=prac?0:cgw.total,prev=run.score;
   run.score+=gain;run.cleared=(run.cleared||0)+1;run.streak=eff>=.9?(run.streak||0)+1:0;
   run.adj=Math.max(-2,Math.min(run.level<10?1:2,run.adj+(eff>=.9?1:eff<.4?-1:0)));      // adaptación
   let bonusHint=false;if(!prac&&G.n%5===0){run.hints++;bonusHint=true}
@@ -1462,6 +1529,7 @@ function win(){
       `<div><span>Eficiencia ${pc}%</span><b>${cgw.pts.toLocaleString('de-DE')}</b></div>`+
       (cgw.perfect?`<div class="g"><span>✨ Bonus perfecto</span><b>+${cgw.perfect}</b></div>`:'')+
       (cgw.mult>1?`<div class="g"><span>🔥 Racha ×${cgw.mult.toFixed(1)}</span><b>${run.streak} seguidos</b></div>`:'')+
+      (cgw.routeBonus?`<div class="g"><span>✨ Ruta aventurera +10 %</span><b>+${cgw.routeBonus.toLocaleString('de-DE')}</b></div>`:'')+
       (cgw.lost>0?`<div class="r"><span>Perdiste por movimientos extra</span><b>−${cgw.lost.toLocaleString('de-DE')}</b></div>`:'');
     $('gain').textContent=prac?'🎯':'+0';$('winTotal').textContent=run.score.toLocaleString('de-DE');$('winTotalP').style.display=prac?'none':'';
     const zoneDone=G.n%10===0&&G.n<MAXL,bonusNext=G.n%BONUS_EVERY===0&&G.n<MAXL&&!prac;
@@ -1477,6 +1545,8 @@ $('bNext').onclick=async()=>{
   $('win').classList.remove('show');
   if(G.n>=MAXL){endRun(true);return}
   const crossing=G.n%10===0, from=zoneIdx(G.n);
+  if(busy)return;busy=true;
+  if(crossing){await travelDialog();getPack(run.level+1)}
   if(G.n%BONUS_EVERY===0&&run.mode==='c') run.bonus=1;           // fase bonus pendiente (se conserva si cierras la app)
   run.level++;saveRun();
   if(run.bonus){const prize=await showBonus();run.hints+=prize;run.bonus=0;saveRun()}
@@ -1746,7 +1816,7 @@ openMenu();
 /* ============================ PWA ============================ */
 // El récord y la partida en curso viven en localStorage; pedimos al navegador que no los borre
 if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{});
-const APP_VERSION='29';                      // debe coincidir con VERSION de sw.js (desbloquea-vNN)
+const APP_VERSION='30';                      // debe coincidir con VERSION de sw.js (desbloquea-vNN)
 $('ver').textContent='Versión '+APP_VERSION;
 let pendingWorker=null,updating=false;
 function showUpdate(w){pendingWorker=w;$('upd').classList.add('show');sfx.hint()}
@@ -1794,3 +1864,4 @@ document.addEventListener('contextmenu',e=>e.preventDefault());
 </script>
 </body>
 </html>
+

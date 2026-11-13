@@ -1,9 +1,10 @@
 /* Service worker: la app funciona sin conexión.
    ACTUALIZAR: al publicar cambios, sube VERSION aquí y APP_VERSION en index.html.
    El navegador detecta el cambio de este archivo y la app muestra el aviso «Nueva versión disponible». */
-const VERSION = 'desbloquea-v29';
+const VERSION = 'desbloquea-v30';
 const SHELL = [
   './', './index.html', './manifest.webmanifest',
+  ...Array.from({length:10},(_,i)=>'./backgrounds/zone-'+(i+1)+'.webp'),
   './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'
 ];
 
@@ -35,3 +36,4 @@ self.addEventListener('fetch', e => {
 
 /* La página pide activar la versión nueva cuando el usuario pulsa «Actualizar» */
 self.addEventListener('message', e => { if (e.data === 'SKIP_WAITING') self.skipWaiting(); });
+
