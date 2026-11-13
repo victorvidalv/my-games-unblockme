@@ -567,6 +567,58 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:li
 @media(max-height:600px){.travel-card{padding:14px}.hero-art{height:75px;width:54px}.route-map{height:105px;margin:6px 0}.travel-card p{margin:6px 0}.route-option{padding:9px}}
 @media(prefers-reduced-motion:reduce){.hero-art.walking{animation:none}}
 
+/* Illustrated atlas and the three travelling hint games. Shared WebP art, no extra downloads. */
+#journey{background:linear-gradient(#071023cf,#071023f2),var(--atlas-scene) center/cover;gap:12px;padding-top:calc(env(safe-area-inset-top) + 20px)}
+#journey .mapwrap{width:min(96vw,500px);max-height:720px;filter:drop-shadow(0 20px 24px #0007)}
+#journey .mtag{color:#e8cc94;font-size:10px;letter-spacing:.22em;padding:9px 16px;border:1px solid #e8cc9444;background:#17233a99;border-radius:30px}
+#journey .mcap{max-width:600px}#journey .mcap h2{font-size:clamp(21px,5vw,30px);color:#fff0d2;letter-spacing:0;text-shadow:0 3px 18px #0009}
+#journey .mcap p{color:#d4dff1;font-size:12px;line-height:1.5}
+.atlas-city{filter:drop-shadow(0 5px 8px #0008)}.atlas-city.current{filter:drop-shadow(0 0 12px #e6c27955)}
+.atlas-traveler{filter:drop-shadow(0 5px 4px #000b)}
+@media(min-aspect-ratio:13/10){#journey .mapwrap{width:min(95vw,1080px);max-height:520px}}
+#bonus{background:linear-gradient(#050b20ad,#050b20e8),var(--bonus-scene) center/cover;z-index:60}
+#bonus .bonuscard{position:relative;isolation:isolate;max-width:470px;border:1px solid #f5d89a55;border-radius:28px;padding:24px 22px 20px;background:linear-gradient(#152440ef,#0d142bed);box-shadow:0 30px 90px #000c,inset 0 1px 0 #fff3;overflow-y:auto}
+#bonus .bonuscard::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(#102040aa,#0d142bf5 45%),var(--bonus-scene) center top/cover;opacity:.6;pointer-events:none}
+.bonus-heading{display:flex;align-items:center;gap:12px;text-align:left;margin:4px 0 12px}
+#bHero{flex:none;width:64px;height:94px;filter:drop-shadow(0 5px 8px #0007)}#bHero .hero-art{width:64px;height:94px}
+#bonus .btag{font-size:9px;letter-spacing:.15em;color:#3a1a00;margin:0 0 9px;opacity:1}
+#bonus h2{font-size:25px;color:#fff0d5;letter-spacing:-.02em;line-height:1.1;margin:0 0 8px}
+#bSpeech{font-size:12px;color:#c9dfeb;line-height:1.45;margin:0;opacity:1}
+.bonus-wallet{display:flex;justify-content:space-between;align-items:center;padding:10px 13px;border:1px solid #f1dba52b;border-radius:12px;background:#080f2388;font-size:11px;letter-spacing:.04em;color:#c4cee0;margin:8px 0 12px}
+.bonus-wallet b{color:#ffdb8b;font-size:17px}#bSub{font-size:12px;line-height:1.45;margin:8px 0 10px;color:#dde5f4;opacity:.9}
+.bonus-stage{position:relative;margin:12px auto;min-height:100px;width:100%}
+.bonus-legend{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;color:#e9d5a9;font-size:10px;margin:9px 0 12px}
+.bonus-legend span{border-radius:20px;padding:6px 10px;background:#ffffff0b;border:1px solid #ffffff16}
+#bonus .bgrid{margin:0 auto;gap:10px;max-width:310px}
+#bonus .bcard{min-height:0;height:86px;aspect-ratio:auto;border-radius:14px}
+#bonus .bb{border:1px solid #f5d79d77;background:repeating-linear-gradient(45deg,#ffffff03 0 4px,#0000 4px 11px),linear-gradient(140deg,#456a80,#293d60 55%,#192744);box-shadow:inset 0 0 0 5px #16233a,inset 0 0 0 6px #f5d79d33}
+#bonus .bb i{font-style:normal;color:#ffe0a1;font-size:33px;text-shadow:0 0 17px #ffd27788}
+#bonus .bf{border:1px solid #ffe4a655}
+.wheel-shell{width:min(100%,280px);aspect-ratio:1;position:relative;margin:14px auto 6px;border:8px solid #cfaa67;border-radius:50%;background:#152442;box-shadow:0 0 0 3px #574424,0 0 0 6px #efd99855,0 12px 25px #0008,inset 0 0 20px #0009}
+.wheel-shell::before{content:'';position:absolute;inset:-6px;border-radius:50%;border:3px dotted #fff1c7;pointer-events:none;z-index:2}
+.prize-wheel{display:block;width:100%;height:100%;filter:drop-shadow(0 2px 3px #0005)}
+.wheel-pointer{position:absolute;top:-25px;left:50%;transform:translateX(-50%);z-index:4;font-size:37px;color:#ffdc8b;text-shadow:0 3px 1px #865a29,0 0 16px #ffdb9777}
+.wheel-hub{position:absolute;inset:calc(50% - 26px);width:52px;height:52px;border-radius:50%;background:linear-gradient(145deg,#ffe9ad,#aa7537);box-shadow:0 4px 10px #0009,inset 0 0 0 5px #ffe4a755;display:grid;place-items:center;color:#533f2d;font-size:28px;pointer-events:none}
+.amulet-machine{position:relative;border-radius:26px;padding:15px 17px 10px;background:linear-gradient(145deg,#d5b67b,#8e6638 40%,#e6c68a 70%,#78542d);box-shadow:0 8px 0 #4c3726,0 14px 26px #0008,inset 0 1px 0 #fff8;border:2px solid #f3db9f}
+.machine-crown{color:#fff1cd;font-size:12px;letter-spacing:.18em;font-weight:900;text-align:center;padding:8px 4px 12px;text-shadow:0 2px 4px #321d11}
+.reels{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;background:#0a1225;border:5px solid #4d3c32;padding:7px;border-radius:17px;box-shadow:inset 0 3px 10px #000b,0 1px 0 #fff5}
+.reel{height:88px;overflow:hidden;position:relative;background:linear-gradient(#c8d1d7,#fff7e9 40%,#e2decd);border-radius:9px;box-shadow:inset 0 4px 9px #0006}
+.reel::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(#12203b50,transparent 30%,transparent 65%,#12203b55);border:1px solid #fff5;border-radius:inherit}
+.reel-strip span{height:88px;display:grid;place-items:center;font-size:42px;text-shadow:0 4px 4px #0002}
+.reel.match{background:linear-gradient(#f5c864,#fff6b6,#e1af51);box-shadow:inset 0 0 0 3px #ffda6e,0 0 16px #ffe596}
+.spinning .reel:not(.stopped) .reel-strip{filter:blur(1px)}
+.machine-plaque{text-align:center;margin:13px auto 4px;font-size:9px;letter-spacing:.16em;color:#faeac9;background:#3e332e;padding:6px;border-radius:6px}
+.machine-lights{text-align:center;font-size:20px;color:#ffeab7;letter-spacing:.1em;text-shadow:0 0 7px #ffbd58}
+#bAction{width:100%;margin:8px 0 2px;background:linear-gradient(#f0ce89,#bc8848);color:#302c30;box-shadow:0 4px 0 #72512e,0 8px 18px #0006;text-shadow:none}
+#bAction[hidden]{display:none}#bGo[hidden]{display:none}#bonus .bres{margin:12px 0 8px;min-height:0}#bonus .bres:empty{display:none}#bonus .bres b{font-size:24px}#bonus .bres span{font-size:12px;line-height:1.4}
+#bonus .bres.neutral{color:#ccd8ed}.bonus-flight{position:absolute;left:48%;top:40%;font-size:40px;z-index:10;pointer-events:none;animation:bonusFly .9s ease-in forwards}
+@keyframes bonusFly{to{transform:translate(100px,-160px) scale(.3);opacity:0}}
+@media(max-width:360px){#bonus .bonuscard{padding:18px 14px}#bonus h2{font-size:22px}.wheel-shell{width:230px}#bonus .bcard{height:74px}}
+@media(max-height:700px){#bonus .bonuscard{padding:16px}#bHero,#bHero .hero-art{height:70px;width:48px}#bonus h2{font-size:22px}.bonus-heading{margin-bottom:6px}.bonus-wallet{padding:7px 11px;margin:6px 0}.wheel-shell{width:220px}#bonus .bcard{height:68px}.bonus-legend{margin:6px 0}.bonus-stage{margin:8px auto}}
+@media(prefers-reduced-motion:reduce){.bonus-flight{animation:none}#journey.show,#journey.out{animation-duration:.01s}}
+
+
+@media(min-aspect-ratio:13/10) and (max-height:640px){#bonus .bonuscard{display:block!important;max-width:470px!important}#bonus .bonuscard .bgrid{width:100%;max-width:280px}}
 </style>
 </head>
 <body>
@@ -698,21 +750,18 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:li
   </div>
 </div>
 
-<!-- Fase bonus: cartas -->
-<div class="modal" id="bonus">
-  <div class="card bonuscard">
-    <div class="btag" id="bTag">🎁 FASE BONUS</div>
-    <h2 id="bTitle">Encuentra 3 iguales</h2>
-    <p id="bSub">Toca las cartas. El primer premio que consigas completar es el tuyo.</p>
-    <div class="blegend">
-      <div class="lg one"><b>💡</b><span>+1 pista</span></div>
-      <div class="lg three"><b>🌟</b><span>+3 pistas</span></div>
-      <div class="lg foe"><b>👾</b><span>Enemigo: 0</span></div>
-    </div>
-    <div class="bgrid" id="bGrid"></div>
-    <div class="bres" id="bRes"></div>
-    <button class="primary big" id="bGo" style="display:none;width:100%">Continuar ➜</button>
-  </div>
+<!-- Parada sorpresa: uno de tres minijuegos, siempre con Lía. -->
+<div class="modal" id="bonus" role="dialog" aria-modal="true" aria-labelledby="bTitle">
+ <div class="card bonuscard">
+  <div class="btag" id="bTag"></div>
+  <div class="bonus-heading"><div id="bHero" aria-hidden="true"></div><div><h2 id="bTitle"></h2><p id="bSpeech"></p></div></div>
+  <div class="bonus-wallet"><span>TU RESERVA PARA LA AVENTURA</span><b>💡 <span id="bHints">0</span></b></div>
+  <p id="bSub"></p><div id="bStage" class="bonus-stage"></div>
+  <div class="bonus-legend" id="bLegend"></div>
+  <button id="bAction">Jugar</button>
+  <div class="bres" id="bRes" role="status" aria-live="polite"></div>
+  <button class="primary" id="bGo" hidden style="width:100%">Continuar ➜</button>
+ </div>
 </div>
 
 <!-- Final del camino (nivel 100) -->
@@ -946,28 +995,28 @@ const Music=(()=>{
             mix:[0,2,4,5,7,9,10],phd:[0,1,4,5,7,8,10],in:[0,1,5,7,8],wt:[0,2,4,6,8,10]};
   /* Una identidad musical por zona (mismo orden que ZONES). motif = frases [paso,grado,duración] que suenan en los compases pares. */
   const THEMES=[
-    /* 0 Pradera Esmeralda  – luminosa y recta */
+    /* 0 Valle Esmeralda  – luminosa y recta */
     {root:48,sc:'maj', prog:[0,4,5,3],tempo:1.00,swing:0,  arpW:'triangle',arpW2:'triangle',arpPat:[0,1,2,1,0,2,1,2],pad1:1,padW:'triangle',bassW:'sine',bassPat:'root',leadW:'triangle',hat:'e8',motifLow:1,
       motif:[[[0,7,3],[4,9,2],[6,8,2],[8,7,4],[12,5,3]],[[0,5,3],[4,7,2],[6,9,2],[8,11,4],[12,9,3]]]},
-    /* 1 Puerto Coral – marinera, con swing */
+    /* 1 Puerto de las Velas – marinera, con swing */
     {root:50,sc:'mix', prog:[0,6,3,0],tempo:0.96,swing:.28,arpW:'sine',arpW2:'triangle',arpPat:[0,2,1,2],arpEvery:2,arpDur:.14,bassW:'triangle',bassPat:'walk',leadW:'sine',hat:'e8',motifLow:1,
       motif:[[[0,9,2],[3,8,3],[6,7,2],[8,5,4],[12,7,3]],[[0,7,2],[3,9,3],[6,11,2],[8,9,4],[12,8,3]]]},
-    /* 2 Desierto Dorado – escala frigia dominante, pulso seco */
+    /* 2 Oasis Dorado – escala frigia dominante, pulso seco */
     {root:52,sc:'phd', prog:[0,1,0,6],tempo:0.92,swing:0,  arpW:'square',arpW2:'square',arpF:1500,arpPat:[0,2,1,2,0,1,2,1],arpEvery:2,arpDur:.09,bassW:'sawtooth',bassPat:'walk',bassF:380,leadW:'sawtooth',leadV:.03,hat:'e8',motifLow:1,
       motif:[[[0,7,2],[2,8,2],[4,10,3],[8,8,2],[10,7,2],[12,5,4]],[[0,5,2],[2,7,2],[4,8,3],[8,10,2],[10,8,2],[12,7,4]]]},
-    /* 3 Bosque de Otoño – folk cálido, sin percusión */
+    /* 3 Aldea de Otoño – folk cálido, sin percusión */
     {root:45,sc:'dor', prog:[0,3,6,4],tempo:0.97,swing:.15,arpW:'triangle',arpW2:'triangle',arpPat:[0,1,2,1],arpEvery:2,pad1:1,padW:'sine',bassW:'triangle',bassPat:'root',leadW:'sine',hat:'none',motifLow:1,
       motif:[[[0,9,4],[4,8,2],[6,7,2],[8,5,4],[12,7,4]],[[0,7,4],[4,5,2],[6,7,2],[8,9,4],[12,8,4]]]},
-    /* 4 Ciudad Neón – synthwave, 16avos y bajo sincopado */
+    /* 4 Metrópolis Neón – synthwave, 16avos y bajo sincopado */
     {root:42,sc:'min', prog:[0,5,3,6],tempo:1.12,swing:0,  arpW:'sawtooth',arpW2:'sawtooth',arpF:3200,arpPat:[0,2,1,2,0,2,1,2],arpEvery:1,arpDur:.08,bassW:'sawtooth',bassPat:'off',bassF:600,leadW:'square',leadV:.03,hat:'s16',
       motif:[[[0,9,2],[3,9,1],[4,11,2],[8,10,2],[11,9,1],[12,7,3]],[[0,7,2],[3,7,1],[4,9,2],[8,11,2],[11,12,1],[12,9,3]]]},
-    /* 5 Montañas de Hielo – lenta, cristalina, mucho aire */
+    /* 5 Refugio Glacial – lenta, cristalina, mucho aire */
     {root:53,sc:'lyd', prog:[0,1,4,0],tempo:0.88,swing:0,  arpW:'sine',arpW2:'sine',arpPat:[0,2,1,2],arpEvery:4,arpDur:.5,arpV:.05,pad1:1,padW:'sine',padV:.04,bassW:'sine',bassPat:'root',leadW:'sine',leadV:.04,hat:'none',motifLow:1,
       motif:[[[0,11,6],[8,9,6]],[[0,10,6],[8,12,6]]]},
-    /* 6 Jardín Sakura – pentatónica japonesa */
+    /* 6 Villa Sakura – pentatónica japonesa */
     {root:47,sc:'in',  prog:[0,2,3,1],tempo:0.98,swing:0,  arpW:'triangle',arpW2:'triangle',arpPat:[0,1,2,1],arpEvery:2,arpDur:.12,pad1:1,padW:'sine',bassW:'sine',bassPat:'root',leadW:'triangle',hat:'none',motifLow:1,
       motif:[[[0,7,3],[4,8,2],[6,7,2],[8,5,4],[12,4,4]],[[0,5,3],[4,7,2],[6,8,2],[8,10,4],[12,8,4]]]},
-    /* 7 Isla Volcánica – menor armónica, marcha intensa */
+    /* 7 Puerto del Volcán – menor armónica, marcha intensa */
     {root:38,sc:'hmin',prog:[0,5,3,4],tempo:1.08,swing:0,  arpW:'square',arpW2:'square',arpF:2000,arpPat:[0,2,1,0,2,1,2,1],arpEvery:1,arpDur:.09,bassW:'sawtooth',bassPat:'walk',bassF:520,leadW:'sawtooth',leadV:.035,hat:'e8',
       motif:[[[0,9,2],[2,9,2],[4,8,2],[6,7,2],[8,5,4],[12,7,2]],[[0,5,2],[2,5,2],[4,7,2],[6,8,2],[8,10,4],[12,9,2]]]},
     /* 8 Galaxia – escala de tonos enteros, flotante */
@@ -1159,15 +1208,15 @@ function saveRun(){store.run=run&&{...run};persist()}
 /* ============================ Zonas: una cada 10 niveles ============================
    Cambian los colores de las piezas y el fondo; la llave roja siempre se mantiene roja. */
 const ZONES=[
-  {n:'Pradera Esmeralda',e:'🌿',t1:'#4a35a066',t2:'#0e8a9a55',cc:'#43e0c1'},                      // paleta original
-  {n:'Puerto Coral',     e:'⚓',s:60,l:54,h:[190,20,205,175,45,220,160,30]},
-  {n:'Desierto Dorado',  e:'🏜️',s:68,l:54,h:[38,170,48,22,75,200,30,55]},
-  {n:'Bosque de Otoño',  e:'🍂',s:62,l:50,h:[28,95,40,300,110,22,55,150]},
-  {n:'Ciudad Neón',      e:'🌃',s:88,l:58,h:[300,185,265,215,320,150,60,280]},
-  {n:'Montañas de Hielo',e:'🏔️',s:60,l:64,h:[200,210,190,225,180,240,170,255]},
-  {n:'Jardín Sakura',    e:'🌸',s:62,l:72,h:[330,300,280,150,170,45,310,200]},
-  {n:'Isla Volcánica',   e:'🌋',s:55,l:48,h:[25,35,45,200,215,260,22,165]},
-  {n:'Galaxia',          e:'🌌',s:70,l:58,h:[265,250,230,285,310,195,175,330]},
+  {n:'Valle Esmeralda',e:'🌿',t1:'#4a35a066',t2:'#0e8a9a55',cc:'#43e0c1'},                      // paleta original
+  {n:'Puerto de las Velas',     e:'⚓',s:60,l:54,h:[190,20,205,175,45,220,160,30]},
+  {n:'Oasis Dorado',  e:'🏜️',s:68,l:54,h:[38,170,48,22,75,200,30,55]},
+  {n:'Aldea de Otoño',  e:'🍂',s:62,l:50,h:[28,95,40,300,110,22,55,150]},
+  {n:'Metrópolis Neón',      e:'🌃',s:88,l:58,h:[300,185,265,215,320,150,60,280]},
+  {n:'Refugio Glacial',e:'🏔️',s:60,l:64,h:[200,210,190,225,180,240,170,255]},
+  {n:'Villa Sakura',    e:'🌸',s:62,l:72,h:[330,300,280,150,170,45,310,200]},
+  {n:'Puerto del Volcán',   e:'🌋',s:55,l:48,h:[25,35,45,200,215,260,22,165]},
+  {n:'Ciudad Celeste',          e:'🌌',s:70,l:58,h:[265,250,230,285,310,195,175,330]},
   {n:'Castillo Dorado',  e:'🏰',s:72,l:60,h:[45,50,40,210,160,280,35,200]},
 ];
 ZONES.forEach(z=>{ if(z.h){ z.t1=`hsl(${z.h[0]} ${z.s}% ${Math.max(30,z.l-16)}% / .42)`; z.t2=`hsl(${z.h[1]} ${z.s}% ${Math.max(30,z.l-16)}% / .32)`; z.cc=`hsl(${z.h[0]} 80% 64%)`; } });
@@ -1191,7 +1240,7 @@ function travelDialog(intro=false){
   const select=v=>{choice=v;const brave=v==='brave';
    $('routeNormal').setAttribute('aria-pressed',String(!brave));$('routeBrave').setAttribute('aria-pressed',String(brave));
    $('upperRoute').classList.toggle('chosen',brave);$('lowerRoute').classList.toggle('chosen',!brave);
-   $('routeExplain').textContent=intro?'La aventura comienza en Pradera Esmeralda. Cada diez niveles elegiremos cómo seguir.':run.mode==='p'?'Durante los próximos 10 niveles: '+(brave?'puzles algo más difíciles.':'dificultad habitual.')+' En Práctica no hay puntos ni eliminación.':`Durante los próximos 10 niveles: ${brave?'puzles algo más difíciles y +10 % de puntos.':'dificultad y puntos habituales.'} Después podrás elegir de nuevo.`;
+   $('routeExplain').textContent=intro?'La aventura comienza en Valle Esmeralda. Cada diez niveles elegiremos cómo seguir.':run.mode==='p'?'Durante los próximos 10 niveles: '+(brave?'puzles algo más difíciles.':'dificultad habitual.')+' En Práctica no hay puntos ni eliminación.':`Durante los próximos 10 niveles: ${brave?'puzles algo más difíciles y +10 % de puntos.':'dificultad y puntos habituales.'} Después podrás elegir de nuevo.`;
    go.textContent=intro?'Comenzar la aventura ➜':`Seguir por el camino ${brave?'aventurero':'tranquilo'} ➜`;
   };
   $('routeNormal').onclick=()=>select('normal');$('routeBrave').onclick=()=>select('brave');
@@ -1235,99 +1284,58 @@ function renderStage(){                                   // barra de 10 tramos 
 /* Mapa de zonas: se muestra al empezar un camino y al cambiar de zona (la llave roja viaja a la siguiente parada) */
 const ZDECO=[['🌳','🌼'],['🌊','⛵'],['🌵','🐪'],['🍁','🌲'],['🌆','✨'],['❄️','🏔️'],['🌸','⛩️'],['🌋','🔥'],['🪐','⭐'],['🏰','🚩']];
 function showMap(fromI,toI,{travel=false}={}){
-  return new Promise(res=>{
-    const el=$('journey'),svg=$('mapSvg'),NS='http://www.w3.org/2000/svg';
-    const wide=innerWidth/innerHeight>1.3&&innerHeight<760, W=wide?700:320, H=wide?260:540;
-    const pts=[];for(let i=0;i<10;i++)pts.push(wide?[55+i*66,i%2?70:190]:[i%2?235:85,500-i*50]);
-    svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.innerHTML='';
-    const mk=(tag,at,par=svg)=>{const e=document.createElementNS(NS,tag);for(const k in at)e.setAttribute(k,at[k]);par.appendChild(e);return e};
-    const open=travel?fromI:toI;                                   // última parada desbloqueada al abrir
-    // ---- definiciones: terreno por zonas, brillo y degradados de las paradas
-    const defs=mk('defs',{});
-    const lg=mk('linearGradient',{id:'land',x1:0,y1:0,x2:wide?1:0,y2:wide?0:1},defs);
-    for(let k=0;k<10;k++){const idx=wide?k:9-k;mk('stop',{offset:k/9,'stop-color':ZONES[idx].cc,'stop-opacity':.28},lg)}
-    const bl=mk('filter',{id:'mblur',x:'-60%',y:'-60%',width:'220%',height:'220%'},defs);mk('feGaussianBlur',{stdDeviation:7},bl);
-    ZONES.forEach((z,i)=>{const rg=mk('radialGradient',{id:'ng'+i,cx:'35%',cy:'28%',r:'85%'},defs);
-      mk('stop',{offset:0,'stop-color':z.cc,'stop-opacity':1},rg);mk('stop',{offset:1,'stop-color':'#0c1236','stop-opacity':1},rg)});
-    mk('rect',{x:5,y:5,width:W-10,height:H-10,rx:30,fill:'url(#land)',stroke:'#ffffff2e','stroke-width':1.5});
-    // ---- nubes
-    (wide?[[110,60,1,0],[340,215,.8,2],[560,70,.9,4]]:[[60,100,1,0],[255,210,.8,2],[70,340,.9,4],[262,440,1,1]]).forEach(([x,y,s,d])=>{
-      const g=mk('g',{class:'mcloud',style:`--d:${d}`});[[0,0,22],[20,-6,17],[-20,-4,15],[8,6,20]].forEach(([dx,dy,r])=>mk('circle',{cx:x+dx*s,cy:y+dy*s,r:r*s},g))});
-    // ---- camino: borde, asfalto, línea central y tramo recorrido
-    const bases=[],fills=[];
-    for(let i=0;i<9;i++){
-      const [x1,y1]=pts[i],[x2,y2]=pts[i+1],mx=(x1+x2)/2,my=(y1+y2)/2;
-      const d=wide?`M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}`:`M${x1} ${y1} C${x1} ${my} ${x2} ${my} ${x2} ${y2}`;
-      mk('path',{d,class:'rd-o'});mk('path',{d,class:'rd-b'});bases.push(mk('path',{d,class:'rd-c'}));
-      const f=mk('path',{d,class:'msegf',stroke:ZONES[i+1].cc,style:`color:${ZONES[i+1].cc}`}),L=f.getTotalLength();
-      f.style.strokeDasharray=L;f.style.strokeDashoffset=i<open?0:L;fills.push({f,L});
-    }
-    // ---- decorado temático (a color en zonas abiertas, en niebla en las bloqueadas)
-    const decos=[];
-    ZONES.forEach((z,i)=>{const [x,y]=pts[i],side=wide?0:(i%2?1:-1);
-      ZDECO[i].forEach((em,k)=>{
-        const dx=wide?(k?26:-26):side*(k?52:34), dy=wide?(i%2?(k?38:30):(k?-38:-30)):(k?20:-20);
-        const tx=mk('text',{class:'mdeco'+(i<=open?'':' lock'),x:x+dx,y:y+dy,style:`--i:${i+k}`});tx.textContent=em;decos.push({tx,i});
-      })});
-    // ---- paradas
-    const nodes=ZONES.map((z,i)=>{
-      const [x,y]=pts[i],R=i===9?24:21,
-        g=mk('g',{class:'mnode '+(i<=open?'unl':'lock')+(i<open?' done':'')+(i===open?' cur':'')});g.style.setProperty('--i',i);
-      mk('circle',{class:'glow',cx:x,cy:y,r:R+10,fill:z.cc,filter:'url(#mblur)'},g);
-      mk('circle',{class:'ring',cx:x,cy:y,r:R+7,stroke:z.cc},g);
-      mk('circle',{class:'nlock',cx:x,cy:y,r:R},g);
-      mk('circle',{class:'nb',cx:x,cy:y,r:R,fill:`url(#ng${i})`},g);
-      const em=mk('text',{class:'ne',x,y:y+1},g);em.textContent=i<=open?z.e:'🔒';
-      mk('circle',{class:'bd',cx:x+R-3,cy:y+R-3,r:8,stroke:z.cc},g);
-      const bn=mk('text',{class:'bn',x:x+R-3,y:y+R-2.5},g);bn.textContent=i+1;
-      const st=mk('text',{class:'star',x:x+R-2,y:y-R+3},g);st.textContent='★';
-      const lw=z.n.length*6.2+16,anchorR=wide?0:(i%2?-1:1);           // etiqueta en píldora
-      const lx=wide?x:(i%2?x-R-8:x+R+8), ly=wide?(i%2?y-R-16:y+R+18):y;
-      const px=wide?lx-lw/2:(anchorR>0?lx:lx-lw);
-      mk('rect',{class:'mlpill',x:px,y:ly-10,width:lw,height:20,rx:10},g);
-      const lb=mk('text',{class:'mlabel',x:px+lw/2,y:ly+.5,'text-anchor':'middle','dominant-baseline':'central'},g);lb.textContent=i<=open?z.n:'???';
-      return {g,em,lb,z,x,y,R};
-    });
-    // Lía recorre el mapa entre ciudades.
-    const key=mk('g',{class:'mkey'});
-    key.innerHTML=HERO_MARKUP;
-    const avatar=key.firstElementChild;
-    avatar.style.width='40px';avatar.style.height='58px';avatar.setAttribute('width','40');avatar.setAttribute('height','58');avatar.setAttribute('x','-20');avatar.setAttribute('y','-58');
-    const setKey=(x,y,hop=0)=>key.setAttribute('transform',`translate(${x} ${y-15-hop})`);
-    setKey(pts[open][0],pts[open][1]);
-    // ---- textos
-    const cap=$('mName').parentNode,setCap=(tag,name,sub)=>{$('mTag').textContent=tag;$('mName').textContent=name;$('mSub').textContent=sub;cap.classList.remove('pop');void cap.offsetWidth;cap.classList.add('pop')};
-    if(travel) setCap('¡ZONA COMPLETADA!',`${ZONES[fromI].e} ${ZONES[fromI].n}`,'Rumbo a '+ZONES[toI].n+'…');
-    else{applyZone(toI);setCap('TU RUTA · '+pathOf(run.start).n.toUpperCase(),`${ZONES[toI].e} ${ZONES[toI].n}`,`Nivel ${run.level} · tramo ${zoneStep(run.level)} de 10`)}
-    el.classList.remove('out');el.classList.add('show');
-    let done=false;const timers=[];
-    const end=()=>{if(done)return;done=true;timers.forEach(clearTimeout);el.classList.add('out');setTimeout(()=>{el.classList.remove('show','out');Music.duck(1);res()},470)};
-    if(travel){
-      Music.duck(.4);
-      const arrive=()=>{
-        const n=nodes[toI];applyZone(toI);
-        nodes[fromI].g.classList.remove('cur');nodes[fromI].g.classList.add('done');
-        n.g.classList.remove('lock');n.g.classList.add('unl','cur','arrive');n.em.textContent=n.z.e;n.lb.textContent=n.z.n;
-        decos.forEach(d=>{if(d.i<=toI)d.tx.classList.remove('lock')});
-        setKey(n.x,n.y);
-        setCap(`ZONA ${toI+1} DE 10`,`${n.z.e} ${n.z.n}`,toI===9?'La última zona. ¡Ya casi!':'Nuevos colores y nueva música.');
-        const r=n.g.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,36,['#ffffff','#ffcf6b',n.z.cc],7);
-      };
-      timers.push(setTimeout(()=>{
-        sfx.journey();
-        const base=bases[fromI],L=fills[fromI].L,dur=1400,t0=performance.now();let lastSp=0;
-        (function step(now){
-          const k=Math.min(1,(now-t0)/dur),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2,p=base.getPointAtLength(L*e);
-          setKey(p.x,p.y,Math.abs(Math.sin(k*Math.PI*5))*7);          // salticos de la ficha
-          fills[fromI].f.style.strokeDashoffset=L*(1-e);
-          if(now-lastSp>70&&k<1){lastSp=now;const sp=mk('circle',{class:'mspark',cx:p.x,cy:p.y,r:2.6,fill:ZONES[toI].cc},svg);svg.insertBefore(sp,key);setTimeout(()=>sp.remove(),850)}
-          if(k<1)requestAnimationFrame(step); else arrive();
-        })(t0);
-      },800));
-      timers.push(setTimeout(end,4200));
-    } else { sfx.start(); timers.push(setTimeout(end,2400)); }
-    timers.push(setTimeout(()=>el.addEventListener('pointerdown',end,{once:true}),700));
+ return new Promise(resolve=>{
+  const el=$('journey'),svg=$('mapSvg'),NS='http://www.w3.org/2000/svg';
+  const wide=innerWidth/innerHeight>1.3,W=wide?1000:480,H=wide?390:650;
+  const mk=(tag,attrs,parent=svg)=>{const n=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,v);parent.appendChild(n);return n};
+  svg.innerHTML='';svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.setAttribute('role','img');svg.setAttribute('aria-label',`El atlas de Lía. Destino: ${ZONES[toI].n}`);
+  const pts=ZONES.map((_,i)=>wide?[100+(i<5?i:9-i)*200,i<5?100:285]:[i%4<2?118:362,60+Math.floor(i/2)*130]);
+  // Serpentine order: two cities per row on a hand-drawn constellation road.
+  if(!wide)pts.forEach((p,i)=>p[0]=(Math.floor(i/2)%2===0?(i%2===0?118:362):(i%2===0?362:118)));
+  const defs=mk('defs',{});const grad=mk('linearGradient',{id:'atlasShade',x1:0,y1:0,x2:0,y2:1},defs);
+  mk('stop',{offset:0,'stop-color':'#081126','stop-opacity':0},grad);mk('stop',{offset:1,'stop-color':'#081126','stop-opacity':.95},grad);
+  const open=travel?fromI:toI,paths=[];
+  mk('rect',{x:2,y:2,width:W-4,height:H-4,rx:32,fill:'#0a1734','fill-opacity':.65,stroke:'#c6cde629'});
+  for(let i=0;i<45;i++)mk('circle',{cx:18+(i*137)%(W-36),cy:16+(i*83)%(H-32),r:i%5===0?2:1,fill:'#f5d99b',opacity:i%3===0?.5:.15});
+  for(let i=0;i<9;i++){
+   const [x,y]=pts[i],[nx,ny]=pts[i+1],mx=(x+nx)/2,my=(y+ny)/2;
+   const d=wide?(y===ny?`M${x} ${y} C${mx} ${y-25} ${mx} ${ny+25} ${nx} ${ny}`:`M${x} ${y} C${x+95} ${my} ${nx+95} ${my} ${nx} ${ny}`):(y===ny?`M${x} ${y} C${mx} ${y+35} ${mx} ${ny+35} ${nx} ${ny}`:`M${x} ${y} C${x+(x<240?-55:55)} ${my} ${nx+(nx<240?-55:55)} ${my} ${nx} ${ny}`);
+   mk('path',{d,fill:'none',stroke:'#040919','stroke-width':15});
+   const road=mk('path',{d,fill:'none',stroke:i<open?'#e7c47c':'#7289a657','stroke-width':4,'stroke-dasharray':i<open?'none':'3 10','stroke-linecap':'round'});paths.push(road);
+  }
+  const cards=ZONES.map((z,i)=>{
+   const [x,y]=pts[i],w=wide?162:176,h=94,id='cityCrop'+i;
+   const clip=mk('clipPath',{id},defs);mk('rect',{x:x-w/2,y:y-h/2,width:w,height:h,rx:17},clip);
+   const g=mk('g',{class:'atlas-city'+(i===open?' current':'')+(i>open?' undiscovered':'')});
+   mk('rect',{x:x-w/2-3,y:y-h/2-3,width:w+6,height:h+6,rx:20,fill:'#10223c',stroke:i===open?'#ffdb8f':i<open?'#73bfaa':'#7289a655','stroke-width':i===open?3:1},g);
+   mk('image',{href:`backgrounds/zone-${i+1}.webp`,x:x-w/2,y:y-h/2,width:w,height:h,preserveAspectRatio:'xMidYMid slice','clip-path':`url(#${id})`,opacity:i>open?.35:1},g);
+   mk('rect',{x:x-w/2,y:y-h/2,width:w,height:h,rx:17,fill:'url(#atlasShade)'},g);
+   const label=mk('text',{x,y:y+22,'text-anchor':'middle',fill:'#fff','font-size':wide?12:13,'font-weight':800},g);label.textContent=z.n;
+   const sub=mk('text',{x,y:y+39,'text-anchor':'middle',fill:i>open?'#b7c5dd':'#e7c47c','font-size':9,'letter-spacing':1.2},g);sub.textContent=i<open?'COMPLETADA':i===open?'ESTÁS AQUÍ':`NIVELES ${i*10+1}–${(i+1)*10}`;
+   mk('circle',{cx:x-w/2+15,cy:y-h/2+15,r:11,fill:'#0b152de6',stroke:'#f3d08b99'},g);
+   const num=mk('text',{x:x-w/2+15,y:y-h/2+19,'text-anchor':'middle',fill:'#ffdf9f','font-size':11,'font-weight':800},g);num.textContent=i<open?'✓':i+1;
+   return g;
   });
+  const hero=mk('g',{class:'atlas-traveler'});hero.innerHTML=HERO_MARKUP;
+  const art=hero.firstElementChild;art.style.width='44px';art.style.height='64px';art.setAttribute('width','44');art.setAttribute('height','64');art.setAttribute('x','-22');art.setAttribute('y','-70');
+  const place=(x,y)=>hero.setAttribute('transform',`translate(${x} ${y-27})`);place(...pts[open]);
+  el.style.setProperty('--atlas-scene',`url("backgrounds/zone-${toI+1}.webp")`);
+  $('mTag').textContent=travel?'EL ATLAS DE LÍA · UN NUEVO HORIZONTE':`EL ATLAS DE LÍA · CIUDAD ${toI+1} DE 10`;
+  $('mName').textContent=travel?`Hasta pronto, ${ZONES[fromI].n}`:ZONES[toI].n;
+  $('mSub').textContent=travel?`Nuestro próximo destino: ${ZONES[toI].n}`:`Diez puzles, una ciudad y un nuevo capítulo. Nivel ${run.level} de 100.`;
+  el.classList.remove('out');el.classList.add('show');Music.duck(.35);
+  let finished=false,frame=0,timer=0,ready=!travel;
+  const end=()=>{if(finished||!ready)return;finished=true;clearTimeout(timer);cancelAnimationFrame(frame);el.removeEventListener('pointerdown',end);el.removeEventListener('keydown',key);el.classList.add('out');setTimeout(()=>{el.classList.remove('show','out');Music.duck(1);resolve()},350)};
+  const key=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();end()}};
+  el.addEventListener('pointerdown',end);el.addEventListener('keydown',key);el.tabIndex=0;el.focus();
+  if(travel){
+   sfx.journey();const path=paths[fromI],length=path.getTotalLength(),t0=performance.now(),duration=matchMedia('(prefers-reduced-motion: reduce)').matches?0:1700;
+   art.classList.add('walking');
+   function step(t){const k=duration?Math.min(1,(t-t0)/duration):1,e=k*k*(3-2*k),p=path.getPointAtLength(length*e);place(p.x,p.y);
+    if(k<1)frame=requestAnimationFrame(step);else{art.classList.remove('walking');applyZone(toI);cards[fromI].classList.remove('current');cards[fromI].querySelectorAll('text')[1].textContent='COMPLETADA';cards[fromI].querySelector('rect').setAttribute('stroke','#73bfaa');cards[toI].classList.remove('undiscovered');cards[toI].classList.add('current');const pic=cards[toI].querySelector('image');pic.setAttribute('opacity',1);cards[toI].querySelector('rect').setAttribute('stroke','#ffdb8f');const texts=cards[toI].querySelectorAll('text');texts[1].textContent='ESTÁS AQUÍ';$('mName').textContent=ZONES[toI].n;$('mSub').textContent='Lía: «¡Ya estamos aquí! Vamos a descubrir sus secretos.»';ready=true;timer=setTimeout(end,2200);sfx.win()}}
+   frame=requestAnimationFrame(step);
+  }else{applyZone(toI);sfx.start();timer=setTimeout(end,4200)}
+ });
 }
 
 function startRun(start,mode){
@@ -1532,7 +1540,7 @@ function win(){
       (cgw.routeBonus?`<div class="g"><span>✨ Ruta aventurera +10 %</span><b>+${cgw.routeBonus.toLocaleString('de-DE')}</b></div>`:'')+
       (cgw.lost>0?`<div class="r"><span>Perdiste por movimientos extra</span><b>−${cgw.lost.toLocaleString('de-DE')}</b></div>`:'');
     $('gain').textContent=prac?'🎯':'+0';$('winTotal').textContent=run.score.toLocaleString('de-DE');$('winTotalP').style.display=prac?'none':'';
-    const zoneDone=G.n%10===0&&G.n<MAXL,bonusNext=G.n%BONUS_EVERY===0&&G.n<MAXL&&!prac;
+    const zoneDone=G.n%10===0&&G.n<MAXL,bonusNext=isBonusLevel(G.n)&&G.n<MAXL&&!prac;
     $('bNext').textContent=G.n>=MAXL?'Ver resultado ★':bonusNext?'🎁 ¡Fase bonus! ➜':zoneDone?`Viajar: ${ZONES[zoneIdx(G.n+1)].e} ${ZONES[zoneIdx(G.n+1)].n} ➜`:'Siguiente nivel ➜';
     if(zoneDone)$('winTag').textContent=`🏁 ¡${ZONES[zoneIdx(G.n)].n.toUpperCase()} COMPLETADA!`;
     $('win').classList.add('show');
@@ -1547,7 +1555,7 @@ $('bNext').onclick=async()=>{
   const crossing=G.n%10===0, from=zoneIdx(G.n);
   if(busy)return;busy=true;
   if(crossing){await travelDialog();getPack(run.level+1)}
-  if(G.n%BONUS_EVERY===0&&run.mode==='c') run.bonus=1;           // fase bonus pendiente (se conserva si cierras la app)
+  if(isBonusLevel(G.n)&&run.mode==='c') run.bonus=1;           // fase bonus pendiente (se conserva si cierras la app)
   run.level++;saveRun();
   if(run.bonus){const prize=await showBonus();run.hints+=prize;run.bonus=0;saveRun()}
   if(crossing) await showMap(from,zoneIdx(run.level),{travel:true});      // la llave viaja por el mapa a la zona siguiente
@@ -1573,70 +1581,77 @@ function recordBest(final){
 let lastCfg={start:1,mode:'c'};
 /* ============================ Fase bonus: 9 cartas, 3 premios x 3 copias ============================
    Gana el primer premio que consigas completar con 3 cartas iguales: +1 pista, +3 pistas o enemigo (0). */
-const BONUS_EVERY=12;
+const isBonusLevel=level=>level>=15&&level<100&&level%10===5;
 const BONUS_CARDS=[{e:'💡',n:'+1 pista',v:1,c:'#43e0c1'},{e:'🌟',n:'+3 pistas',v:3,c:'#ffd24a'},{e:'👾',n:'Enemigo',v:0,c:'#ff4a6a'}];
-/* Las bombillas ganadas vuelan desde las cartas hasta el contador de pistas, que sube de una en una */
-function flyPrizes(P,cards,deck,ty){
-  const target=$('bHints'),tr=target.getBoundingClientRect(),base=run.hints;let got=0;
-  const winners=cards.filter((c,k)=>deck[k]===ty);
-  for(let k=0;k<P.v;k++){
-    const src=winners[k%winners.length].getBoundingClientRect(),sx=src.left+src.width/2,sy=src.top+src.height/2;
-    const e=document.createElement('div');e.className='fly';e.textContent='💡';e.style.left=sx+'px';e.style.top=sy+'px';document.body.appendChild(e);
-    const dx=tr.left+tr.width/2-sx,dy=tr.top+tr.height/2-sy;
-    const a=e.animate([
-      {transform:'translate(-50%,-50%) scale(.5)',opacity:0},
-      {transform:'translate(-50%,-50%) scale(1.7)',opacity:1,offset:.28},
-      {transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.8)`,opacity:1}
-    ],{duration:950,delay:1000+k*380,easing:'cubic-bezier(.5,0,.3,1)',fill:'both'});
-    a.onfinish=()=>{e.remove();got++;target.textContent=base+got;target.classList.remove('tick');void target.offsetWidth;target.classList.add('tick');
-      tone(650+got*150,.16,'sine',.1);const r=target.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,12,['#ffd24a','#ffffff'],3.5)};
-  }
-  return 1000+(P.v-1)*380+950+250;                      // ms hasta que termina la cuenta
+const WHEEL_PRIZES=[1,0,2,1,3,1,2,1];
+const REEL_SYMBOLS=['💎','🔑','🌟'];
+const bonusDelay=ms=>new Promise(r=>setTimeout(r,matchMedia('(prefers-reduced-motion: reduce)').matches?Math.min(ms,100):ms));
+function slotPrize(symbols){const n=Math.max(...REEL_SYMBOLS.map((_,i)=>symbols.filter(v=>v===i).length));return n===3?3:n===2?1:0}
+function createBonusPlan(){
+ const kind=['cards','wheel','slots'][Math.floor(Math.random()*3)];
+ const deck=[0,0,0,1,1,1,2,2,2];for(let i=8;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}
+ return {kind,deck,opened:[],wheel:Math.floor(Math.random()*8),reels:Array.from({length:3},()=>Math.floor(Math.random()*3))};
 }
 function showBonus(){
-  return new Promise(res=>{
-    const m=$('bonus'),grid=$('bGrid'),go=$('bGo'),resBox=$('bRes');
-    const deck=[0,0,0,1,1,1,2,2,2];for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}
-    const counts=[0,0,0];let locked=false,flips=0;
-    $('bTag').textContent=`🎁 FASE BONUS · NIVEL ${run.level-1}`;$('bTitle').textContent='Encuentra 3 iguales';
-    $('bSub').innerHTML=`Tus pistas: <b id="bHints">${run.hints}</b><br>Toca las cartas: el primer premio que completes es el tuyo.`;
-    resBox.innerHTML='';resBox.className='bres';go.style.display='none';grid.innerHTML='';
-    const cards=deck.map((ty,i)=>{
-      const d=document.createElement('button');d.className='bcard';d.style.setProperty('--i',i);d.style.setProperty('--pc',BONUS_CARDS[ty].c);d.setAttribute('aria-label','Carta '+(i+1));
-      d.innerHTML=`<span class="bin"><span class="bb"><i>❓</i></span><span class="bf"><b>${BONUS_CARDS[ty].e}</b><small>${BONUS_CARDS[ty].n}</small></span></span>`;
-      grid.appendChild(d);return d});
-    const flip=i=>{cards[i].classList.add('on');tone(480+flips*70,.12,'triangle',.08);vib(8)};
-    cards.forEach((c,i)=>c.onclick=()=>{
-      if(locked||c.classList.contains('on'))return;
-      flips++;flip(i);const ty=deck[i];counts[ty]++;
-      {const r=c.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,7,[BONUS_CARDS[ty].c,'#ffffff'],3)}
-      if(counts[ty]===2){                              // dos iguales: ¡tensión!
-        cards.forEach((cc,k)=>{if(deck[k]===ty&&cc.classList.contains('on'))cc.classList.add('pair')});
-        resBox.className='bres';resBox.innerHTML=`<span class="hintline">✨ ¡Dos ${BONUS_CARDS[ty].v===0?'enemigos':BONUS_CARDS[ty].e}! Falta una…</span>`;
-        setTimeout(()=>{if(!locked)resBox.innerHTML=''},1700);tone(880,.18,'sine',.09);setTimeout(()=>tone(1175,.2,'sine',.08),120);
-      }
-      if(counts[ty]===3){
-        locked=true;const P=BONUS_CARDS[ty];
-        setTimeout(()=>{
-          cards.forEach((cc,k)=>{if(deck[k]===ty)cc.classList.add('winc');else cc.classList.add('dim')});
-          setTimeout(()=>cards.forEach((cc,k)=>{if(!cc.classList.contains('on'))setTimeout(()=>cc.classList.add('on'),k*70)}),700);
-          const pop=document.createElement('div');pop.className='bpop '+(P.v>0?'good':'bad');pop.innerHTML=`<b>${P.e}</b><span>${P.v>0?'+'+P.v:'0'}</span>`;grid.appendChild(pop);setTimeout(()=>pop.remove(),1500);
-          let wait=1100;
-          if(P.v>0){
-            resBox.className='bres good';resBox.innerHTML=`<b>¡+${P.v} pista${P.v>1?'s':''}!</b><span>Un premio ${P.v>=3?'gordo':'bonito'} para tu partida</span>`;
-            (P.v>=3?sfx.fanfare:sfx.win)();const r=grid.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,P.v>=3?70:36,['#ffd24a','#ffffff',P.c],9);if(P.v>=3)rain();
-            wait=flyPrizes(P,cards,deck,ty);
-          } else {
-            resBox.className='bres bad';resBox.innerHTML=`<b>¡Un enemigo!</b><span>Esta vez no hay pistas. ¡La próxima será mejor!</span>`;
-            sfx.fail();vib([60,40,60]);document.body.classList.add('flash');setTimeout(()=>document.body.classList.remove('flash'),900);
-          }
-          setTimeout(()=>{go.style.display='';go.classList.add('pulse')},wait);
-          go.onclick=()=>{m.classList.remove('show');go.classList.remove('pulse');setTimeout(()=>res(P.v),250)};
-        },650);
-      }
-    });
-    m.classList.add('show');sfx.start();
-  });
+ return new Promise(resolve=>{
+  const plan=run.bonusPlan||(run.bonusPlan=createBonusPlan());saveRun();
+  const m=$('bonus'),stage=$('bStage'),go=$('bGo'),action=$('bAction'),result=$('bRes');
+  const titles={cards:'El secreto de las cartas',wheel:'La ruleta de las pistas',slots:'La máquina de amuletos'};
+  const lines={cards:'Busca tres símbolos iguales. El primer trío decide tu premio.',wheel:'Gira la rueda. La flecha dorada señala cuántas pistas ganas.',slots:'Tres amuletos iguales: +3 pistas. Dos iguales: +1. Todos distintos: 0.'};
+  const zone=zoneIdx(Math.max(1,run.level-1));m.style.setProperty('--bonus-scene',`url("backgrounds/zone-${zone+1}.webp")`);m.dataset.game=plan.kind;
+  $('bTag').textContent=`PARADA SORPRESA · ${ZONES[zone].n.toUpperCase()}`;
+  $('bTitle').textContent=titles[plan.kind];$('bSub').textContent=lines[plan.kind];
+  $('bHero').innerHTML=HERO_MARKUP;$('bSpeech').textContent={cards:'«¿Qué esconden? ¡Vamos a descubrirlo!»',wheel:'«Una vuelta más hacia nuestra próxima aventura.»',slots:'«¡Que suenen los amuletos! A ver qué nos traen.»'}[plan.kind];
+  $('bHints').textContent=run.hints;result.innerHTML='';result.className='bres';stage.innerHTML='';stage.className='bonus-stage '+plan.kind;
+  go.hidden=true;go.style.display='none';go.disabled=false;action.hidden=plan.kind==='cards';action.disabled=false;
+  action.textContent=plan.kind==='wheel'?'Girar la ruleta ✦':'Activar los amuletos ✦';
+  $('bLegend').innerHTML=plan.kind==='cards'?'<span>💡 Trío: +1</span><span>🌟 Trío: +3</span><span>👾 Trío: 0</span>':plan.kind==='wheel'?'<span>💡 Premios: 0, 1, 2 o 3 pistas</span>':'<span>✦ Tres iguales: +3</span><span>✧ Dos iguales: +1</span>';
+  let locked=plan.prize!==undefined;
+  async function finish(prize,restore=false){
+   locked=true;plan.prize=prize;saveRun();action.disabled=true;action.hidden=true;
+   $('bSpeech').textContent=prize>=3?'«¡Un tesoro de pistas! Nos vendrá genial.»':prize?'«¡Perfecto! Guardémoslas para el camino.»':'«Esta vez no hubo premio. ¡La aventura continúa!»';
+   result.className='bres '+(prize?'good':'neutral');result.innerHTML=`<b>${prize?'¡+'+prize+' pista'+(prize===1?'':'s')+'!':'Sin pistas esta vez'}</b><span>${prize?'Se añaden a tu reserva al continuar.':'Las pistas que ya tienes siguen contigo.'}</span>`;
+   if(!restore){if(prize){(prize>=3?sfx.fanfare:sfx.win)();const rect=stage.getBoundingClientRect();burst(rect.left+rect.width/2,rect.top+rect.height/2,prize>=3?60:28,['#ffcf6b','#43e0c1','#ffffff'],7);if(prize>=3)rain();
+     for(let i=0;i<prize;i++){await bonusDelay(180);const bulb=document.createElement('span');bulb.className='bonus-flight';bulb.textContent='💡';stage.appendChild(bulb);setTimeout(()=>bulb.remove(),1000);$('bHints').textContent=run.hints+i+1;tone(650+i*120,.1,'sine',.08)}
+    }else tone(260,.3,'sine',.05);await bonusDelay(700);
+   }else $('bHints').textContent=run.hints+prize;
+   go.hidden=false;go.style.display='';go.textContent='Guardar pistas y seguir ➜';if(!prize)go.textContent='Seguir la aventura ➜';go.focus();
+  }
+  go.onclick=()=>{if(go.disabled||plan.prize===undefined)return;go.disabled=true;m.classList.remove('show');delete run.bonusPlan;resolve(plan.prize)};
+  if(plan.kind==='cards'){
+   stage.innerHTML='<div class="bgrid" id="bGrid"></div>';const grid=$('bGrid');
+   const cards=plan.deck.map((ty,i)=>{const P=BONUS_CARDS[ty],b=document.createElement('button');b.className='bcard';b.style.setProperty('--i',i);b.style.setProperty('--pc',P.c);b.setAttribute('aria-label',`Carta ${i+1}, oculta`);b.innerHTML=`<span class="bin"><span class="bb"><i>✦</i></span><span class="bf"><b>${P.e}</b><small>${P.n}</small></span></span>`;grid.appendChild(b);
+    if(plan.opened.includes(i)){b.classList.add('on');b.setAttribute('aria-label',P.n)}
+    b.onclick=()=>{if(locked||plan.opened.includes(i))return;plan.opened.push(i);b.classList.add('on');b.setAttribute('aria-label',P.n);tone(500+plan.opened.length*55,.1,'triangle',.07);saveRun();
+     const count=plan.opened.filter(k=>plan.deck[k]===ty).length;
+     if(count===2){$('bSpeech').textContent='«¡Ya hay dos iguales! Falta una…»';cards.forEach((c,k)=>{if(plan.opened.includes(k)&&plan.deck[k]===ty)c.classList.add('pair')})}
+     if(count===3){locked=true;cards.forEach((c,k)=>c.classList.add(plan.deck[k]===ty?'winc':'dim'));finish(P.v)}
+    };return b});
+  }else if(plan.kind==='wheel'){
+   const colors=['#266b77','#33446b','#70569a','#286c66','#ae7140','#3c577d','#67629b','#36736a'];let sectors='';
+   const point=(r,a)=>[160+r*Math.cos(a*Math.PI/180),160+r*Math.sin(a*Math.PI/180)];
+   WHEEL_PRIZES.forEach((v,i)=>{const a=-90+i*45,b=a+45,p=point(140,a),q=point(140,b),t=point(101,a+22.5);sectors+=`<path d="M160 160L${p}A140 140 0 0 1 ${q}Z" fill="${colors[i]}" stroke="#eac78b66" stroke-width="1.5"/><text x="${t[0]}" y="${t[1]-4}" text-anchor="middle" fill="#fff1cb" font-size="22" font-weight="900">${v?'+'+v:'0'}</text><text x="${t[0]}" y="${t[1]+17}" text-anchor="middle" fill="#efe3ce" font-size="11">${v===1?'PISTA':'PISTAS'}</text>`});
+   stage.innerHTML=`<div class="wheel-shell"><span class="wheel-pointer" aria-hidden="true">▼</span><svg class="prize-wheel" viewBox="0 0 320 320" role="img" aria-label="Ruleta con ocho sectores. Premios de cero a tres pistas.">${sectors}</svg><div class="wheel-hub">✦</div></div>`;
+   const wheel=stage.querySelector('.prize-wheel'),angle=2160-22.5-plan.wheel*45;
+   if(locked)wheel.style.transform=`rotate(${angle}deg)`;
+   action.onclick=async()=>{if(locked)return;locked=true;action.disabled=true;action.textContent='La rueda está girando…';$('bSpeech').textContent='«¡Mira la flecha dorada!»';sfx.start();
+    const dur=matchMedia('(prefers-reduced-motion: reduce)').matches?150:4800;const anim=wheel.animate([{transform:'rotate(0deg)'},{transform:`rotate(${angle}deg)`}],{duration:dur,easing:'cubic-bezier(.12,.74,.12,1)',fill:'forwards'});
+    let tick=0;const timer=setInterval(()=>{tone(350+(tick++%8)*45,.035,'triangle',.025)},140);
+    try{await anim.finished}finally{clearInterval(timer)}await finish(WHEEL_PRIZES[plan.wheel]);
+   };
+  }else{
+   stage.innerHTML='<div class="amulet-machine"><div class="machine-crown">✦ LÍA EXPRESS ✦</div><div class="reels"></div><div class="machine-plaque">TRES AMULETOS · UN DESTINO</div><div class="machine-lights" aria-hidden="true">✧ · ✧ · ✧ · ✧ · ✧ · ✧ · ✧</div></div>';
+   const reels=stage.querySelector('.reels');
+   for(let i=0;i<3;i++){const reel=document.createElement('div');reel.className='reel';reel.setAttribute('aria-label',`Amuleto ${i+1}`);reel.innerHTML=`<div class="reel-strip">${Array.from({length:22},(_,k)=>`<span>${REEL_SYMBOLS[k===21?plan.reels[i]:k%3]}</span>`).join('')}</div>`;reels.appendChild(reel)}
+   const strips=[...reels.querySelectorAll('.reel-strip')];if(locked)strips.forEach(s=>s.style.transform='translateY(-1848px)');
+   action.onclick=async()=>{if(locked)return;locked=true;action.disabled=true;action.textContent='Los amuletos están girando…';stage.classList.add('spinning');$('bSpeech').textContent='«Uno… dos… ¡y el último!»';sfx.start();
+    await Promise.all(strips.map(async(strip,i)=>{const dur=matchMedia('(prefers-reduced-motion: reduce)').matches?150:2300+i*650;
+     const anim=strip.animate([{transform:'translateY(0)'},{transform:'translateY(-1848px)'}],{duration:dur,easing:'cubic-bezier(.12,.7,.16,1)',fill:'forwards'});await anim.finished;tone(650+i*150,.15,'triangle',.07);strip.parentElement.classList.add('stopped');strip.parentElement.setAttribute('aria-label',`Amuleto ${i+1}: ${REEL_SYMBOLS[plan.reels[i]]}`);
+    }));stage.classList.remove('spinning');const prize=slotPrize(plan.reels);const counts=plan.reels.map(v=>plan.reels.filter(n=>n===v).length);strips.forEach((strip,i)=>{if(counts[i]>=2)strip.parentElement.classList.add('match')});await finish(prize);
+   };
+  }
+  m.classList.add('show');if(plan.prize!==undefined)finish(plan.prize,true);else if(plan.kind!=='cards')action.focus();else stage.querySelector('button').focus();
+ });
 }
 
 /* Final del nivel 100: felicitación + reto al siguiente camino (o aplausos si fue Extremo) */
@@ -1816,7 +1831,7 @@ openMenu();
 /* ============================ PWA ============================ */
 // El récord y la partida en curso viven en localStorage; pedimos al navegador que no los borre
 if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{});
-const APP_VERSION='30';                      // debe coincidir con VERSION de sw.js (desbloquea-vNN)
+const APP_VERSION='31';                      // debe coincidir con VERSION de sw.js (desbloquea-vNN)
 $('ver').textContent='Versión '+APP_VERSION;
 let pendingWorker=null,updating=false;
 function showUpdate(w){pendingWorker=w;$('upd').classList.add('show');sfx.hint()}
