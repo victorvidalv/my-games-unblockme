@@ -5,7 +5,7 @@ y devuelve la luz al Faro del Alba. Funciona en el navegador y se puede instalar
 
 - **Objetivo:** desliza los bloques y saca la llave roja por la derecha en el menor número de movimientos.
   Un arrastre largo cuenta como **1** movimiento.
-- **Límite:** si superas el doble del mínimo, la aventura termina.
+- **Límite:** tienes el doble del mínimo en turnos. Al agotarlos sin sacar la llave **ya no se puede mover** y la aventura termina (ganar en el último turno vale).
 - **Tres caminos** de 100 niveles: Normal, Difícil y Experto (cambia dónde empieza la dificultad).
 - **Tres héroes**, cada uno con un poder (ver [Héroes](#héroes-y-poderes)).
 

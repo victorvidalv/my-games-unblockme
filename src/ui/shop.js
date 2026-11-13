@@ -4,6 +4,7 @@ import { saveRun, skipLevel } from '../game/session.js';
 import { S } from '../state.js';
 import { layout, recLine, updateHud } from './board.js';
 import { ask } from './menu.js';
+import { icon } from './icons.js';
 import { playBuyEffect, playRewindEffect } from './turns.js';
 
 const fmt = (n) => n.toLocaleString('de-DE');
@@ -19,13 +20,13 @@ function applyEffects(id) {
     $('lim').textContent = S.G.limit;
     updateHud();
     playBuyEffect();
-    $('msg').textContent = `⏳ ${itemById('moves').name}. Ahora el límite es ${S.G.limit}.`;
+    $('msg').textContent = `${itemById('moves').name}: ahora el límite es ${S.G.limit}.`;
   } else if (id === 'redo') {
     playRewindEffect();
     layout();
     $('bUndo').disabled = true;
     updateHud();
-    $('msg').textContent = '↺ Tablero reiniciado desde cero.';
+    $('msg').textContent = 'Tablero reiniciado desde cero.';
   }
   saveRun();
 }
@@ -80,7 +81,7 @@ function render() {
   $('shopList').innerHTML = SHOP_ITEMS.map((i) => {
     const a = availability(i.id, { run: S.run, G: S.G });
     return `<button class="shop-item${a.ok ? '' : ' off'}" data-id="${i.id}" aria-disabled="${!a.ok}">
-      <span class="ico">${i.icon}</span><span><b>${i.name}</b><small>${a.ok || !a.reason ? `${SHORT[i.id]} · ${i.levels} niveles` : a.reason}</small></span>
+      <span class="ico">${icon(i.icon)}</span><span><b>${i.name}</b><small>${a.ok || !a.reason ? `${SHORT[i.id]} · ${i.levels} niveles` : a.reason}</small></span>
       <span class="price">${fmt(priceOf(i.id, S.G.rate))}</span></button>`;
   }).join('');
 }

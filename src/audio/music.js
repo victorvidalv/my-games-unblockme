@@ -1,6 +1,5 @@
 import { AC, audioPageHidden, clearAudioRecoveryHint, ctx, muted } from './sound.js';
 import { zoneIdx } from '../data/zones.js';
-import { $ } from '../dom.js';
 import { HEROES_THEME, MENU_THEME, SCALES, ZONE_THEMES, chordMidi, entryAt } from './themes.js';
 
 /* ============================ Música procedural ============================
@@ -13,7 +12,7 @@ export const Music=(()=>{
   const THEMES=ZONE_THEMES;
 
   let bus=null,flt=null,noiseBuf=null,timer=0,playing=false,step=0,next=0,duckLv=1,audioOwner=null,muffled=false;
-  let T=0,P=false,theme=THEMES[0],baseBpm=96,tempoNow=96;
+  let theme=THEMES[0],baseBpm=96,tempoNow=96;
   const hz=m=>440*Math.pow(2,(m-69)/12);
   function init(){
     ctx();if(bus&&audioOwner===AC)return;
@@ -79,7 +78,7 @@ export const Music=(()=>{
     o.connect(q);q.connect(g);g.connect(bus);o.start(t);o.stop(t+.45);
   }
 
-  const targetBpm=()=>baseBpm*(1+.28*T+(P?.08:0));
+  const targetBpm=()=>baseBpm;                                   // la música NUNCA cambia de tempo ni de capas: el aviso de pocos turnos es visual
   const bpm=()=>tempoNow;
   const noteOf=(th,deg)=>{const s=SC[th.sc],n=s.length;return th.root+s[((deg%n)+n)%n]+12*Math.floor(deg/n)};
 
@@ -108,7 +107,7 @@ export const Music=(()=>{
   function drums(th,st,t,bar,E){
     const g=GROOVES[th.groove]||GROOVES.pop,has=a=>a&&a.includes(st);
     const fill=bar%4===3&&st>=13;                                  // redoble al final de cada frase
-    if(has(g.k)&&!(fill&&st>=14))kick(t,P?.11:KV.k);
+    if(has(g.k)&&!(fill&&st>=14))kick(t,KV.k);
     if(has(g.s)&&!(fill&&st>=13))snare(t,KV.s);
     if(fill)snare(t,.03+.012*(st-13));
     if(has(g.rim))rim(t,KV.rim);
@@ -141,7 +140,6 @@ export const Music=(()=>{
     const chord=chordMidi(th,entryAt(th,bar,st));                            // [fundamental, 3ª, 5ª, 7ª, …]
     const firstOfBar=chordMidi(th,entryAt(th,bar,0));
     const nextRoot=chordMidi(th,entryAt(th,bar+1,0))[0];
-    const beat=st%4===0;
 
     // colchón suave de acordes (cuerdas largas)
     if(st===0)firstOfBar.slice(0,3).forEach(m=>voice('strings',m+12,t,sd*15,.0085));
@@ -157,8 +155,7 @@ export const Music=(()=>{
       const hit=(RIFFS[th.bassPat]||RIFFS.pop).find(r=>r[0]===st);
       if(hit)bn=hit[1]==='8'?chord[0]+12:chord[IV[hit[1]]];
     }
-    if(P&&bn===null&&st%4===2)bn=chord[0];
-    if(bn!==null)voice('upright',bassReg(bn),t,.26,P?.09:th.bassV);
+    if(bn!==null)voice('upright',bassReg(bn),t,.26,th.bassV);
 
     // acompañamiento
     if((COMP[th.comp]||[]).includes(st)){
@@ -168,17 +165,15 @@ export const Music=(()=>{
     // arpegio suave
     if(th.arpVoice){
       const every=th.arpEvery||2,pat=th.arpPat||[0,1,2,1];
-      if(st%every===0)voice(th.arpVoice,chord[pat[(st/every)%pat.length]%chord.length]+12,t,Math.max(.2,sd*2),P?.03:th.arpV);
+      if(st%every===0)voice(th.arpVoice,chord[pat[(st/every)%pat.length]%chord.length]+12,t,Math.max(.2,sd*2),th.arpV);
     }
 
     // batería
     drums(th,st,t,bar,E);
-    if(P&&beat){osc('sine',58,t,.22,.025,.04);voice('bell',noteOf(th,st%8===0?7:9),t,.12,.009)}   // latido y alarma de pánico
-    if(T>.55&&st%2===1)noise(t,.03,.006,6800);                                  // más tensión → más hats
 
     // capa épica: timbal en las frases y metales que refuerzan la melodía
     if(E>=2){
-      if(st===0&&bar%4===0)timpani(t,chord[0]-24,P?.075:.055);
+      if(st===0&&bar%4===0)timpani(t,chord[0]-24,.055);
       if(bar%4===3&&st>=12&&st%2===0)timpani(t,chord[2]-24,.03+.004*(st-12));
     }
 
@@ -218,25 +213,26 @@ export const Music=(()=>{
     recover(){if(!playing||muted||document.hidden||audioPageHidden)return false;init();return armSequencer()},
     setLevel(n){useTheme(THEMES[zoneIdx(n)])},
     /** Toca un tema concreto desde el principio (lo usa melodies.html). */
-    playTheme(th){T=0;P=false;duckLv=1;muffled=false;theme=th;baseBpm=th.bpm;tempoNow=th.bpm;step=0;if(playing){playing=false;clearInterval(timer);timer=0}this.start()},
+    playTheme(th){duckLv=1;muffled=false;theme=th;baseBpm=th.bpm;tempoNow=th.bpm;step=0;if(playing){playing=false;clearInterval(timer);timer=0}this.start()},
     /** Música fuera de partida: 'menu' (menú principal) o 'heroes' (elección de héroe). Arranca si hace falta. */
     scene(name){
-      T=0;P=false;
       useTheme(name==='heroes'?HEROES_THEME:MENU_THEME);
       tempoNow=baseBpm;duckLv=1;muffled=false;
       if(flt)flt.frequency.setTargetAtTime(9000,AC.currentTime,.15);
       this.start();
     },
-    setTension(t,p){T=Math.max(0,Math.min(1,t));P=!!p;if(!playing)tempoNow=targetBpm()},
     duck(v){duckLv=v;if(bus&&playing)bus.gain.setTargetAtTime(vol(),AC.currentTime,.25)},
     muffle(on){muffled=!!on;if(flt)flt.frequency.setTargetAtTime(on?900:9000,AC.currentTime,.15)},
     refresh(){if(muted)this.stop(.2);else if(bus&&playing)bus.gain.setTargetAtTime(vol(),AC.currentTime,.1)},
     bpm,targetBpm,get themeName(){return theme.name},get playing(){return playing}
   };
 })();
-export function setTensionFx(t,panic){
-  Music.setTension(t,panic);
-  const b=$('bgfx');b.style.setProperty('--tn',t.toFixed(2));
-  if(panic)b.style.setProperty('--beat',(60/Music.bpm()).toFixed(3)+'s');
-  document.body.classList.toggle('panic',panic);
+/**
+ * Aviso de pocos turnos: solo VISUAL (la música no cambia).
+ *  low  (≈ 20 % de los turnos o menos) → clase body.low-turns: el fondo de la ciudad se atenúa.
+ *  last (último movimiento)            → clase body.last-turn: el fondo se atenúa más.
+ */
+export function setTensionFx(low,last){
+  document.body.classList.toggle('low-turns',!!low);
+  document.body.classList.toggle('last-turn',!!last);
 }

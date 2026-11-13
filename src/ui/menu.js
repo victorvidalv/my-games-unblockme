@@ -9,7 +9,7 @@ import { syncHero } from './heroes.js';
 import { showMap } from './map.js';
 /* ---------- Menú: elegir camino ---------- */
 const MODE_INFO={
-  c:'Sube puntos nivel a nivel. Si usas más del doble de los movimientos mínimos, la partida termina.',
+  c:'Sube puntos nivel a nivel. Si agotas los turnos (el doble del mínimo) sin sacar la llave, la partida termina.',
   p:'Sin puntos ni eliminación. Pistas ilimitadas y deshacer gratis. Ideal para aprender y relajarte.'
 };
 function renderPaths(){
@@ -32,9 +32,10 @@ function renderPaths(){
   });
 }
 /* ---------- Ventana de confirmación con diseño propio ---------- */
+import { ICON_NAMES, icon } from './icons.js';
 export function ask({ico='❓',title,text,yes='Aceptar',no='Cancelar',danger=false}){
   return new Promise(res=>{
-    $('askIco').textContent=ico;$('askTitle').textContent=title;$('askText').innerHTML=text;
+    $('askIco').innerHTML=ICON_NAMES.includes(ico)?icon(ico):ico;$('askTitle').textContent=title;$('askText').innerHTML=text;
     const y=$('askYes'),n=$('askNo');y.textContent=yes;n.textContent=no;y.className=danger?'danger':'primary';
     const done=v=>{$('ask').classList.remove('show');y.onclick=n.onclick=null;res(v)};
     y.onclick=()=>done(true);n.onclick=()=>done(false);

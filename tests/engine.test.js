@@ -3,7 +3,7 @@ import {
   N, WIN_POS, encode, decode, encodeBoard, decodeBoard, isValidState, randomBoard,
   analyze, hintMove, minMoves, maxDistance, expand,
   curve, rateAt, moveLimit, MAX_LEVEL,
-  generateBoard, mulberry32, calcGain, gainFor, baseScore, moveStatus, movesLeft, isWon,
+  generateBoard, mulberry32, calcGain, gainFor, baseScore, moveStatus, movesLeft, isWon, isLow,
 } from '../src/engine/index.js';
 
 /** Tablero mínimo: llave roja sola → 1 movimiento (un arrastre largo hasta la salida). */
@@ -173,12 +173,31 @@ describe('puntaje y límite de movimientos', () => {
     const base = gainFor(10, 4, 4, 0).total;
     expect(gainFor(10, 4, 4, 0, { brave: true }).total).toBe(base + Math.round(base * 0.1));
   });
-  it('estado del contador: ok → aviso → último → eliminado', () => {
+  it('estado del contador: ok → pocos → último turno → sin turnos (ya no se puede mover)', () => {
     expect(moveStatus(3, 10)).toBe('ok');
-    expect(moveStatus(8, 10)).toBe('warn');
-    expect(moveStatus(10, 10)).toBe('last');
+    expect(moveStatus(7, 10)).toBe('ok');
+    expect(moveStatus(8, 10)).toBe('warn');      // quedan 2
+    expect(moveStatus(9, 10)).toBe('last');      // queda 1
+    expect(moveStatus(10, 10)).toBe('over');     // 0 turnos: terminó
     expect(moveStatus(11, 10)).toBe('over');
     expect(movesLeft(7, 10)).toBe(3);
     expect(movesLeft(12, 10)).toBe(0);
+  });
+  it('«pocos turnos» = queda el 20 % del límite o menos (siempre al menos el último turno) y aún se puede mover', () => {
+    expect(isLow(7, 10)).toBe(false);
+    expect(isLow(8, 10)).toBe(true);
+    expect(isLow(9, 10)).toBe(true);
+    expect(isLow(10, 10)).toBe(false);           // sin turnos: ya no hay aviso, hay derrota
+    expect(isLow(15, 20)).toBe(false);
+    expect(isLow(16, 20)).toBe(true);
+    expect(isLow(3, 4)).toBe(true);              // límites pequeños: el último turno ya avisa
+    expect(isLow(2, 4)).toBe(false);
+  });
+  it('al agotar los turnos no se puede seguir: todo estado con 0 turnos es «over»', () => {
+    for (const limit of [4, 10, 33, 74]) {
+      for (let moves = 0; moves <= limit + 2; moves++) {
+        expect(moveStatus(moves, limit) === 'over').toBe(moves >= limit);
+      }
+    }
   });
 });

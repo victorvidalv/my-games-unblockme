@@ -17,10 +17,10 @@ export const EXTRA_MOVES = 5;
 export const LEVEL_VALUE = 1.5;
 
 export const SHOP_ITEMS = [
-  { id: 'hint', icon: '💡', name: 'Pista', levels: 2, detail: 'Una pista que te enseña el mejor movimiento.' },
-  { id: 'moves', icon: '⏳', name: `+${EXTRA_MOVES} turnos`, levels: 8, detail: `Sube ${EXTRA_MOVES} movimientos el límite de este tablero para no perder.` },
-  { id: 'redo', icon: '↺', name: 'Rehacer tablero', levels: 2, detail: 'Empieza este tablero de cero con 0 movimientos (conservas los turnos comprados).' },
-  { id: 'skip', icon: '⏭', name: 'Saltar nivel', levels: 10, detail: 'Pasa al siguiente nivel sin puntos y sin racha.' },
+  { id: 'hint', icon: 'hint', name: 'Pista', levels: 2, detail: 'Una pista que te enseña el mejor movimiento.' },
+  { id: 'moves', icon: 'hourglass', name: `+${EXTRA_MOVES} turnos`, levels: 8, detail: `Sube ${EXTRA_MOVES} movimientos el límite de este tablero para no perder.` },
+  { id: 'redo', icon: 'rewind', name: 'Rehacer tablero', levels: 2, detail: 'Empieza este tablero de cero con 0 movimientos (conservas los turnos comprados).' },
+  { id: 'skip', icon: 'skip', name: 'Saltar nivel', levels: 10, detail: 'Pasa al siguiente nivel sin puntos y sin racha.' },
 ];
 
 export const itemById = (id) => SHOP_ITEMS.find((i) => i.id === id);

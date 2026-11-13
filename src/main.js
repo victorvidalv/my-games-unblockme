@@ -22,15 +22,18 @@ import './styles/16-result.css';
 import './styles/17-shop.css';
 import './styles/18-turns.css';
 import './styles/19-specials.css';
+import './styles/20-icons.css';
 import { hooks } from './audio/sound.js';
 import { saveRun } from './game/session.js';
 import { S, persist, store } from './state.js';
 import { fitBoard } from './ui/board.js';
 import { syncHero } from './ui/heroes.js';
 import { openMenu } from './ui/menu.js';
+import { hydrateIcons } from './ui/icons.js';
 import './ui/controls.js';
 import './pwa.js';
 
+hydrateIcons();                       // iconos propios en el HTML estático (botones, avisos)
 hooks.onSuspend = () => (S.run ? saveRun() : persist());
 syncHero(store.run?.hero || store.heroChoice || 'lia');
 fitBoard();

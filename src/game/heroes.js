@@ -4,9 +4,9 @@
  */
 /* Ojo: el identificador interno de Juth sigue siendo 'van' (imágenes heroes/van*.webp y partidas guardadas). Solo cambia el nombre que se ve. */
 export const HEROES = [
-  { id: 'lia', name: 'Lía', role: 'Exploradora', icon: '♥', color: '#68d8bd', power: 'Una segunda oportunidad', short: '1 vida extra por partida', detail: 'Repite un tablero al caer. Una vez por aventura, sin perder tus puntos.', quote: '«Si la puerta no abre, buscamos otra.»' },
-  { id: 'jean', name: 'Jean', role: 'Relojero', icon: '↶', color: '#8fb9ff', power: 'Tres pasos atrás', short: '3 deshacer gratis por tablero', detail: 'Recupera tus tres últimos movimientos sin penalización, uno a uno.', quote: '«Voy tarde. El tiempo, también.»' },
-  { id: 'van', name: 'Juth', role: 'Cronista', icon: '✦', color: '#c5a2ff', power: 'Dos luces en el camino', short: '+2 pistas cada 10 niveles', detail: 'Dos pistas extra al completar cada ciudad.', quote: '«Primero observo. Luego abro.»' },
+  { id: 'lia', name: 'Lía', role: 'Exploradora', icon: 'heart', color: '#68d8bd', power: 'Una segunda oportunidad', short: '1 vida extra por partida', detail: 'Repite un tablero al caer. Una vez por aventura, sin perder tus puntos.', quote: '«Si la puerta no abre, buscamos otra.»' },
+  { id: 'jean', name: 'Jean', role: 'Relojero', icon: 'clock', color: '#8fb9ff', power: 'Tres pasos atrás', short: '3 deshacer gratis por tablero', detail: 'Recupera tus tres últimos movimientos sin penalización, uno a uno.', quote: '«Voy tarde. El tiempo, también.»' },
+  { id: 'van', name: 'Juth', role: 'Cronista', icon: 'stars', color: '#c5a2ff', power: 'Dos luces en el camino', short: '+2 pistas cada 10 niveles', detail: 'Dos pistas extra al completar cada ciudad.', quote: '«Primero observo. Luego abro.»' },
 ];
 
 export const heroById = (id) => HEROES.find((h) => h.id === id) || HEROES[0];

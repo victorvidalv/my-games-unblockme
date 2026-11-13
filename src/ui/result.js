@@ -8,7 +8,7 @@ const fmt = (n) => n.toLocaleString('de-DE');
 /** Animación dorada de «¡PERFECTO!»: rayos, brillo, estrellas y confeti. */
 function perfectFx(streakMult) {
   const el = $('perfect');
-  $('perfectSub').textContent = 'MÍNIMO DE MOVIMIENTOS' + (streakMult > 1 ? '  ·  🔥 RACHA ×' + streakMult.toFixed(1) : '');
+  $('perfectSub').textContent = 'MÍNIMO DE MOVIMIENTOS' + (streakMult > 1 ? '  ·  RACHA ×' + streakMult.toFixed(1) : '');
   el.classList.remove('go');
   void el.offsetWidth;
   el.classList.add('go');
@@ -42,7 +42,7 @@ export function showResult({ level, gain, moves, opt, previous, total, streakMul
     el.classList.toggle('perfect', perfect);
     $('resTitle').textContent = perfect ? '¡PERFECTO!' : '';
     $('resLevel').textContent = `NIVEL ${level} COMPLETADO`;
-    $('resLine').textContent = `${moves} movimientos · mínimo ${opt}` + (gain.routeBonus ? ` · ruta aventurera +${fmt(gain.routeBonus)}` : '') + (gain.bossBonus ? ` · 👑 jefe +${fmt(gain.bossBonus)}` : '');
+    $('resLine').textContent = `${moves} movimientos · mínimo ${opt}` + (gain.routeBonus ? ` · ruta aventurera +${fmt(gain.routeBonus)}` : '') + (gain.bossBonus ? ` · jefe +${fmt(gain.bossBonus)}` : '');
     $('resTotal').textContent = `Total ${fmt(total)} pts`;
     $('resBar').style.animationDuration = ms + 'ms';
     el.classList.remove('show');

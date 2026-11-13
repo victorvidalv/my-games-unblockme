@@ -1,14 +1,14 @@
 import { setTensionFx } from '../audio/music.js';
 import { sfx, tone, vib } from '../audio/sound.js';
 import { isLocked, slideRange, snapDrag } from '../engine/board.js';
-import { isWon, moveStatus, movesLeft } from '../engine/rules.js';
+import { isLow, isWon, moveStatus, movesLeft } from '../engine/rules.js';
 import { $ } from '../dom.js';
 import { fail, saveRun, win } from '../game/session.js';
 import { S, gainNow, pathOf, rkey, store } from '../state.js';
 import { zoneIdx } from '../data/zones.js';
 import { coachOnMove } from './coach.js';
 import { updateHeroHud } from './heroes.js';
-import { renderTurns } from './turns.js';
+import { lowState, renderTurns } from './turns.js';
 export const boardEl=$('board'), cellPx=()=>boardEl.clientWidth/6;
 /* Mide el espacio libre real y da al tablero el mayor tamaño posible (sin scroll) */
 export function fitBoard(){
@@ -75,8 +75,8 @@ export function syncSpecials(animate=true){
     G.gateLocked[i]=locked;
     el.classList.toggle('locked',locked);el.classList.toggle('open',!locked);plate.classList.toggle('on',!locked);
     if(animate&&was!==undefined&&was!==locked){
-      if(!locked){sfx.unlock();vib([15,20,15]);flashEl(el,'just-open',900);flashEl(plate,'pulse',900);$('msg').textContent='🔓 ¡Candado abierto! Ya puedes moverla mientras la placa siga cubierta.'}
-      else{sfx.plate();$('msg').textContent='🔒 Sin nadie sobre la placa, el candado se cierra otra vez.'}
+      if(!locked){sfx.unlock();vib([15,20,15]);flashEl(el,'just-open',900);flashEl(plate,'pulse',900);$('msg').textContent='¡Candado abierto! Ya puedes moverla mientras la placa siga cubierta.'}
+      else{sfx.plate();$('msg').textContent='Sin nadie sobre la placa, el candado se cierra otra vez.'}
     }
   });
 }
@@ -92,7 +92,7 @@ function attach(el,i){
     const p=S.G.pieces[i],s=cellPx(),[lo,hi]=slideRange(S.G.pieces,S.G.pos,i,S.G.walls),x0=S.G.pos[i],start=p.o==='h'?e.clientX:e.clientY;
     if(p.kind==='gate'&&isLocked(S.G.pieces,S.G.pos,i,S.G.walls)){      // candado cerrado: sacude, avisa y señala la placa
       flashEl(el,'deny',450);flashEl(S.G.plateEls[i],'hint',1500);sfx.locked();vib([30,30,30]);
-      $('msg').textContent='🔒 Está atrapada. Cubre la placa ▣ con otra pieza para abrirla.';return;
+      $('msg').textContent='Está atrapada. Cubre la placa ▣ con otra pieza para abrirla.';return;
     }
     el.classList.remove('hint');el.classList.add('drag');let cur=x0,lastCell=x0,delta=0;
     const move=ev=>{
@@ -122,11 +122,11 @@ function afterMove(){
   updateHud();saveRun();coachOnMove();
   const prac=S.run.mode==='p';
   const status=prac?'ok':moveStatus(S.G.moves,S.G.limit);
-  if(status==='over'){fail('limit');return}
-  if(isWon(S.G.pos)){win();return}
+  if(isWon(S.G.pos)){win();return}                         // ganar en el último turno vale
+  if(status==='over'){fail('limit');return}                // sin turnos: ya no se puede mover
   if(prac){if(S.G.moves===S.G.opt+1)$('msg').textContent='Vas por encima del mínimo. En práctica no pasa nada: ¡sigue!';return}
-  if(status==='last'){$('msg').textContent='⚠️ ÚLTIMO MOVIMIENTO: el siguiente te elimina.';sfx.warn();vib([30,40,30])}
-  else if(status==='warn'){$('msg').textContent=`⚠️ Te quedan ${movesLeft(S.G.moves,S.G.limit)} movimientos antes del límite.`;sfx.warn()}
+  if(status==='last'){$('msg').textContent='ÚLTIMO TURNO: si no sacas la llave con este movimiento, la aventura termina.';sfx.warn();vib([30,40,30])}
+  else if(status==='warn'){$('msg').textContent=`Te quedan ${movesLeft(S.G.moves,S.G.limit)} turnos.`;sfx.warn()}
 }
 function fitScores(){                 // reduce la cifra si no cabe en su cuadro (p. ej. 123.456 en móviles estrechos)
   ['score','scoreMax'].forEach(id=>{const el=$(id);el.style.fontSize='';let fs=parseFloat(getComputedStyle(el).fontSize);
@@ -164,9 +164,9 @@ export function updateHud(){
   f.style.background=`hsl(${hue} 85% 52%)`;f.style.color=`hsl(${hue} 85% 52%)`;
   const prac=S.run.mode==='p',cg=gainNow();
   $('pot').textContent=prac?'sin puntaje':'+'+cg.total.toLocaleString('de-DE');
-  $('meter').classList.toggle('danger',!prac&&S.G.moves>=S.G.limit*.8);
-  const panic=!prac&&!S.G.done&&S.G.moves>=S.G.limit&&S.G.pos[0]!==4, tn=(prac||S.G.done)?0:Math.max(0,Math.min(1,(S.G.moves/S.G.limit-.5)/.5));
-  setTensionFx(tn,panic);
+  $('meter').classList.toggle('danger',!prac&&isLow(S.G.moves,S.G.limit));
+  const {low,last}=lowState();                          // pocos turnos: solo aviso visual, la música no cambia
+  setTensionFx(low,last);
   renderTurns();
 }
 

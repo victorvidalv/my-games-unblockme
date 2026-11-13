@@ -25,14 +25,4 @@
 body.perfect .frame{animation:framegold 1.6s ease-out}
 @keyframes framegold{30%{box-shadow:0 0 0 3px #ffd24a,0 0 60px 14px #ffb300aa,0 26px 50px #000a;filter:brightness(1.15)}}
 
-/* ---------- Tensión / pánico ---------- */
-body{transition:--t1 2.5s,--t2 2.5s}
-#bgfx{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:calc(var(--tn,0)*.8);transition:opacity .7s;
-  background:radial-gradient(ellipse at 50% 42%,#ff1f3a00 22%,#ff1f3add 100%),linear-gradient(#c0102a38,#c0102a38)}
-body.panic #bgfx{opacity:1;animation:beatpulse var(--beat,.5s) ease-in-out infinite}
-@keyframes beatpulse{0%,100%{filter:brightness(.75)}12%{filter:brightness(1.7)}26%{filter:brightness(.9)}40%{filter:brightness(1.35)}}
-body.panic .frame{animation:framepanic var(--beat,.5s) ease-in-out infinite}
-@keyframes framepanic{0%,100%{box-shadow:0 26px 50px #000a,0 0 0 2px #3b200a,inset 0 2px 0 #ffd9a266}
-  15%{box-shadow:0 0 0 3px #ff2d4a,0 0 46px 10px #ff2d4aaa,0 26px 50px #000a}}
-body.panic .lv b{color:#ff6a7a;text-shadow:0 0 22px #ff2d4a}
-body.panic .meter{border-color:#ff2d4a88}
+/* El aviso de pocos turnos está en 18-turns.css (atenuado del fondo + banner); la música no cambia. */

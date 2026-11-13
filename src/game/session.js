@@ -7,6 +7,7 @@ import { MAX_LEVEL, moveLimit, rateAt } from '../engine/difficulty.js';
 import { hash32 } from '../engine/rng.js';
 import { playSkipEffect } from '../ui/turns.js';
 import { startCoach } from '../ui/coach.js';
+import { icon } from '../ui/icons.js';
 import { buildLevel, pickBoard, varyBoard } from '../engine/levels.js';
 import levelBank from '../data/levels.json';
 import specialBank from '../data/special.json';
@@ -68,12 +69,12 @@ export async function startLevel(){
   startCoach();                                        // avisos y guía de los primeros niveles / mecánicas nuevas
 }
 function tipFor(g){
-  if(heroOf().id==='jean'&&undosLeft()>0)return `↶ Jean puede deshacer ${undosLeft()} veces gratis en este tablero.`;
+  if(heroOf().id==='jean'&&undosLeft()>0)return `Jean puede deshacer ${undosLeft()} veces gratis en este tablero.`;
   const t=['Piensa antes de mover: cada movimiento de más resta puntos.','Los bloques largos bloquean más: libéralos primero.','Un solo arrastre largo cuenta como 1 movimiento.','Deshacer cuesta 1 movimiento. Úsalo con cabeza.','La pista no cuesta movimientos, pero es limitada.'];
   return t[(g.n*7)%t.length];
 }
 function banner(){
-  const b=$('banner'),z=zoneOf(S.G.n);b.querySelector('b').textContent=S.G.boss?'👑 JEFE':'NIVEL '+S.G.n;
+  const b=$('banner'),z=zoneOf(S.G.n);b.querySelector('b').innerHTML=S.G.boss?icon('crown')+' JEFE':'NIVEL '+S.G.n;
   b.querySelector('span').textContent=S.G.boss?BOSS_NAMES[zoneIdx(S.G.n)]:`${z.e} ${z.n} · ${zoneStep(S.G.n)}/10`;
   b.querySelector('.b2').textContent=`Mínimo ${S.G.opt} mov.`+(S.run.mode==='p'?'':` · Límite ${S.G.limit}`);
   b.classList.remove('go');void b.offsetWidth;b.classList.add('go');
@@ -147,7 +148,7 @@ export function skipLevel(){
   S.G.done=true;S.busy=true;boardEl.classList.add('board-lock');
   S.run.streak=0;S.run.pendingClear={level:S.G.n,gain:0,moves:S.G.moves,opt:S.G.opt,routeChosen:false,skipped:true};
   recordBest();saveRun();setTensionFx(0,false);
-  $('msg').textContent='⏭ Nivel saltado. Sin puntos.';
+  $('msg').textContent='Nivel saltado. Sin puntos.';
   playSkipEffect().then(()=>advanceClear());
 }
 function finalFail(why){

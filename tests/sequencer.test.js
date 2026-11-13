@@ -66,13 +66,22 @@ describe('secuenciador (con audio simulado)', () => {
     }
   });
 
-  it('el modo pánico y la tensión también suenan sin errores', () => {
+  it('con pocos turnos la música NO cambia: mismo tempo y sin capas nuevas (el aviso es solo visual)', async () => {
+    const { setTensionFx } = await import('../src/audio/music.js');
     Music.setLevel(1);
-    Music.setTension(1, true);
+    Music.start();
+    play(2000);
+    const bpm = Music.bpm();
+    expect(bpm).toBeCloseTo(124, 0);   // el tempo del tema del Valle, sin aceleración
     stats.osc = 0;
-    play(3000);
-    expect(stats.osc).toBeGreaterThan(40);
-    Music.setTension(0, false);
+    play(15500);                        // 8 compases
+    const normal = stats.osc;
+    setTensionFx(true, true);          // pocos turnos + último turno
+    stats.osc = 0;
+    play(15500);
+    expect(Music.bpm()).toBeCloseTo(bpm, 0);
+    expect(Math.abs(stats.osc - normal) / normal).toBeLessThan(0.06); // mismas notas: ni latido, ni alarma, ni más hats
+    setTensionFx(false, false);
     Music.stop(0.1);
     expect(Music.playing).toBe(false);
   });

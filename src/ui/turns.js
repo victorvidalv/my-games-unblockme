@@ -1,12 +1,30 @@
 import { tone, vib } from '../audio/sound.js';
 import { $ } from '../dom.js';
-import { movesLeft } from '../engine/rules.js';
+import { isLow, isWon, movesLeft } from '../engine/rules.js';
 import { S } from '../state.js';
 import { burst } from './fx.js';
 
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const center = (el) => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
 const flash = (el, cls, ms) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(() => el.classList.remove(cls), ms); };
+
+/** ¿Quedan pocos turnos (≈ 20 % o menos del límite)? `last` = es el último movimiento. */
+export function lowState() {
+  const G = S.G;
+  const low = !!G && !!S.run && S.run.mode !== 'p' && !G.done && !isWon(G.pos) && isLow(G.moves, G.limit);
+  return { low, last: low && movesLeft(G.moves, G.limit) === 1 };
+}
+
+/** Banner animado «quedan pocos turnos» (una vez al entrar en la zona de riesgo; vuelve a salir si deshaces y reentras). */
+function announceLow(last) {
+  const G = S.G;
+  const left = movesLeft(G.moves, G.limit);
+  $('lowTitle').textContent = last ? '¡ÚLTIMO TURNO!' : 'QUEDAN POCOS TURNOS';
+  $('lowSub').textContent = last ? 'Si no sacas la llave con este movimiento, termina' : `Te ${left === 1 ? 'queda' : 'quedan'} ${left} de ${G.limit}`;
+  $('lowBanner').classList.toggle('last', last);
+  flash($('lowBanner'), 'show', 2600);
+  flash($('meter'), 'low-hit', 1200);
+}
 
 /**
  * Contador de turnos: «Restan N» y, si compraste turnos, una tira de cristales de hielo (uno por turno comprado).
@@ -16,6 +34,12 @@ export function renderTurns() {
   const G = S.G;
   const bought = G.bought || 0;
   $('left').textContent = movesLeft(G.moves, G.limit);
+  const { low, last } = lowState();
+  $('meter').classList.toggle('low', low);
+  if (low && !G.lowShown) { G.lowShown = true; announceLow(last); }
+  else if (low && last && !G.lastShown) { announceLow(true); }
+  if (!low) G.lowShown = false;
+  G.lastShown = last;
   const box = $('bought');
   box.hidden = !bought;
   if (!bought) { G.usedShown = 0; return; }
@@ -37,7 +61,7 @@ export function renderTurns() {
     tone(660, 0.25, 'triangle', 0.05, 0.08, -200);
     vib([15, 25, 15]);
     if (!reduced()) { const [x, y] = center($('boughtPips')); burst(x, y, 14, ['#bfefff', '#7fd8ff', '#ffffff'], 4); }
-    $('msg').textContent = `❄ Usas un turno comprado. Quedan ${bought - used} de ${bought}.`;
+    $('msg').textContent = `Usas un turno comprado. Quedan ${bought - used} de ${bought}.`;
   }
   G.usedShown = used;
 }

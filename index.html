@@ -15,7 +15,6 @@
 <link rel="preload" as="image" href="/backgrounds/cover.webp" fetchpriority="high">
 </head>
 <body>
-<div id="bgfx"></div>
 <div id="app">
   <div class="top">
     <div class="lv"><small>NIVEL</small><b id="lvl">1</b><i>/100</i><div class="pchip" id="pchip">NORMAL</div></div>
@@ -32,7 +31,7 @@
     <div class="route-status" id="routeStatus"><span id="routeIcon" aria-hidden="true">🌿</span><strong id="routeName">RUTA TRANQUILA</strong><small id="routeScope">NIV. 1–10</small><span class="route-reward" id="routeReward">Normal</span></div>
     <div class="mrow"><span>Movimientos <b id="mv">0</b></span><span>Mínimo <b id="mn" style="font-size:14px">–</b> · Límite <b id="lim" style="font-size:14px">–</b> · Restan <b id="left" style="font-size:14px">–</b></span></div>
     <div class="bar"><i id="fill"></i><u></u></div>
-    <div class="bought" id="bought" hidden><span class="bl">❄ TURNOS COMPRADOS</span><span class="pips" id="boughtPips"></span><span class="bq">quedan <b id="boughtLeft">0</b></span></div>
+    <div class="bought" id="bought" hidden><span class="bl"><i class="bi" data-icon="crystal"></i> TURNOS COMPRADOS</span><span class="pips" id="boughtPips"></span><span class="bq">quedan <b id="boughtLeft">0</b></span></div>
     <div class="pot"><span>Base <b id="base">0</b></span><span>Premio posible <b id="pot">+0</b></span></div>
   </div>
 
@@ -45,9 +44,9 @@
   <div class="legend" id="legend"></div>
 
   <div class="controls">
-    <button id="bUndo">↶ Deshacer <em>+1 mov</em></button>
-    <button id="bHint">Pista <span class="badge" id="hintN">3</span></button>
-    <button id="bShop" aria-label="Tienda">🛒 <span>Tienda</span></button>
+    <button id="bUndo"><i class="bi" data-icon="undo"></i> Deshacer <em>+1 mov</em></button>
+    <button id="bHint"><i class="bi" data-icon="hint"></i> Pista <span class="badge" id="hintN">3</span></button>
+    <button id="bShop" aria-label="Tienda"><i class="bi" data-icon="purse"></i> <span>Tienda</span></button>
   </div>
 </div>
 
@@ -89,6 +88,7 @@
   <button class="updx" id="updNo" aria-label="Más tarde">✕</button>
 </div>
 <div id="result" role="status"><div class="res-card"><small id="resLevel"></small><strong id="resTitle"></strong><b id="resPts">+0</b><span id="resLine"></span><em id="resTotal"></em><i class="res-bar"><u id="resBar"></u></i><small class="res-skip">Toca para continuar</small></div></div>
+<div id="lowBanner" aria-live="assertive"><i data-icon="alert"></i><div><b id="lowTitle"></b><span id="lowSub"></span></div></div>
 <div id="rewindFx" aria-hidden="true"><span>↺</span><i></i></div>
 <div id="skipFx" aria-hidden="true"><div class="chev"><b>»</b><b>»</b><b>»</b></div><strong>NIVEL SALTADO</strong><small>Sin puntos · sin racha</small></div>
 <div id="perfect"><div class="rays"></div><div class="glow"></div><b>¡PERFECTO!</b><div class="stars">★ ★ ★</div><span id="perfectSub"></span></div>

@@ -7,15 +7,15 @@ import { zoneIdx } from '../data/zones.js';
  */
 export const MECHANICS = {
   wall: {
-    id: 'wall', icon: '🪨', name: 'Roca fija', chip: 'Roca fija',
+    id: 'wall', icon: 'rock', name: 'Roca fija', chip: 'Roca fija',
     tip: 'Las rocas no se mueven ni se pueden empujar. Rodéalas para abrirle camino a la llave roja.',
   },
   gate: {
-    id: 'gate', icon: '🔒', name: 'Candado', chip: 'Candado: cubre ▣',
+    id: 'gate', icon: 'lock', name: 'Candado', chip: 'Candado: cubre ▣',
     tip: 'Esta pieza está atrapada. Se libera mientras OTRA pieza cubra la placa ▣ del suelo. En cuanto la tapes, el candado se abre.',
   },
   heavy: {
-    id: 'heavy', icon: '⚓', name: 'Pieza pesada', chip: 'Pesada: 1 paso',
+    id: 'heavy', icon: 'weight', name: 'Pieza pesada', chip: 'Pesada: 1 paso',
     tip: 'Esta pieza pesa tanto que solo avanza UNA casilla por movimiento. Planifica cada paso.',
   },
 };
