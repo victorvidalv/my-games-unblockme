@@ -1,10 +1,11 @@
 /* Service worker: la app funciona sin conexión.
    ACTUALIZAR: al publicar cambios, sube VERSION aquí y APP_VERSION en index.html.
    El navegador detecta el cambio de este archivo y la app muestra el aviso «Nueva versión disponible». */
-const VERSION = 'desbloquea-v31';
+const VERSION = 'desbloquea-v32';
 const SHELL = [
   './', './index.html', './manifest.webmanifest',
   ...Array.from({length:10},(_,i)=>'./backgrounds/zone-'+(i+1)+'.webp'),
+  ...['lia','jean','van'].map(h=>'./heroes/'+h+'.webp'),
   './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'
 ];
 

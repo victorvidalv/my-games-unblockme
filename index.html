@@ -619,6 +619,31 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:li
 
 
 @media(min-aspect-ratio:13/10) and (max-height:640px){#bonus .bonuscard{display:block!important;max-width:470px!important}#bonus .bonuscard .bgrid{width:100%;max-width:280px}}
+#heroSelect{z-index:61;background:linear-gradient(#070e24c9,#070e24f5),var(--hero-scene) center 25%/cover}
+.hero-selector{max-width:820px!important;width:100%;padding:28px!important;background:linear-gradient(150deg,#1d2a45f5,#10182cf5)!important;border:1px solid #e9d29e55!important;text-align:left;box-shadow:0 30px 90px #000b!important}
+.hero-selector .tag{color:#e8cd97;letter-spacing:.18em;font-size:10px}.hero-selector h2{font-size:clamp(25px,4vw,36px);letter-spacing:-.025em;margin:8px 0}.hero-selector .hero-subtitle{font-size:13px;color:#c9d5e6;line-height:1.5;margin:0 0 20px}
+.hero-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.hero-choice{position:relative;padding:0;overflow:hidden;isolation:isolate;border-radius:19px;min-width:0;height:280px;border:2px solid #ffffff24;background:#15213c;box-shadow:0 7px 18px #0006;text-align:left;transition:border-color .2s,transform .2s,filter .2s;filter:saturate(.7)}
+.hero-choice img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 17%;transition:transform .6s}.hero-choice::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 40%,#081225e8 95%);pointer-events:none}
+.hero-choice.selected{border-color:var(--accent);box-shadow:0 0 0 2px #ffffff11,0 0 25px color-mix(in srgb,var(--accent) 20%,transparent);filter:saturate(1)}.hero-choice.selected img{transform:scale(1.035)}
+.hero-choice:focus-visible{outline:3px solid #fff;outline-offset:3px}.hero-choice-name{position:absolute;left:14px;right:8px;bottom:13px;z-index:2;color:#fff4de;font-size:28px;font-weight:900;line-height:1.1}.hero-choice-name small{display:block;font-size:10px;color:#d8e3f3;font-weight:500;line-height:1.4;margin-top:4px}.hero-check{position:absolute;right:9px;top:9px;display:none;width:25px;height:25px;line-height:25px;text-align:center;border-radius:50%;background:var(--accent);color:#0e1c30;z-index:2}.hero-choice.selected .hero-check{display:block}
+.hero-power{display:flex;align-items:flex-start;gap:14px;padding:17px;margin-top:17px;border:1px solid color-mix(in srgb,var(--chosen) 35%,transparent);border-radius:17px;background:linear-gradient(120deg,#ffffff08,#ffffff02)}
+.hero-power-icon{display:grid;place-items:center;flex:none;width:48px;height:48px;border-radius:14px;color:var(--chosen);background:#070e2488;border:1px solid #ffffff15;font-size:30px}.hero-power h3{font-size:18px;margin:0 0 3px;color:#fff0d6}.hero-power strong{font-size:12px;color:var(--chosen)}.hero-power p{font-size:12px!important;color:#d3dfef;margin:7px 0 0!important;line-height:1.55!important;opacity:1!important}
+#heroQuote{font-size:12px;font-style:italic;color:#c8d6e8;text-align:center;margin:13px 0}#heroPractice{font-size:11px;color:#e8d49f;text-align:center;line-height:1.5}.hero-selector-actions{display:flex;gap:12px;margin-top:14px}.hero-selector-actions #heroConfirm{flex:1}.hero-selector-actions #heroCancel{background:#ffffff10;box-shadow:none;border:1px solid #ffffff22;font-size:12px}
+.hero-hud{display:flex;gap:9px;align-items:center;margin:-2px 0 9px;padding-bottom:8px;border-bottom:1px solid #ffffff14;font-size:10px}.hero-hud img{width:30px;height:34px;object-fit:cover;object-position:50% 12%;border-radius:8px;border:1px solid var(--hero-color,#68d8bd)}.hero-hud b{color:var(--hero-color,#68d8bd);font-size:12px}.hero-hud span{color:#d2deef;line-height:1.4}
+#rescue{z-index:63;background:radial-gradient(ellipse,#a9496855,#070d23e8)}.rescue-card{max-width:380px!important;border-color:#f3acb077!important;background:linear-gradient(#30304cf5,#151b34f5)!important}.rescue-portrait{width:115px;height:155px;object-fit:cover;object-position:center top;border-radius:55px 55px 30px 30px;border:2px solid #f4afad;box-shadow:0 0 35px #ed7b8f55}.rescue-heart{display:block;font-size:40px;color:#ff9eac;text-shadow:0 0 25px #ff7c9c;margin:-24px auto 10px;position:relative;animation:rescueBeat 1.1s ease-in-out infinite}.rescue-card h2{font-size:26px}.rescue-card p{font-size:13px;line-height:1.6}.rescue-card button{width:100%}
+@keyframes rescueBeat{50%{transform:scale(1.12)}}
+#bonusIntro{position:fixed;inset:0;z-index:64;display:none;align-items:center;justify-content:center;overflow:hidden;background:linear-gradient(#071124bf,#071124ef),var(--entry-scene) center/cover;opacity:0;transition:opacity .35s}
+#bonusIntro.show{display:flex;animation:jin .4s forwards}#bonusIntro.leaving{animation:jout .35s forwards}
+.entry-glow{position:absolute;width:150vmax;height:150vmax;border-radius:50%;background:repeating-conic-gradient(from 0deg,#edce8120 0deg 4deg,transparent 4deg 20deg);mask-image:radial-gradient(#000 5%,transparent 60%);animation:entryRotate 18s linear infinite;pointer-events:none}
+.entry-content{position:relative;text-align:center;width:min(90vw,480px);padding:25px}.entry-portrait{width:140px;height:190px;object-fit:cover;object-position:center top;border:2px solid #e8cb8b;border-radius:70px 70px 28px 28px;box-shadow:0 0 50px #efcf8166;animation:entryPortrait .9s cubic-bezier(.2,1,.3,1) both}
+#entryName{font-size:12px;letter-spacing:.05em;color:#d3e0ee;margin:18px 0 14px}.entry-icons{display:flex;justify-content:center;gap:16px}.entry-token{display:grid;place-items:center;width:60px;height:66px;border:1px solid #eacf8766;border-radius:14px;background:linear-gradient(#29475c,#17253c);color:#f9dc9f;font-size:30px;box-shadow:0 8px 16px #0005;animation:entryShuffle .7s ease-in-out infinite alternate}.entry-token:nth-child(2){animation-delay:.14s}.entry-token:nth-child(3){animation-delay:.28s}
+#entryTitle{opacity:0;transform:translateY(12px);font-size:clamp(25px,6vw,34px);line-height:1.2;color:#fff0cd;margin:23px 0;text-shadow:0 0 30px #f3cf6c55;transition:opacity .5s,transform .5s}.revealed #entryTitle{opacity:1;transform:none}.revealed .entry-token{animation:none;opacity:.35;transform:scale(.85)}.revealed .entry-winner{opacity:1;transform:scale(1.13);background:linear-gradient(#f4d89a,#b58a4d);color:#18243b;box-shadow:0 0 30px #f8d68e66;border-color:#fff0b8}
+#entrySkip{position:absolute;bottom:calc(env(safe-area-inset-bottom) + 20px);left:50%;transform:translateX(-50%);font-size:11px;padding:8px 16px;min-height:38px;background:#ffffff0d;box-shadow:none;border:1px solid #ffffff26;color:#d6e1f2}
+@keyframes entryRotate{to{rotate:360deg}}@keyframes entryShuffle{to{transform:translateY(-9px) rotate(5deg)}}@keyframes entryPortrait{from{opacity:0;transform:translateY(45px) scale(.85)}to{opacity:1;transform:none}}
+@media(max-width:600px){.hero-selector{padding:20px 16px!important}.hero-cards{gap:8px}.hero-choice{height:190px;border-radius:13px}.hero-choice-name{left:8px;bottom:10px;font-size:24px}.hero-choice-name small{font-size:9px}.hero-check{right:5px;top:5px;width:20px;height:20px;line-height:20px}.hero-power{padding:13px;gap:10px}.hero-power h3{font-size:17px}.hero-power-icon{width:36px;height:40px;font-size:25px}.hero-selector-actions{flex-direction:column-reverse}.hero-selector-actions #heroCancel{min-height:34px;padding:8px}.hero-selector .hero-subtitle{margin-bottom:14px}}
+@media(max-height:660px){.hero-choice{height:150px}.hero-selector{padding:16px!important}.hero-selector h2{font-size:24px}.hero-selector .hero-subtitle{margin-bottom:10px}.hero-power{margin-top:10px;padding:10px}#heroQuote{margin:9px 0}.entry-portrait{width:100px;height:130px}.entry-content{padding:16px}.entry-token{width:48px;height:50px}#entryTitle{margin:15px 0}}
+@media(prefers-reduced-motion:reduce){.entry-glow,.entry-token,.entry-portrait,.rescue-heart{animation:none!important}#bonusIntro.show,#bonusIntro.leaving{animation-duration:.01s}}
+
 </style>
 </head>
 <body>
@@ -635,6 +660,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:li
   <div class="prog stage"><span class="sname" id="sname"></span><div class="segs" id="segs"></div></div>
 
   <div class="meter" id="meter">
+    <div class="hero-hud"><img id="heroHudImg" alt="" width="30" height="34"><b id="heroHudName"></b><span id="heroHudPower"></span></div>
     <div class="mrow"><span>MOVIMIENTOS <b id="mv">0</b></span><span>Mín <b id="mn" style="font-size:14px">–</b> · Límite <b id="lim" style="font-size:14px">–</b></span></div>
     <div class="bar"><i id="fill"></i><u></u></div>
     <div class="pot"><span>Base <b id="base">0</b></span><span>Ganarías ahora <b id="pot">+0</b></span></div>
@@ -654,6 +680,17 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;background:li
 </div>
 
 <div class="modal" id="travel" role="dialog" aria-modal="true" aria-labelledby="travelTitle"><div class="card travel-card"><div class="traveler"><svg class="hero-art" viewBox="0 0 100 145" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Lía, exploradora de cabello violeta y capa turquesa"><path d="M24 53Q9 1 48 5Q89 0 82 60L75 93H22Z" fill="#292342" stroke="#14192e" stroke-width="3"/><path d="M35 111L33 139H44L51 111M56 111L59 139H71L67 105" fill="#30334d" stroke="#171c32" stroke-width="3"/><path d="M31 136h15v7H27q-1-6 4-7M58 136h14l6 7H58Z" fill="#ae7859"/><path d="M34 69Q48 61 64 69L77 111Q49 123 23 111Z" fill="#43c9b5" stroke="#183d50" stroke-width="3"/><path d="M35 73L22 96l9 6 16-22M66 74l14 23-8 6-15-24" fill="#e6ae91" stroke="#563f51" stroke-width="2"/><path d="M29 72L47 83l21-14-7 28-15-12-15 11Z" fill="#203c56"/><ellipse cx="50" cy="43" rx="23" ry="27" fill="#f5c5a4"/><path d="M25 42L25 21Q48-4 75 22l4 29-13-22-9 7 2-14-21 20 1-12Z" fill="#635080" stroke="#292342" stroke-width="2"/><path d="M32 45q7-7 14 0M54 45q7-7 14 0" fill="none" stroke="#3a294b" stroke-width="3"/><ellipse cx="40" cy="48" rx="4" ry="6" fill="#32777c"/><ellipse cx="61" cy="48" rx="4" ry="6" fill="#32777c"/><circle cx="41" cy="46" r="1.8" fill="white"/><circle cx="62" cy="46" r="1.8" fill="white"/><path d="M46 60q5 4 10-1" fill="none" stroke="#b26570" stroke-width="2"/><path d="M22 23L53 7l28 16-5 6-54 1Z" fill="#2e716f" stroke="#203c56" stroke-width="3"/><path d="M54 11l4 12" stroke="#ffcf6b" stroke-width="4"/><path d="M47 80v10" stroke="#ffcf6b" stroke-width="2"/><circle cx="47" cy="91" r="4" fill="none" stroke="#ff667c" stroke-width="3"/><path d="M47 95v7h5" fill="none" stroke="#ff667c" stroke-width="3"/><path d="M33 101l36-5" stroke="#775b50" stroke-width="5"/><rect x="60" y="94" width="14" height="17" rx="4" fill="#c89557"/></svg><div><div class="tag" id="travelTag"></div><h2 id="travelTitle"></h2><p id="travelText"></p></div></div><svg class="route-map" id="routeMap" viewBox="0 0 440 160" aria-label="Dos caminos hacia la siguiente ciudad"><path d="M40 80Q120 -10 220 48T400 80" class="route-path" id="upperRoute"/><path d="M40 80Q120 170 220 112T400 80" class="route-path" id="lowerRoute"/><circle cx="40" cy="80" r="13" fill="#43e0c1"/><circle cx="400" cy="80" r="17" fill="#ffcf6b"/><text x="220" y="24" text-anchor="middle" fill="#ffcf6b" font-size="13">AVENTURERO · +10 %</text><text x="220" y="153" text-anchor="middle" fill="#d6f4ec" font-size="13">TRANQUILO</text><g id="routeWalker"></g></svg><div class="route-options" id="routeOptions"><button class="route-option" id="routeNormal" aria-pressed="true"><strong>🌿 Camino tranquilo</strong><small>Dificultad habitual.<br>Puntos habituales.</small></button><button class="route-option" id="routeBrave" aria-pressed="false"><strong>✨ Camino aventurero</strong><small>Un poco más difícil.<br>+10 % de puntos.</small></button></div><p class="route-explain" id="routeExplain"></p><button class="primary travel-go" id="travelGo"></button></div></div>
+
+<div class="modal" id="heroSelect" role="dialog" aria-modal="true" aria-labelledby="heroSelectTitle"><div class="card hero-selector">
+ <div class="tag" id="heroPath"></div><h2 id="heroSelectTitle">Tu aventura. Tu protagonista.</h2><p class="hero-subtitle">Elige quién te acompañará por las diez ciudades. Cada héroe tiene un poder distinto durante toda la partida.</p>
+ <div class="hero-cards" id="heroCards" role="radiogroup" aria-label="Elige un héroe"></div>
+ <div class="hero-power"><span class="hero-power-icon" id="heroPowerIcon" aria-hidden="true"></span><div><h3 id="heroPowerTitle"></h3><strong id="heroPowerShort"></strong><p id="heroPowerDetail"></p></div></div>
+ <p id="heroQuote"></p><p id="heroPractice" hidden>En Práctica no hay eliminación y las ayudas ya son ilimitadas. Puedes elegir el personaje que prefieras.</p>
+ <div class="hero-selector-actions"><button id="heroCancel">Volver al menú</button><button class="primary" id="heroConfirm">Comenzar la aventura ➜</button></div>
+</div></div>
+<div class="modal" id="rescue" role="dialog" aria-modal="true" aria-labelledby="rescueTitle"><div class="card rescue-card"><img class="rescue-portrait" id="rescueHero" alt="Lía protege la aventura"><span class="rescue-heart" aria-hidden="true">♥</span><div class="tag">PODER DE LÍA · UNA VEZ POR PARTIDA</div><h2 id="rescueTitle">La aventura sigue</h2><p>Lía te da una segunda oportunidad. Repites este mismo tablero desde cero y conservas tus puntos y tus pistas.</p><button class="primary" id="rescueContinue">Volver a intentarlo ♥</button></div></div>
+<div id="bonusIntro" role="dialog" aria-modal="true" aria-labelledby="entryTitle"><div class="entry-glow"></div><div class="entry-content"><img id="entryHero" class="entry-portrait" alt=""><p id="entryName"></p><div class="entry-icons" id="entryIcons" aria-hidden="true"></div><h2 id="entryTitle"></h2></div><button id="entrySkip">Continuar ➜</button></div>
+
 <canvas id="fx"></canvas>
 <div id="journey">
   <div class="mtag" id="mTag"></div>
@@ -1223,7 +1260,57 @@ ZONES.forEach(z=>{ if(z.h){ z.t1=`hsl(${z.h[0]} ${z.s}% ${Math.max(30,z.l-16)}% 
 const zoneIdx=l=>Math.min(9,Math.floor((l-1)/10)), zoneStep=l=>((l-1)%10)+1, zoneOf=l=>ZONES[zoneIdx(l)];
 let curZone=-1;
 
-const HERO_MARKUP=document.querySelector('#travel .hero-art').outerHTML;
+let HERO_MARKUP=document.querySelector('#travel .hero-art').outerHTML;
+const HEROES=[
+ {id:'lia',name:'Lía',role:'Guardiana del corazón',icon:'♥',color:'#68d8bd',power:'Una segunda oportunidad',short:'1 vida extra por partida',detail:'Si superas el límite de movimientos, Lía te permite repetir ese mismo tablero una vez. Conservas tus puntos y tus pistas.',quote:'«Siempre hay un camino para volver a intentarlo.»'},
+ {id:'jean',name:'Jean',role:'Viajero del tiempo',icon:'↶',color:'#8fb9ff',power:'Un instante de vuelta',short:'1 deshacer gratis por nivel',detail:'La primera vez que deshaces en cada nivel, recuperas el movimiento anterior sin penalización. Los siguientes deshacer cuestan lo habitual.',quote:'«A veces, avanzar empieza por volver un instante atrás.»'},
+ {id:'van',name:'Van',role:'Tejedora de ideas',icon:'✦',color:'#c5a2ff',power:'Dos luces en el camino',short:'+2 pistas cada 10 niveles',detail:'Al completar los niveles 10, 20, 30… recibes dos pistas adicionales. Se suman a los premios normales y a los minijuegos.',quote:'«Toda gran aventura empieza con una pequeña idea.»'}
+];
+function heroOf(id=run?.hero){return HEROES.find(h=>h.id===id)||HEROES[0]}
+function heroMarkup(h){return `<svg xmlns="http://www.w3.org/2000/svg" class="hero-art" viewBox="0 0 100 145" role="img" aria-label="${h.name}, ${h.role}"><defs><clipPath id="portrait-${h.id}"><rect width="100" height="145" rx="16"/></clipPath></defs><image href="heroes/${h.id}.webp" width="100" height="145" preserveAspectRatio="xMidYMin slice" clip-path="url(#portrait-${h.id})"/><rect x="1" y="1" width="98" height="143" rx="16" fill="none" stroke="${h.color}" stroke-opacity=".65" stroke-width="2"/></svg>`}
+function syncHero(id=run?.hero){const h=heroOf(id);HERO_MARKUP=heroMarkup(h);const art=document.querySelector('#travel .traveler>.hero-art');if(art)art.outerHTML=HERO_MARKUP;document.documentElement.style.setProperty('--hero-color',h.color)}
+function chooseHero(start,mode){
+ return new Promise(resolve=>{
+  const modal=$('heroSelect'),cards=$('heroCards');let selected=heroOf(store.heroChoice||run?.hero).id;
+  $('heroPath').textContent=`${pathOf(start).n.toUpperCase()} · ${mode==='p'?'PRÁCTICA':'DESAFÍO'}`;
+  const render=()=>{const h=heroOf(selected);modal.style.setProperty('--chosen',h.color);modal.style.setProperty('--hero-scene',`url("heroes/${h.id}.webp")`);
+   cards.innerHTML=HEROES.map(v=>`<button class="hero-choice ${v.id===selected?'selected':''}" role="radio" aria-checked="${v.id===selected}" tabindex="${v.id===selected?0:-1}" data-hero="${v.id}" style="--accent:${v.color}" aria-label="${v.name}: ${v.short}"><img src="heroes/${v.id}.webp" alt="${v.name}, ${v.role}" width="360" height="720"><span class="hero-choice-name">${v.name}<small>${v.role}</small></span><span class="hero-check" aria-hidden="true">✓</span></button>`).join('');
+   $('heroPowerIcon').textContent=h.icon;$('heroPowerTitle').textContent=h.power;$('heroPowerShort').textContent=h.short;$('heroPowerDetail').textContent=h.detail;$('heroQuote').textContent=h.quote;
+   $('heroPractice').hidden=mode!=='p';$('heroConfirm').textContent=`Comenzar con ${h.name} ➜`;
+   cards.querySelectorAll('button').forEach(b=>b.onclick=()=>{selected=b.dataset.hero;render();cards.querySelector(`[data-hero="${selected}"]`).focus()});
+  };
+  const close=value=>{modal.classList.remove('show');modal.removeEventListener('keydown',keyboard);resolve(value)};
+  const keyboard=e=>{if(['ArrowRight','ArrowLeft','ArrowUp','ArrowDown'].includes(e.key)&&cards.contains(document.activeElement)){e.preventDefault();const delta=e.key==='ArrowRight'||e.key==='ArrowDown'?1:-1;selected=HEROES[(HEROES.findIndex(h=>h.id===selected)+delta+3)%3].id;render();cards.querySelector(`[data-hero="${selected}"]`).focus()}else if(e.key==='Escape')close(null);else if(e.key==='Tab'){const bs=[...modal.querySelectorAll('button')].filter(b=>b.tabIndex>=0);if(e.shiftKey&&document.activeElement===bs[0]){e.preventDefault();bs.at(-1).focus()}else if(!e.shiftKey&&document.activeElement===bs.at(-1)){e.preventDefault();bs[0].focus()}}};
+  $('heroCancel').onclick=()=>close(null);$('heroConfirm').onclick=()=>{store.heroChoice=selected;persist();close(selected)};render();modal.classList.add('show');modal.addEventListener('keydown',keyboard);cards.querySelector('[aria-checked=true]').focus();
+ });
+}
+function updateHeroHud(){
+ if(!run||!G)return;const h=heroOf(),prac=run.mode==='p';
+ $('heroHudImg').src=`heroes/${h.id}.webp`;$('heroHudImg').alt=h.name;$('heroHudName').textContent=h.name;
+ $('heroHudPower').textContent=prac?'Práctica · ayudas ilimitadas':h.id==='lia'?(run.lifeUsed?'Segunda oportunidad usada':'♥ Segunda oportunidad disponible'):h.id==='jean'?(run.undoUsedAt===G.n?'↶ Deshacer gratis usado':'↶ Deshacer gratis disponible'):`✦ +2 pistas al completar nivel ${Math.min(100,(Math.floor((G.n-1)/10)+1)*10)}`;
+ $('bUndo').querySelector('em').textContent=prac?'gratis':h.id==='jean'&&run.undoUsedAt!==G.n?'1 gratis':'+1 mov';
+}
+function showRescue(){
+ G.done=true;busy=true;boardEl.classList.add('board-lock');setTensionFx(0,false);Music.duck(.3);
+ $('rescueHero').src='heroes/lia.webp';$('rescue').classList.add('show');$('rescueContinue').focus();
+ $('rescueContinue').onclick=()=>{
+  if(!run?.rescue)return;G.pos=G.start.slice();G.moves=0;G.hist=[];G.done=false;delete run.rescue;saveRun();
+  $('rescue').classList.remove('show');boardEl.classList.remove('board-lock');busy=false;$('bUndo').disabled=true;layout();updateHud();Music.duck(1);sfx.start();$('msg').textContent='♥ Lía te dio otra oportunidad. ¡Este tablero empieza de nuevo!';
+ };
+}
+function bonusEntrance(kind){
+ return new Promise(resolve=>{
+  const h=heroOf(),modal=$('bonusIntro'),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const title={cards:'El secreto de las cartas',wheel:'La ruleta de las pistas',slots:'La máquina de amuletos'}[kind];
+  modal.style.setProperty('--entry-scene',`url("backgrounds/zone-${zoneIdx(Math.max(1,run.level-1))+1}.webp")`);
+  $('entryHero').src=`heroes/${h.id}.webp`;$('entryHero').alt=h.name;$('entryName').textContent=`${h.name} descubre una parada sorpresa`;$('entryTitle').textContent=title;
+  $('entryIcons').innerHTML=['cards','wheel','slots'].map((v,i)=>`<span class="entry-token ${v===kind?'entry-winner':''}">${['✦','◉','◆'][i]}</span>`).join('');
+  let done=false;const timers=[];const finish=()=>{if(done)return;done=true;timers.forEach(clearTimeout);modal.classList.add('leaving');setTimeout(()=>{modal.classList.remove('show','revealed','leaving');resolve()},reduced?30:350)};
+  $('entrySkip').onclick=finish;modal.classList.add('show');sfx.journey();$('entrySkip').focus();timers.push(setTimeout(()=>modal.classList.add('revealed'),reduced?30:900));timers.push(setTimeout(finish,reduced?180:2800));
+ });
+}
+
+syncHero(store.run?.hero||store.heroChoice||'lia');
 function paintScenery(i){
  document.documentElement.style.setProperty('--scene',`url("backgrounds/zone-${i+1}.webp")`);
 }
@@ -1231,9 +1318,9 @@ function travelDialog(intro=false){
  return new Promise(resolve=>{
   const modal=$('travel'),go=$('travelGo'),options=$('routeOptions');let choice='normal';
   const next=Math.min(9,Math.floor(run.level/10)),z=ZONES[intro?0:next];
-  $('travelTag').textContent=intro?'LÍA · LA VIAJERA DE LAS DIEZ CIUDADES':'ZONA COMPLETADA · ELIGE TU RUTA';
+  $('travelTag').textContent=intro?`${heroOf().name.toUpperCase()} · ${heroOf().role.toUpperCase()}`:'ZONA COMPLETADA · ELIGE TU RUTA';
   $('travelTitle').textContent=intro?'Una llave, diez destinos':`Rumbo a ${z.n}`;
-  $('travelText').textContent=intro?'Soy Lía. ¿Me ayudas a llegar al Castillo Dorado? Cada puzle nos acerca a la siguiente ciudad.':'¡Llegamos al cruce! Podemos seguir por abajo, o tomar la subida y ganar un poco más.';
+  $('travelText').textContent=intro?`Soy ${heroOf().name}. ¿Me ayudas a llegar al Castillo Dorado? Cada puzle nos acerca a la siguiente ciudad.`:'¡Llegamos al cruce! Podemos seguir por abajo, o tomar la subida y ganar un poco más.';
   options.hidden=intro;options.style.display=intro?'none':'grid';
   $('routeBrave').querySelector('small').innerHTML=run.mode==='p'?'Un poco más difícil.<br>Sin puntos en Práctica.':'Un poco más difícil.<br>+10 % de puntos.';
   $('routeMap').querySelector('text').textContent=run.mode==='p'?'AVENTURERO · MÁS RETO':'AVENTURERO · +10 %';$('routeMap').style.display=intro?'none':'block';
@@ -1288,7 +1375,7 @@ function showMap(fromI,toI,{travel=false}={}){
   const el=$('journey'),svg=$('mapSvg'),NS='http://www.w3.org/2000/svg';
   const wide=innerWidth/innerHeight>1.3,W=wide?1000:480,H=wide?390:650;
   const mk=(tag,attrs,parent=svg)=>{const n=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,v);parent.appendChild(n);return n};
-  svg.innerHTML='';svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.setAttribute('role','img');svg.setAttribute('aria-label',`El atlas de Lía. Destino: ${ZONES[toI].n}`);
+  svg.innerHTML='';svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.setAttribute('role','img');svg.setAttribute('aria-label',`El atlas de ${heroOf().name}. Destino: ${ZONES[toI].n}`);
   const pts=ZONES.map((_,i)=>wide?[100+(i<5?i:9-i)*200,i<5?100:285]:[i%4<2?118:362,60+Math.floor(i/2)*130]);
   // Serpentine order: two cities per row on a hand-drawn constellation road.
   if(!wide)pts.forEach((p,i)=>p[0]=(Math.floor(i/2)%2===0?(i%2===0?118:362):(i%2===0?362:118)));
@@ -1320,7 +1407,7 @@ function showMap(fromI,toI,{travel=false}={}){
   const art=hero.firstElementChild;art.style.width='44px';art.style.height='64px';art.setAttribute('width','44');art.setAttribute('height','64');art.setAttribute('x','-22');art.setAttribute('y','-70');
   const place=(x,y)=>hero.setAttribute('transform',`translate(${x} ${y-27})`);place(...pts[open]);
   el.style.setProperty('--atlas-scene',`url("backgrounds/zone-${toI+1}.webp")`);
-  $('mTag').textContent=travel?'EL ATLAS DE LÍA · UN NUEVO HORIZONTE':`EL ATLAS DE LÍA · CIUDAD ${toI+1} DE 10`;
+  $('mTag').textContent=travel?`EL ATLAS DE ${heroOf().name.toUpperCase()} · UN NUEVO HORIZONTE`:`EL ATLAS DE ${heroOf().name.toUpperCase()} · CIUDAD ${toI+1} DE 10`;
   $('mName').textContent=travel?`Hasta pronto, ${ZONES[fromI].n}`:ZONES[toI].n;
   $('mSub').textContent=travel?`Nuestro próximo destino: ${ZONES[toI].n}`:`Diez puzles, una ciudad y un nuevo capítulo. Nivel ${run.level} de 100.`;
   el.classList.remove('out');el.classList.add('show');Music.duck(.35);
@@ -1332,18 +1419,19 @@ function showMap(fromI,toI,{travel=false}={}){
    sfx.journey();const path=paths[fromI],length=path.getTotalLength(),t0=performance.now(),duration=matchMedia('(prefers-reduced-motion: reduce)').matches?0:1700;
    art.classList.add('walking');
    function step(t){const k=duration?Math.min(1,(t-t0)/duration):1,e=k*k*(3-2*k),p=path.getPointAtLength(length*e);place(p.x,p.y);
-    if(k<1)frame=requestAnimationFrame(step);else{art.classList.remove('walking');applyZone(toI);cards[fromI].classList.remove('current');cards[fromI].querySelectorAll('text')[1].textContent='COMPLETADA';cards[fromI].querySelector('rect').setAttribute('stroke','#73bfaa');cards[toI].classList.remove('undiscovered');cards[toI].classList.add('current');const pic=cards[toI].querySelector('image');pic.setAttribute('opacity',1);cards[toI].querySelector('rect').setAttribute('stroke','#ffdb8f');const texts=cards[toI].querySelectorAll('text');texts[1].textContent='ESTÁS AQUÍ';$('mName').textContent=ZONES[toI].n;$('mSub').textContent='Lía: «¡Ya estamos aquí! Vamos a descubrir sus secretos.»';ready=true;timer=setTimeout(end,2200);sfx.win()}}
+    if(k<1)frame=requestAnimationFrame(step);else{art.classList.remove('walking');applyZone(toI);cards[fromI].classList.remove('current');cards[fromI].querySelectorAll('text')[1].textContent='COMPLETADA';cards[fromI].querySelector('rect').setAttribute('stroke','#73bfaa');cards[toI].classList.remove('undiscovered');cards[toI].classList.add('current');const pic=cards[toI].querySelector('image');pic.setAttribute('opacity',1);cards[toI].querySelector('rect').setAttribute('stroke','#ffdb8f');const texts=cards[toI].querySelectorAll('text');texts[1].textContent='ESTÁS AQUÍ';$('mName').textContent=ZONES[toI].n;$('mSub').textContent=`${heroOf().name}: «¡Ya estamos aquí! Vamos a descubrir sus secretos.»`;ready=true;timer=setTimeout(end,2200);sfx.win()}}
    frame=requestAnimationFrame(step);
   }else{applyZone(toI);sfx.start();timer=setTimeout(end,4200)}
  });
 }
 
-function startRun(start,mode){
+async function startRun(start,mode){
+  const chosen=await chooseHero(start,mode);if(!chosen){openMenu();return}
   if(run) recordBest(true);                         // si abandonas, lo logrado cuenta
   const seed=menuSeed; menuSeed=Math.floor(Math.random()*2**31);
   Object.keys(packs).forEach(k=>{if(!k.startsWith(seed+':'))delete packs[k]});
-  run={seed,level:1,start,mode,score:0,hints:3+Math.floor(start/25),adj:0,streak:0,recBroken:false};
-  applyZone(0);saveRun();getPack(run.level);                     // se genera el nivel mientras se muestra el mapa
+  run={seed,level:1,start,mode,hero:chosen,lifeUsed:false,undoUsedAt:0,vanAwardedAt:0,score:0,hints:3+Math.floor(start/25),adj:0,streak:0,recBroken:false};
+  syncHero();applyZone(0);saveRun();getPack(run.level);                     // se genera el nivel mientras se muestra el mapa
   travelDialog(true).then(()=>showMap(zoneIdx(run.level),zoneIdx(run.level))).then(startLevel);
 }
 async function startLevel(){
@@ -1361,6 +1449,7 @@ async function startLevel(){
   const d=run.route==='brave'&&higher.length?Math.min(...higher):normalD;
   const arr=pack.cands[d], pos=arr[Math.floor(Math.random()*arr.length)].slice();
   G={n:run.level,rate,pieces:pack.pieces,pos,start:pos.slice(),opt:d,limit:d*2,moves:0,hist:[],done:false,els:[]};
+  if(run.rescue&&run.rescue.level===run.level){const r=run.rescue;G={...G,rate:r.rate,pieces:r.pieces,pos:r.start.slice(),start:r.start.slice(),opt:r.opt,limit:r.opt*2}}
   G.colors=[0,1,2,3,4,5,6,7].sort(()=>Math.random()-.5);
   $('lvl').textContent=G.n;$('mn').textContent=G.opt;$('base').textContent=run.mode==='p'?'—':baseScore(G.rate);
   applyZone(zoneIdx(G.n));renderStage();
@@ -1372,6 +1461,7 @@ async function startLevel(){
   $('msg').textContent=G.n===1?'Desliza los bloques y saca la llave roja ➜ Cada movimiento cuenta.':tipFor(G);
   buildPieces();updateHud();banner();sfx.start();busy=false;
   fitBoard();Music.setLevel(G.n,G.rate);setTensionFx(0,false);Music.duck(1);Music.muffle(false);Music.start();
+  if(run.rescue){showRescue();return}
   if(!store.tutorial&&G.n===1){                      // primera vez: señala el primer movimiento
     store.tutorial=true;persist();const g0=G;
     setTimeout(()=>{ if(G!==g0||G.done||G.moves>0)return;
@@ -1382,6 +1472,7 @@ async function startLevel(){
   }
 }
 function tipFor(g){
+  if(heroOf().id==='jean'&&run.undoUsedAt!==g.n)return '↶ Jean puede deshacer una vez gratis en este nivel.';
   const t=['Piensa antes de mover: cada movimiento de más resta puntos.','Los bloques largos bloquean más: libéralos primero.','Un solo arrastre largo cuenta como 1 movimiento.','Deshacer cuesta 1 movimiento. Úsalo con cabeza.','La pista no cuesta movimientos, pero es limitada.'];
   return t[(g.n*7)%t.length];
 }
@@ -1496,6 +1587,7 @@ function recLine(){            // refresca camino, puntaje actual y máximo del 
   fitScores();
 }
 function updateHud(){
+  updateHeroHud();
   $('mv').textContent=G.moves;
   const f=$('fill'),pct=Math.min(100,G.moves/G.limit*100);
   f.style.width=pct+'%';
@@ -1516,6 +1608,8 @@ function win(){
   run.score+=gain;run.cleared=(run.cleared||0)+1;run.streak=eff>=.9?(run.streak||0)+1:0;
   run.adj=Math.max(-2,Math.min(run.level<10?1:2,run.adj+(eff>=.9?1:eff<.4?-1:0)));      // adaptación
   let bonusHint=false;if(!prac&&G.n%5===0){run.hints++;bonusHint=true}
+  const heroHintBonus=!prac&&heroOf().id==='van'&&G.n%10===0&&(run.vanAwardedAt||0)<G.n;
+  if(heroHintBonus){run.hints+=2;run.vanAwardedAt=G.n}
   const r=boardEl.getBoundingClientRect();
   setTensionFx(0,false);Music.duck(.35);
   const perfect=G.moves<=G.opt;
@@ -1531,12 +1625,13 @@ function win(){
     const ring=$('ring'),pc=Math.round(eff*100);
     ring.style.setProperty('--c',eff>=.9?'#43e0c1':eff>=.5?'#ffc65a':'#ff6a6a');
     ring.style.setProperty('--p',0);$('ringTxt').textContent='0%';
-    $('winTxt').textContent=`${G.moves} movimientos de ${G.opt} mínimos`+(G.moves===G.opt?' · ¡PERFECTO!':'')+(bonusHint?' · +1 💡 pista':'');
+    $('winTxt').textContent=`${G.moves} movimientos de ${G.opt} mínimos`+(G.moves===G.opt?' · ¡PERFECTO!':'')+(bonusHint?' · +1 💡 pista':'')+(heroHintBonus?' · Van: +2 💡 pistas':'');
     $('breakdown').innerHTML=prac?`<div><span>Eficiencia ${pc}%</span><b>${G.moves} / ${G.opt}</b></div><div><span>Modo práctica</span><b>sin puntaje</b></div>`:
       `<div><span>Base del nivel</span><b>${cgw.base.toLocaleString('de-DE')}</b></div>`+
       `<div><span>Eficiencia ${pc}%</span><b>${cgw.pts.toLocaleString('de-DE')}</b></div>`+
       (cgw.perfect?`<div class="g"><span>✨ Bonus perfecto</span><b>+${cgw.perfect}</b></div>`:'')+
       (cgw.mult>1?`<div class="g"><span>🔥 Racha ×${cgw.mult.toFixed(1)}</span><b>${run.streak} seguidos</b></div>`:'')+
+      (heroHintBonus?`<div class="g"><span>✦ Poder de Van</span><b>+2 pistas</b></div>`:'')+
       (cgw.routeBonus?`<div class="g"><span>✨ Ruta aventurera +10 %</span><b>+${cgw.routeBonus.toLocaleString('de-DE')}</b></div>`:'')+
       (cgw.lost>0?`<div class="r"><span>Perdiste por movimientos extra</span><b>−${cgw.lost.toLocaleString('de-DE')}</b></div>`:'');
     $('gain').textContent=prac?'🎯':'+0';$('winTotal').textContent=run.score.toLocaleString('de-DE');$('winTotalP').style.display=prac?'none':'';
@@ -1564,6 +1659,8 @@ $('bNext').onclick=async()=>{
 
 /* ---------- Derrota ---------- */
 function fail(why){
+  if(G.done)return;
+  if(run.mode!=='p'&&heroOf().id==='lia'&&!run.lifeUsed){run.lifeUsed=true;run.rescue={level:G.n,rate:G.rate,pieces:G.pieces.map(p=>({...p})),start:G.start.slice(),opt:G.opt};saveRun();showRescue();return}
   G.done=true;boardEl.classList.add('board-lock');
   Music.stop(.3);setTensionFx(0,false);document.body.classList.add('shake','flash');sfx.fail();vib([80,40,80,40,160]);
   const r=boardEl.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,50,['#ff2d4a','#ff7a5a','#7a0f22','#fff'],9);
@@ -1592,7 +1689,9 @@ function createBonusPlan(){
  const deck=[0,0,0,1,1,1,2,2,2];for(let i=8;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}
  return {kind,deck,opened:[],wheel:Math.floor(Math.random()*8),reels:Array.from({length:3},()=>Math.floor(Math.random()*3))};
 }
-function showBonus(){
+async function showBonus(){
+ const pending=run.bonusPlan||(run.bonusPlan=createBonusPlan());saveRun();
+ if(!pending.introSeen&&pending.prize===undefined){await bonusEntrance(pending.kind);pending.introSeen=true;saveRun()}
  return new Promise(resolve=>{
   const plan=run.bonusPlan||(run.bonusPlan=createBonusPlan());saveRun();
   const m=$('bonus'),stage=$('bStage'),go=$('bGo'),action=$('bAction'),result=$('bRes');
@@ -1641,6 +1740,7 @@ function showBonus(){
    };
   }else{
    stage.innerHTML='<div class="amulet-machine"><div class="machine-crown">✦ LÍA EXPRESS ✦</div><div class="reels"></div><div class="machine-plaque">TRES AMULETOS · UN DESTINO</div><div class="machine-lights" aria-hidden="true">✧ · ✧ · ✧ · ✧ · ✧ · ✧ · ✧</div></div>';
+   stage.querySelector('.machine-crown').textContent=`✦ ${heroOf().name.toUpperCase()} EXPRESS ✦`;
    const reels=stage.querySelector('.reels');
    for(let i=0;i<3;i++){const reel=document.createElement('div');reel.className='reel';reel.setAttribute('aria-label',`Amuleto ${i+1}`);reel.innerHTML=`<div class="reel-strip">${Array.from({length:22},(_,k)=>`<span>${REEL_SYMBOLS[k===21?plan.reels[i]:k%3]}</span>`).join('')}</div>`;reels.appendChild(reel)}
    const strips=[...reels.querySelectorAll('.reel-strip')];if(locked)strips.forEach(s=>s.style.transform='translateY(-1848px)');
@@ -1708,7 +1808,10 @@ $('bToMenu').onclick=()=>{$('over').classList.remove('show');openMenu()};
 /* ---------- Botones del juego ---------- */
 $('bUndo').onclick=()=>{
   if(!G||G.done||busy||!G.hist.length)return;
-  G.pos=G.hist.pop();G.moves=run.mode==='p'?Math.max(0,G.moves-1):G.moves+1;layout();sfx.move();updateHud();$('bUndo').disabled=!G.hist.length;   // en Desafío deshacer cuesta 1 movimiento; en Práctica es gratis
+  const free=run.mode==='p'||(heroOf().id==='jean'&&run.undoUsedAt!==G.n);
+  if(run.mode!=='p'&&free){run.undoUsedAt=G.n;saveRun()}
+  G.pos=G.hist.pop();G.moves=free?Math.max(0,G.moves-1):G.moves+1;layout();sfx.move();updateHud();$('bUndo').disabled=!G.hist.length;
+  if(free&&run.mode!=='p')$('msg').textContent='↶ Jean recuperó tu último movimiento. El deshacer gratis de este nivel está usado.';   // en Desafío deshacer cuesta 1 movimiento; en Práctica es gratis
   if(run.mode==='p'){}
   else if(G.moves>G.limit)fail('limit');else if(G.moves===G.limit)$('msg').textContent='⚠️ ÚLTIMO MOVIMIENTO: el siguiente te elimina.';
 };
@@ -1767,7 +1870,6 @@ async function pickPath(s,mode){
       text:(active?'Dejas la partida en curso.':'Se pierde la partida guardada.')+` Lo conseguido (${cur.mode==='p'?'nivel '+cur.level:cur.score.toLocaleString('de-DE')+' pts, nivel '+cur.level}) cuenta para tu máximo.<br><br>Empezarás <b>${p.n}</b> · ${mode==='p'?'Práctica':'Desafío'}.`});
     if(!ok) return;
   }
-  if(!active&&store.run&&!run){store.run=null;persist()}
   $('menu').classList.remove('show');$('pause').classList.remove('show');Music.muffle(false);
   startRun(s,mode);
 }
@@ -1821,7 +1923,7 @@ $('bResume').onclick=()=>{$('menu').classList.remove('show');Music.muffle(false)
 $('bContinue').onclick=()=>{
   $('menu').classList.remove('show');Music.muffle(false);
   if(run&&G&&!G.done) return;
-  run={start:1,mode:'c',recBroken:false,...store.run};getPack(run.level);
+  run={start:1,mode:'c',hero:'lia',lifeUsed:false,undoUsedAt:0,vanAwardedAt:0,recBroken:false,...store.run};syncHero();getPack(run.level);
   (async()=>{ if(run.bonus&&run.mode==='c'){const prize=await showBonus();run.hints+=prize;run.bonus=0;saveRun()}
     await showMap(zoneIdx(run.level),zoneIdx(run.level));startLevel(); })();
 };
@@ -1831,7 +1933,7 @@ openMenu();
 /* ============================ PWA ============================ */
 // El récord y la partida en curso viven en localStorage; pedimos al navegador que no los borre
 if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{});
-const APP_VERSION='31';                      // debe coincidir con VERSION de sw.js (desbloquea-vNN)
+const APP_VERSION='32';                      // debe coincidir con VERSION de sw.js (desbloquea-vNN)
 $('ver').textContent='Versión '+APP_VERSION;
 let pendingWorker=null,updating=false;
 function showUpdate(w){pendingWorker=w;$('upd').classList.add('show');sfx.hint()}
