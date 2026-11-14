@@ -142,23 +142,49 @@ const THEME_DATA = [
   },
 ];
 
-/** Menú principal: himno de aventura en pop-rock luminoso, con trompas y timbales. */
+/** Menú principal: himno de aventura luminoso. Gancho en la sección A y una sección B propia (más aguda y sincopada). */
 const MENU_DATA = {
   name: 'Crónicas de la llave roja', epic: 3, bpm: 120, sc: 'maj', root: 55, swing: 0.08, leadVoice: 'flute', compVoice: 'piano', comp: 'charleston', bassPat: 'pop', groove: 'pop', echo: true, leadV: 0.048,
-  prog: [0, [5, 1], 3, [4, 0], 0, [2, 5], [1, 4], 0],
-  tuneText: ['7:2 7:1 7:1 11:2 9:2 11:2 14:4 r:2', '14:2 12:1 14:1 16:2 14:2 15:2 14:1 12:1 10:2 12:2', '14:3 12:1 10:2 12:2 14:2 16:2 18:2 16:2', '15:2 13:1 11:1 13:2 15:2 14:2 11:1 14:1 16:2 14:2',
-    '11:2 14:1 16:1 18:2 16:2 14:2 11:2 14:2 16:2', '16:2 14:1 13:1 11:2 9:2 12:2 14:1 16:1 18:2 16:2', '14:2 12:1 10:1 12:2 14:2 15:2 13:1 11:1 13:2 15:2', '14:4 r:2 11:2 14:2 16:2 14:4'],
-  B: { k: -3, endProg: [[1, 4], 0], end: ['14:2 12:2 10:2 12:2 15:2 13:2 11:2 13:2', '14:4 r:2 9:2 11:2 14:2 16:4'] },
+  prog: [0, 4, 5, 3, 0, 4, 3, [4, 0],   5, 3, 0, 4, 5, 1, '4:7', 0],
+  tuneText: [
+    '7:2 9:2 11:4 9:2 11:2 14:4', '11:2 11:2 13:4 11:2 13:2 15:4', '14:2 12:2 10:4 12:2 14:2 16:4', '10:2 12:2 14:4 12:2 10:2 9:4',
+    '7:2 9:2 11:2 14:2 16:4 14:2 11:2', '15:2 14:2 13:2 11:2 13:4 11:2 r:2', '12:2 14:2 15:4 14:2 12:2 10:4', '11:4 13:2 11:2 14:8',
+    '16:2 r:2 16:2 14:2 12:4 14:4', '17:2 r:2 17:2 16:2 14:4 12:4', '14:2 16:2 18:4 16:2 14:2 11:4', '15:2 14:2 13:4 11:2 13:2 15:4',
+    '16:2 16:2 14:2 12:2 14:4 12:2 10:2', '15:2 14:2 12:4 10:2 12:2 14:4', '11:2 13:2 15:2 17:2 18:4 17:2 15:2', '14:6 11:2 14:4 r:4'],
 };
 
-/** Elección de héroe: llamada a la aventura en Si menor al galope, que se abre hacia Re mayor. */
+/** Elección de héroe: llamada a la aventura al galope en Si dórico; la sección B se abre hacia arriba, más brillante. */
 const HEROES_DATA = {
-  name: 'Un compañero, un poder', epic: 3, bpm: 128, sc: 'min', root: 47, swing: 0.06, leadVoice: 'brass', compVoice: 'piano', comp: 'charleston', bassPat: 'gallop', groove: 'drive', echo: false, leadV: 0.048,
-  prog: [0, 5, [2, 6], 0, 0, 5, [3, 4], 0],
-  tuneText: ['r:2 7:2 9:2 11:2 14:2 11:2 14:2 16:2', '14:2 16:2 18:4 16:2 14:2 12:2 14:2', '16:2 15:1 13:1 11:2 13:2 13:2 15:1 17:1 15:2 13:2', '14:3 11:1 9:2 7:2 9:2 11:2 14:4',
-    '7:2 9:1 11:1 14:2 13:2 11:2 9:2 11:2 14:2', '16:2 14:1 16:1 18:2 16:2 14:2 12:2 14:2 16:2', '14:2 12:1 10:1 12:2 14:2 15:2 13:1 11:1 13:2 15:2', '14:2 r:2 11:2 9:2 7:4 r:4'],
-  B: { k: 2, endProg: [[3, 4], 0], end: ['16:2 14:2 12:2 14:2 15:2 13:2 11:2 13:2', '14:4 r:2 11:2 7:4 r:4'] },
+  name: 'Un compañero, un poder', epic: 3, bpm: 128, sc: 'dor', root: 47, swing: 0.06, leadVoice: 'brass', compVoice: 'piano', comp: 'charleston', bassPat: 'gallop', groove: 'drive', echo: false, leadV: 0.048,
+  prog: [0, 3, 0, 6, 0, 3, 6, [3, 4],   2, 6, 3, 0, 2, 6, 3, [4, 0]],
+  tuneText: [
+    '7:2 7:2 r:2 9:2 11:2 9:2 7:4', '10:2 10:2 r:2 12:2 14:2 12:2 10:4', '7:2 9:2 11:2 13:2 14:4 11:2 9:2', '13:2 13:2 r:2 11:2 10:4 8:4',
+    '7:2 7:2 r:2 9:2 11:2 14:2 16:4', '17:2 17:2 r:2 15:2 14:2 12:2 10:4', '13:2 14:2 15:2 17:2 17:4 15:2 14:2', '14:4 12:2 10:2 11:4 13:4',
+    '16:2 r:2 16:2 15:2 13:4 11:4', '15:2 r:2 15:2 13:2 10:4 13:4', '17:2 r:2 17:2 16:2 14:4 12:4', '14:2 16:2 18:2 16:2 18:4 21:4',
+    '16:2 r:2 16:2 15:2 13:4 15:4', '15:2 17:2 18:2 17:2 17:4 15:4', '17:2 16:2 14:2 12:2 14:4 17:4', '18:4 15:2 13:2 14:6 r:2'],
 };
+
+/**
+ * Capas por nivel: cada ciudad tiene UNA melodía central y, a medida que avanzas por sus 10 niveles, se le suman capas.
+ * Así el nivel 1 suena limpio y el 10 suena a orquesta completa, sin cambiar la melodía (no cansa y se siente avanzar).
+ *   1  melodía + colchón de cuerdas + bajo mínimo      6  + arpegio
+ *   2  + bajo completo                                 7  + contramelodía (armonía una tercera debajo)
+ *   3  + percusión ligera (escobillas, shaker, rim)    8  + orquesta (timbal y metales / cuerdas)
+ *   4  + acompañamiento (acordes)                      9  + melodía doblada una octava arriba
+ *   5  + bombo y caja con redobles                    10  + eco, platillos: todo
+ */
+export const LAYERS_PER_CITY = 10;
+export const layerOfLevel = (level) => ((Math.max(1, level) - 1) % LAYERS_PER_CITY) + 1;
+export const layersFor = (layer = LAYERS_PER_CITY) => ({
+  bass: layer >= 2 ? 'full' : 'lite',
+  drums: layer >= 5 ? 'full' : layer >= 3 ? 'light' : 'none',
+  comp: layer >= 4,
+  arp: layer >= 6,
+  counter: layer >= 7,
+  orchestra: layer >= 8,
+  octave: layer >= 9,
+  tutti: layer >= 10,
+});
 
 /** Completa los 8 compases de la sección A con la B desplazada (si el tema usa el atajo `B`) hasta tener 16. */
 function expand(d) {

@@ -1,6 +1,6 @@
 import { AC, audioPageHidden, clearAudioRecoveryHint, ctx, muted } from './sound.js';
 import { zoneIdx } from '../data/zones.js';
-import { HEROES_THEME, MENU_THEME, SCALES, ZONE_THEMES, chordMidi, entryAt } from './themes.js';
+import { HEROES_THEME, LAYERS_PER_CITY, MENU_THEME, SCALES, ZONE_THEMES, chordMidi, entryAt, layerOfLevel, layersFor } from './themes.js';
 
 /* ============================ Música procedural ============================
    Secuenciador por pasos de 1/16 que toca los temas de themes.js: melodía, acordes con séptima, bajo caminante,
@@ -12,7 +12,7 @@ export const Music=(()=>{
   const THEMES=ZONE_THEMES;
 
   let bus=null,flt=null,noiseBuf=null,timer=0,playing=false,step=0,next=0,duckLv=1,audioOwner=null,muffled=false;
-  let theme=THEMES[0],baseBpm=96,tempoNow=96;
+  let theme=THEMES[0],baseBpm=96,tempoNow=96,layerNow=LAYERS_PER_CITY,layerNext=LAYERS_PER_CITY;     // capa que suena / capa que entra en el próximo compás
   const hz=m=>440*Math.pow(2,(m-69)/12);
   function init(){
     ctx();if(bus&&audioOwner===AC)return;
@@ -104,11 +104,12 @@ export const Music=(()=>{
     drive:  {k:[0,4,8,12],    s:[4,12],       h:[0,2,3,4,6,7,8,10,11,12,14,15]},
   };
   const KV={k:.085,s:.055,rim:.03,h:.013,oh:.022,sh:.01,tm:.02,rd:.013,cg:.05};
-  function drums(th,st,t,bar,E){
-    const g=GROOVES[th.groove]||GROOVES.pop,has=a=>a&&a.includes(st);
-    const fill=bar%4===3&&st>=13;                                  // redoble al final de cada frase
-    if(has(g.k)&&!(fill&&st>=14))kick(t,KV.k);
-    if(has(g.s)&&!(fill&&st>=13))snare(t,KV.s);
+  function drums(th,st,t,bar,E,mode='full',tutti=true){
+    if(mode==='none')return;
+    const g=GROOVES[th.groove]||GROOVES.pop,has=a=>a&&a.includes(st),full=mode==='full';
+    const fill=full&&bar%4===3&&st>=13;                            // redoble al final de cada frase
+    if(full&&has(g.k)&&!(fill&&st>=14))kick(t,KV.k);
+    if(full&&has(g.s)&&!(fill&&st>=13))snare(t,KV.s);
     if(fill)snare(t,.03+.012*(st-13));
     if(has(g.rim))rim(t,KV.rim);
     if(has(g.h))noise(t,.035,st%4===2?KV.h*1.3:KV.h,7000);
@@ -117,7 +118,7 @@ export const Music=(()=>{
     if(has(g.tm)){noise(t,.09,KV.tm,8000);noise(t,.07,KV.tm*.6,5500,'bandpass')}
     if(has(g.rd)||(g.rd&&st%2===0&&false))noise(t,.25,KV.rd,5200);
     if(has(g.cg))conga(t,KV.cg,st%4===2?260:330);
-    if(st===0&&bar%8===0&&bar>0)noise(t,1.2,.02+.004*E,3800);     // platillo al empezar cada sección
+    if(tutti&&st===0&&bar%8===0&&bar>0)noise(t,1.2,.02+.004*E,3800);     // platillo al empezar cada sección
   }
 
   /* Riffs de bajo: [paso, intervalo]. r=fundamental, 3, 5, 7, 8=octava. El bajo siempre suena en 40-52 (se oye hasta en el móvil). */
@@ -136,7 +137,8 @@ export const Music=(()=>{
   const COMP={charleston:[0,6],offbeat:[4,12],oompah:[4,12],strum:[0,6,10],chop16:[0,3,6,8,11,14],skank:[2,6,10,14],montuno:[3,6,10,12,14],pump:[0,2,4,6,8,10,12,14],arp:[],none:[]};
 
   function play(s,t){
-    const th=theme,bar=Math.floor(s/16),st=s%16,sd=60/bpm()/4,E=th.epic||0;
+    if(s%16===0)layerNow=layerNext;                                          // las capas entran siempre al empezar un compás
+    const th=theme,bar=Math.floor(s/16),st=s%16,sd=60/bpm()/4,E=th.epic||0,L=layersFor(layerNow);
     const chord=chordMidi(th,entryAt(th,bar,st));                            // [fundamental, 3ª, 5ª, 7ª, …]
     const firstOfBar=chordMidi(th,entryAt(th,bar,0));
     const nextRoot=chordMidi(th,entryAt(th,bar+1,0))[0];
@@ -146,7 +148,9 @@ export const Music=(()=>{
 
     // bajo: caminante (jazz) o riff sincopado según el estilo
     let bn=null;
-    if(th.bassPat==='walk'){
+    if(L.bass==='lite'){                                                    // bajo mínimo: solo la fundamental en los tiempos 1 y 3
+      if(st===0||st===8)bn=chord[0];
+    }else if(th.bassPat==='walk'){
       if(st===0)bn=firstOfBar[0];
       else if(st===4)bn=firstOfBar[2];
       else if(st===8)bn=chord[0];
@@ -158,21 +162,21 @@ export const Music=(()=>{
     if(bn!==null)voice('upright',bassReg(bn),t,.26,th.bassV);
 
     // acompañamiento
-    if((COMP[th.comp]||[]).includes(st)){
+    if(L.comp&&(COMP[th.comp]||[]).includes(st)){
       const notes=th.comp==='strum'?chord.slice(0,4):chord.slice(1,4);
       notes.forEach((m,i)=>voice(th.compVoice,m+12,t+i*.01,.13,th.compV));
     }
     // arpegio suave
-    if(th.arpVoice){
+    if(L.arp){
       const every=th.arpEvery||2,pat=th.arpPat||[0,1,2,1];
-      if(st%every===0)voice(th.arpVoice,chord[pat[(st/every)%pat.length]%chord.length]+12,t,Math.max(.2,sd*2),th.arpV);
+      if(st%every===0)voice(th.arpVoice||'celesta',chord[pat[(st/every)%pat.length]%chord.length]+12,t,Math.max(.2,sd*2),th.arpV);
     }
 
     // batería
-    drums(th,st,t,bar,E);
+    drums(th,st,t,bar,E,L.drums,L.tutti);
 
     // capa épica: timbal en las frases y metales que refuerzan la melodía
-    if(E>=2){
+    if(E>=2&&L.orchestra){
       if(st===0&&bar%4===0)timpani(t,chord[0]-24,.055);
       if(bar%4===3&&st>=12&&st%2===0)timpani(t,chord[2]-24,.03+.004*(st-12));
     }
@@ -180,9 +184,11 @@ export const Music=(()=>{
     // melodía del tema (con refuerzo de metales y eco rítmico si el tema lo pide)
     for(const [at,deg,dur] of th.tune[bar%th.tune.length])if(at===st){
       voice(th.leadVoice,noteOf(th,deg)+12,t,dur*sd,th.leadV);
-      if(E>=2)voice('brass',noteOf(th,deg),t,dur*sd,th.leadV*.5);
-      if(E>=3)voice('brass',noteOf(th,deg)+24,t,dur*sd*.9,th.leadV*.22);
-      if(th.echo&&dur>=2)voice('pizz',noteOf(th,deg)+12,t+sd*3,.1,th.leadV*.3);   // eco a una corchea con puntillo
+      if(L.counter&&dur>=3)voice(th.counterVoice||'horn',noteOf(th,deg-2),t+sd*.02,dur*sd,th.leadV*.4);   // armonía una tercera debajo
+      if(L.orchestra)voice(E>=2?'brass':'strings',noteOf(th,deg),t,dur*sd,th.leadV*(E>=2?.5:.35));
+      if(L.octave)voice('celesta',noteOf(th,deg)+24,t,dur*sd*.9,th.leadV*.3);
+      if(L.octave&&E>=3)voice('brass',noteOf(th,deg)+24,t,dur*sd*.9,th.leadV*.22);
+      if(L.tutti&&th.echo&&dur>=2)voice('pizz',noteOf(th,deg)+12,t+sd*3,.1,th.leadV*.3);   // eco a una corchea con puntillo
     }
   }
   function loop(){
@@ -211,12 +217,15 @@ export const Music=(()=>{
     stop(fade=.5){clearAudioRecoveryHint();playing=false;clearInterval(timer);timer=0;if(bus&&audioOwner.state!=='closed')bus.gain.setTargetAtTime(0,audioOwner.currentTime,fade/3)},
     background(){clearInterval(timer);timer=0},
     recover(){if(!playing||muted||document.hidden||audioPageHidden)return false;init();return armSequencer()},
-    setLevel(n){useTheme(THEMES[zoneIdx(n)])},
+    /** Fija la capa (1-10) a mano; entra en el próximo compás (lo usa melodies.html). */
+    setLayer(n){layerNext=Math.max(1,Math.min(LAYERS_PER_CITY,n))},
+    /** Tema de la ciudad del nivel `n` y la capa que le toca (1 = solo lo básico … 10 = todo). */
+    setLevel(n){useTheme(THEMES[zoneIdx(n)]);layerNext=layerOfLevel(n);if(!playing)layerNow=layerNext},
     /** Toca un tema concreto desde el principio (lo usa melodies.html). */
-    playTheme(th){duckLv=1;muffled=false;theme=th;baseBpm=th.bpm;tempoNow=th.bpm;step=0;if(playing){playing=false;clearInterval(timer);timer=0}this.start()},
+    playTheme(th,layer=LAYERS_PER_CITY){duckLv=1;muffled=false;theme=th;baseBpm=th.bpm;tempoNow=th.bpm;step=0;layerNow=layerNext=layer;if(playing){playing=false;clearInterval(timer);timer=0}this.start()},
     /** Música fuera de partida: 'menu' (menú principal) o 'heroes' (elección de héroe). Arranca si hace falta. */
     scene(name){
-      useTheme(name==='heroes'?HEROES_THEME:MENU_THEME);
+      useTheme(name==='heroes'?HEROES_THEME:MENU_THEME);layerNext=LAYERS_PER_CITY;if(!playing)layerNow=layerNext;
       tempoNow=baseBpm;duckLv=1;muffled=false;
       if(flt)flt.frequency.setTargetAtTime(9000,AC.currentTime,.15);
       this.start();
@@ -224,7 +233,7 @@ export const Music=(()=>{
     duck(v){duckLv=v;if(bus&&playing)bus.gain.setTargetAtTime(vol(),AC.currentTime,.25)},
     muffle(on){muffled=!!on;if(flt)flt.frequency.setTargetAtTime(on?900:9000,AC.currentTime,.15)},
     refresh(){if(muted)this.stop(.2);else if(bus&&playing)bus.gain.setTargetAtTime(vol(),AC.currentTime,.1)},
-    bpm,targetBpm,get themeName(){return theme.name},get playing(){return playing}
+    bpm,targetBpm,get layer(){return layerNow},get themeName(){return theme.name},get playing(){return playing}
   };
 })();
 /**

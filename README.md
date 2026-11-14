@@ -212,6 +212,11 @@ a recargar la página y a las partidas guardadas antiguas.
 - **Poderes:** turnos de reserva de Lía, deshacer de Jean proporcional al tablero (y migración de guardados antiguos), bono de Juth sin duplicarse, Práctica sin consumo.
 - **Reglas:** movimientos restantes y estados ok / aviso / último / eliminado.
 
+## Música
+
+Cada ciudad tiene UNA melodía central y, a medida que subes por sus 10 niveles, se le suman capas (nivel 1: melodía, cuerdas y bajo mínimo; 2: bajo completo; 3: percusión ligera; 4: acordes; 5: bombo y caja; 6: arpegio; 7: contramelodía; 8: orquesta; 9: melodía doblada una octava arriba; 10: todo). Al pasar a la ciudad siguiente cambia el tema y vuelve a la capa 1. Los temas y las capas están en [`src/audio/themes.js`](src/audio/themes.js) y el secuenciador en [`src/audio/music.js`](src/audio/music.js).
+Para escucharlas: `npm run melodies:html` genera `output/melodias.html` (un solo archivo, se abre con doble clic) con un deslizador de capa y un botón «Recorrer 1→10»; en desarrollo también está en `/melodies.html`.
+
 ## Tienda
 
 El botón **🛒 Tienda** (junto a Deshacer y Pista) vende ayudas que se pagan con los **puntos de la aventura**: lo que gastas

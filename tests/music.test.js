@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ALL_THEMES, ZONE_THEMES, MENU_THEME, HEROES_THEME, SCALES, parseBar, shiftBar, shiftEntry, chordMidi, entryAt } from '../src/audio/themes.js';
+import { layersFor, layerOfLevel, LAYERS_PER_CITY, ALL_THEMES, ZONE_THEMES, MENU_THEME, HEROES_THEME, SCALES, parseBar, shiftBar, shiftEntry, chordMidi, entryAt } from '../src/audio/themes.js';
 
 const degreesOf = (e, n) => {
   const d = typeof e === 'string' ? Number(e.split(':')[0]) : e;
@@ -101,6 +101,31 @@ describe('temas musicales', () => {
     for (const th of ALL_THEMES) {
       const durs = new Set(th.tune.flat().map(([, , d]) => d));
       expect(durs.size, th.name).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it('capas por nivel: el nivel dentro de la ciudad decide la capa y cada capa suma algo sin quitar nada', () => {
+    expect([1, 2, 10, 11, 20, 21, 100].map(layerOfLevel)).toEqual([1, 2, 10, 1, 10, 1, 10]);
+    const flags = (l) => Object.entries(layersFor(l)).flatMap(([k, v]) => (v === true ? [k] : v === 'full' ? [k + ':full'] : v === 'light' ? [k + ':light'] : v === 'lite' ? [k + ':lite'] : []));
+    let prev = 0;
+    for (let l = 1; l <= LAYERS_PER_CITY; l++) {
+      const n = flags(l).length;
+      expect(n, `capa ${l}`).toBeGreaterThanOrEqual(prev);
+      prev = n;
+    }
+    expect(layersFor(1).drums).toBe('none');
+    expect(layersFor(3).drums).toBe('light');
+    expect(layersFor(5).drums).toBe('full');
+    expect(Object.values(layersFor(10)).every((v) => v === true || v === 'full')).toBe(true);
+  });
+
+  it('menú y héroes tienen una sección B propia (no es la A desplazada)', () => {
+    for (const th of [MENU_THEME, HEROES_THEME]) {
+      const a = th.tuneText.slice(0, 8).join('|');
+      const b = th.tuneText.slice(8).join('|');
+      expect(a).not.toBe(b);
+      const cells = th.tuneText.slice(8).map((t) => t.replace(/[0-9]+:/g, ''));
+      expect(new Set(cells).size, th.name).toBeGreaterThanOrEqual(2);
     }
   });
 });

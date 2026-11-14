@@ -85,4 +85,34 @@ describe('secuenciador (con audio simulado)', () => {
     Music.stop(0.1);
     expect(Music.playing).toBe(false);
   });
+
+  it('capas por nivel: cada nivel de la ciudad suma notas (1 = básico … 10 = todo) y la melodía no cambia', () => {
+    let prev = 0;
+    const counts = [];
+    for (let l = 1; l <= 10; l++) {
+      Music.setLevel(l);                 // ciudad 1, nivel l → capa l
+      Music.start();
+      play(2300);                        // deja entrar la capa en el siguiente compás
+      expect(Music.layer).toBe(l);
+      stats.osc = 0;
+      play(15500);
+      counts.push(stats.osc);
+      expect(stats.osc, `capa ${l}`).toBeGreaterThanOrEqual(prev * 0.97);
+      prev = stats.osc;
+    }
+    expect(counts[9]).toBeGreaterThan(counts[0] * 3);   // el nivel 10 suena mucho más lleno que el 1
+    expect(new Set(counts).size).toBeGreaterThanOrEqual(7);
+    Music.stop(0.1);
+  });
+
+  it('el nivel 11 vuelve a la capa 1 con el tema de la ciudad siguiente', () => {
+    Music.setLevel(10);
+    Music.start();
+    play(2300);
+    expect(Music.layer).toBe(10);
+    Music.setLevel(11);
+    play(5000);
+    expect(Music.layer).toBe(1);
+    Music.stop(0.1);
+  });
 });

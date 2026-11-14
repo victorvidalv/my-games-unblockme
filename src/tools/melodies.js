@@ -3,7 +3,7 @@
  * y la reproduce con el mismo secuenciador del juego. No forma parte del juego.
  */
 import { Music } from '../audio/music.js';
-import { ALL_THEMES, ZONE_THEMES, SCALES, chordMidi, entryAt } from '../audio/themes.js';
+import { ALL_THEMES, ZONE_THEMES, SCALES, LAYERS_PER_CITY, chordMidi, entryAt } from '../audio/themes.js';
 import { ZONES } from '../data/zones.js';
 
 const NAMES = ['C', 'C♯', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'A♭', 'A', 'B♭', 'B'];
@@ -51,13 +51,21 @@ function rollSvg(th) {
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:${Math.min(240, H)}px">${g}</svg>`;
 }
 
+/** Qué suma cada capa (nivel 1-10 de una ciudad). */
+const LAYER_TEXT = [
+  'Solo la melodía, el colchón de cuerdas y un bajo mínimo', '+ bajo completo', '+ percusión ligera (escobillas, shaker, rim)', '+ acompañamiento (acordes)',
+  '+ bombo y caja con redobles', '+ arpegio', '+ contramelodía (una tercera por debajo)', '+ orquesta (timbal y metales o cuerdas)',
+  '+ melodía doblada una octava arriba', '+ eco y platillos: todo a la vez',
+];
 const list = document.getElementById('list');
 const now = document.getElementById('now');
 let playingId = null;
+let tourTimer = 0;
 let raf = 0;
 let startedAt = 0;
 
 function stopAll() {
+  clearInterval(tourTimer);
   Music.stop(0.15);
   cancelAnimationFrame(raf);
   playingId = null;
@@ -85,12 +93,30 @@ ALL_THEMES.forEach((th, i) => {
       <span class="tag">swing ${Math.round(th.swing * 100)}%</span><span class="tag">melodía: ${INSTR[th.leadVoice] ?? th.leadVoice}</span>
       <span class="tag">acompaña: ${INSTR[th.compVoice] ?? th.compVoice}</span><span class="tag">ritmo: ${GROOVE_NAMES[th.groove] ?? th.groove}</span><span class="tag">bajo: ${th.bassPat}</span><span class="tag">épica ${th.epic}/3</span>
     </div>
+    <div class="layers">
+      <label>Capa (nivel de la ciudad) <input type="range" min="1" max="${LAYERS_PER_CITY}" value="${LAYERS_PER_CITY}" class="lay"> <b class="lv">${LAYERS_PER_CITY}</b></label>
+      <button class="tour">⇢ Recorrer 1→${LAYERS_PER_CITY}</button><small class="what">${LAYER_TEXT[LAYERS_PER_CITY - 1]}</small>
+    </div>
     <div class="chords">${chords}</div>
     <div class="roll">${rollSvg(th)}<div class="cursor"></div></div>
     <div class="legend">Eje horizontal: 16 compases. Cada barra es una nota (largo = duración, altura = tono, color = nota).</div>`;
   list.append(card);
 
-  const btn = card.querySelector('button');
+  const btn = card.querySelector('.head button');
+  const slider = card.querySelector('.lay');
+  const lv = card.querySelector('.lv');
+  const what = card.querySelector('.what');
+  const tour = card.querySelector('.tour');
+  const setLayer = (n) => { slider.value = n; lv.textContent = n; what.textContent = LAYER_TEXT[n - 1]; Music.setLayer(n); };
+  slider.oninput = () => { clearInterval(tourTimer); lv.textContent = slider.value; what.textContent = LAYER_TEXT[slider.value - 1]; if (playingId === i) Music.setLayer(Number(slider.value)); };
+  tour.onclick = () => {
+    if (playingId !== i) btn.onclick();
+    clearInterval(tourTimer);
+    let n = 1;
+    setLayer(1);
+    Music.playTheme(th, 1);
+    tourTimer = setInterval(() => { n++; if (n > LAYERS_PER_CITY) { clearInterval(tourTimer); return; } setLayer(n); }, (60 / th.bpm) * 4 * 2 * 1000);   // una capa nueva cada 2 compases
+  };
   const cursor = card.querySelector('.cursor');
   const spans = [...card.querySelectorAll('.chords span')];
   btn.onclick = () => {
@@ -99,7 +125,7 @@ ALL_THEMES.forEach((th, i) => {
     playingId = i;
     btn.classList.add('on');
     btn.textContent = '■ Parar';
-    Music.playTheme(th);
+    Music.playTheme(th, Number(slider.value));
     startedAt = performance.now() + 150;
     now.textContent = `Sonando: ${th.name}`;
     cursor.style.display = 'block';

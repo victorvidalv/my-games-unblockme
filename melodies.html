@@ -27,13 +27,16 @@
   .roll{position:relative}
   svg{width:100%;height:auto;display:block;border-radius:8px;background:#0c1820}
   .cursor{position:absolute;top:0;bottom:0;width:2px;background:#ffd98a;box-shadow:0 0 8px #ffd98a;pointer-events:none;display:none}
+  .layers{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0;padding:8px 10px;background:#ffffff08;border-radius:9px}
+  .layers input{vertical-align:middle;width:160px}.layers .lv{display:inline-block;min-width:1.4em;text-align:center;color:#ffd98a}
+  .layers .what{color:var(--mut)}
   .legend{color:var(--mut);font-size:12px;margin-top:6px}
 </style>
 </head>
 <body>
 <main>
   <h1>Melodías de SLIDE &amp; SLAY</h1>
-  <p class="lead">Una por ciudad, más el menú y la elección de héroe. Pulsa <b>▶ Escuchar</b> para oírla con el mismo motor del juego. Cada recuadro del piano muestra la melodía (16 compases); arriba, los acordes.</p>
+  <p class="lead">Una por ciudad, más el menú y la elección de héroe. Pulsa <b>▶ Escuchar</b> para oírla con el mismo motor del juego. En cada ciudad la melodía es la misma y <b>va sumando capas</b> a medida que subes de nivel (1→10): mueve el deslizador o pulsa <b>Recorrer</b> para oírlo. Cada recuadro del piano muestra la melodía (16 compases); arriba, los acordes.</p>
   <div class="bar"><button id="stop">■ Parar todo</button><span id="now" class="tag">Nada sonando</span></div>
   <div id="list"></div>
   <button id="audioRecover" hidden></button>
