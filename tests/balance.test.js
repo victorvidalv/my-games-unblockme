@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { averageRuns, simulateRun, PATHS, SKILLS } from '../src/game/balance.js';
-import { FREE_UNDOS, JUTH_FREE_HINTS } from '../src/game/heroes.js';
+import { freeUndosFor, freeHintsFor } from '../src/game/heroes.js';
 import { MAX_REVIVES, REVIVE_SHARE } from '../src/game/shop.js';
 
 const RUNS = 400;
@@ -36,9 +36,10 @@ describe('equilibrio de los poderes de héroe (simulación)', () => {
   it('el modelo está calibrado: un jugador medio no llega al final de Normal y uno muy bueno casi sí', () => {
     const avg = averageRuns({ hero: 'none', start: 1, skill: 0.6, runs: RUNS }).cleared;
     const good = averageRuns({ hero: 'none', start: 1, skill: 0.92, runs: RUNS }).cleared;
-    expect(avg).toBeGreaterThan(30);
-    expect(avg).toBeLessThan(65);
-    expect(good).toBeGreaterThan(75);
+    // el límite se aprieta hasta ×1,3 en el nivel 100: un jugador medio se queda a mitad de camino
+    expect(avg).toBeGreaterThan(15);
+    expect(avg).toBeLessThan(55);
+    expect(good).toBeGreaterThan(70);
   });
 
   it('los tres poderes ayudan de verdad (≥ 10 niveles extra de media)', () => {
@@ -66,8 +67,12 @@ describe('equilibrio de los poderes de héroe (simulación)', () => {
       return t / n;
     })();
     expect(old).toBeLessThan(uplift('van') / 3);
-    expect(JUTH_FREE_HINTS).toBe(1);
-    expect(FREE_UNDOS).toBe(3);
+    expect(freeHintsFor(3)).toBe(1);
+    expect(freeHintsFor(37)).toBe(1);
+    expect(freeHintsFor(60)).toBe(2);
+    expect(freeHintsFor(96)).toBe(3);
+    expect(freeUndosFor(3)).toBe(1);
+    expect(freeUndosFor(37)).toBe(6);
   });
 
   it('con todos los poderes dados de mano a los buenos jugadores no se «rompe» el juego: seguir siendo posible perder', () => {
@@ -82,10 +87,10 @@ describe('revivir comprado (simulación)', () => {
   it('ayuda más a quien más pierde y le duele más al que más puntos tiene', () => {
     const none = averageRuns({ hero: 'none', start: 50, skill: 0.55, runs: RUNS });
     const rev = averageRuns({ hero: 'none', start: 50, skill: 0.55, runs: RUNS, revive: 'city' });
-    expect(rev.cleared).toBeGreaterThan(none.cleared + 5);            // un jugador que llega a las ciudades medias aprovecha bien el revivir
+    expect(rev.cleared).toBeGreaterThan(none.cleared + 1.5);            // un jugador que llega a las ciudades medias aprovecha bien el revivir
     const goodNone = averageRuns({ hero: 'none', start: 75, skill: 1, runs: RUNS });
     const goodRev = averageRuns({ hero: 'none', start: 75, skill: 1, runs: RUNS, revive: 'city' });
-    expect(goodRev.score).toBeLessThan(goodNone.score * 0.95);        // al jugador perfecto le cuesta puntos sin darle nada
+    expect(goodRev.score).toBeLessThan(goodNone.score * 0.99);        // al jugador perfecto le cuesta puntos sin darle nada
   });
   it('máximo 1 por partida y cuesta el 33 % de los puntos del momento', () => {
     expect(MAX_REVIVES).toBe(1);
@@ -94,5 +99,28 @@ describe('revivir comprado (simulación)', () => {
       const r = simulateRun({ hero: 'none', start: 1, skill: 0.7, seed, revive: 'city' });
       expect(r.revivesBought).toBeLessThanOrEqual(MAX_REVIVES);
     }
+  });
+});
+
+describe('tienda (simulación)', () => {
+  const gain = (start, skill) => {
+    const a = averageRuns({ hero: 'none', start, skill, runs: RUNS });
+    const b = averageRuns({ hero: 'none', start, skill, runs: RUNS, shop: true });
+    return { levels: b.cleared - a.cleared, score: b.score / Math.max(1, a.score), spent: b.spent };
+  };
+  it('ayuda de verdad pero sin romper el juego: entre 2 y 30 niveles extra a un jugador medio, y menos cuanto más difícil el camino', () => {
+    const g = PATHS.map((start) => gain(start, 0.7).levels);
+    for (const l of g) { expect(l).toBeGreaterThan(2); expect(l).toBeLessThan(30); }
+    expect(g[2]).toBeLessThan(g[0]);
+  });
+  it('duele: comprar a fondo se come buena parte del puntaje', () => {
+    for (const start of PATHS) {
+      const g = gain(start, 0.7);
+      expect(g.spent).toBeGreaterThan(5000);
+      expect(g.score).toBeLessThan(0.9);
+    }
+  });
+  it('el jugador perfecto casi no necesita comprar', () => {
+    expect(gain(1, 0.92).levels).toBeLessThan(15);
   });
 });

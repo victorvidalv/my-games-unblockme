@@ -2,28 +2,66 @@
  * Héroes y poderes. Los datos (nombre, texto) y las reglas viven juntos aquí; las reglas son
  * funciones puras sobre el objeto `run` (la aventura en curso), sin DOM, y están cubiertas por tests.
  */
+import { moveLimit } from '../engine/difficulty.js';
+
 /* Ojo: el identificador interno de Juth sigue siendo 'van' (imágenes heroes/van*.webp y partidas guardadas). Solo cambia el nombre que se ve. */
 export const HEROES = [
-  { id: 'lia', name: 'Lía', role: 'Portadora de la Brasa', icon: 'heart', color: '#68d8bd', power: 'Una segunda oportunidad', short: '1 vida extra por partida', detail: 'Resiste una caída y vuelve a intentar el tablero sin perder tus puntos.', quote: '«Incluso la ceniza recuerda el calor.»' },
-  { id: 'jean', name: 'Jean', role: 'Vigía del Péndulo', icon: 'clock', color: '#8fb9ff', power: 'Tres pasos atrás', short: '3 deshacer gratis por tablero', detail: 'Desanda tus tres últimos movimientos sin penalización, uno a uno.', quote: '«Todo error deja una grieta por donde volver.»' },
-  { id: 'van', name: 'Juth', role: 'Escriba de las Runas', icon: 'stars', color: '#c5a2ff', power: 'Una luz en cada tablero', short: '1 pista gratis por tablero', detail: 'Revela un paso seguro en cada tablero sin gastar tu reserva de pistas.', quote: '«Lo que no se nombra sigue buscando salida.»' },
+  { id: 'lia', name: 'Lía', role: 'Portadora de la Brasa', icon: 'heart', color: '#68d8bd', power: 'Turnos de reserva', short: '+19 % de turnos en cada tablero', detail: 'Cada tablero te da un 19 % más de turnos (mínimo 2). Perdona los errores pequeños sin quitarte el reto.', quote: '«Incluso la ceniza recuerda el calor.»' },
+  { id: 'jean', name: 'Jean', role: 'Vigía del Péndulo', icon: 'clock', color: '#8fb9ff', power: 'Tres pasos atrás', short: 'Deshacer gratis según el tablero', detail: 'Desanda tus tres últimos movimientos sin penalización, uno a uno.', quote: '«Todo error deja una grieta por donde volver.»' },
+  { id: 'van', name: 'Juth', role: 'Escriba de las Runas', icon: 'stars', color: '#c5a2ff', power: 'Una luz en cada tablero', short: 'Pistas gratis según el tablero', detail: 'Revela un paso seguro en cada tablero sin gastar tu reserva de pistas.', quote: '«Lo que no se nombra sigue buscando salida.»' },
 ];
 
 export const heroById = (id) => HEROES.find((h) => h.id === id) || HEROES[0];
 
-export const FREE_UNDOS = 3; // Jean: deshacer gratis por tablero
-export const JUTH_FREE_HINTS = 1; // Juth: pistas gratis por tablero (equilibrado con simulaciones: ver src/game/balance.js)
+/* Los poderes de Jean y Juth crecen con el tablero (su mínimo de movimientos `opt`), así ayudan igual de bien al principio
+   y al final sin regalar los niveles fáciles. Valores calibrados con `npm run simulate` (src/game/balance.js). */
+export const JEAN_UNDO_SHARE = 0.22; // deshacer gratis = 22 % del mínimo del tablero (Normal)…
+export const JEAN_UNDO_MIN = 1;
+export const JEAN_UNDO_MAX = 6;      // …entre 1 y 6
+export const JUTH_HINT_EVERY = 32;   // pistas gratis = 1 por cada 32 movimientos del mínimo (redondeado)…
+export const JUTH_HINT_MAX = 3;      // …entre 1 y 3
+/** Qué parte de sus poderes conserva el héroe en cada camino: Normal 100 %, Difícil 75 %, Experto 50 %. */
+export const POWER_SCALE = { 1: 1, 50: 0.75, 75: 0.5 };
+export const powerScale = (start = 1) => POWER_SCALE[start >= 75 ? 75 : start >= 50 ? 50 : 1];
+
+/** ¿Este tablero lleva pista gratis de Juth? Normal: todos; Difícil: ~9 de cada 10; Experto: ~8 de cada 10 (repartidos de forma pareja). */
+export const juthActive = (level = 1, start = 1) => {
+  const k = powerScale(start) ** 0.3; // las pistas gratis pesan más que el resto de poderes: se recortan menos
+  return Math.floor(level * k + 1e-9) > Math.floor((level - 1) * k + 1e-9);
+};
+
+export const freeUndosFor = (opt = 10, start = 1) => {
+  const k = powerScale(start);
+  return Math.max(JEAN_UNDO_MIN, Math.min(Math.max(1, Math.round(JEAN_UNDO_MAX * k)), Math.round(opt * JEAN_UNDO_SHARE * k)));
+};
+export const freeHintsFor = (opt = 10, start = 1) => {
+  const k = powerScale(start);
+  return Math.max(1, Math.min(Math.max(1, Math.round(JUTH_HINT_MAX * k)), Math.round((opt / JUTH_HINT_EVERY) * k)));
+};
 export const CITY_EVERY = 10; // niveles por ciudad
 export const HINT_EVERY = 5; // todos los héroes: +1 pista cada 5 niveles
 
 const isPractice = (mode) => mode === 'p';
 
-/* ───────────── Lía: una segunda oportunidad por aventura ───────────── */
+/* ───────────── Lía: turnos de reserva (un % más de turnos en cada tablero) ───────────── */
 
-/** ¿Puede Lía salvarte al caer? (una vez por aventura; no aplica en Práctica, donde no se pierde) */
-export const canRescue = (heroId, run, mode) => heroId === 'lia' && !isPractice(mode) && !run.lifeUsed;
+export const LIA_TURNS_SHARE = 0.23; // +23 % del límite de movimientos (calibrado con npm run simulate)
+export const LIA_MIN_TURNS = 2;     // y como mínimo 2 turnos
 
-/** Foto del tablero para repetirlo desde el principio con 0 movimientos (la usan Lía y el revivir comprado). */
+/** Turnos extra que da el héroe sobre un límite base (solo Lía). */
+export const bonusTurns = (heroId, baseLimit, start = 1) => {
+  if (heroId !== 'lia') return 0;
+  const k = powerScale(start);
+  return Math.max(Math.max(1, Math.round(LIA_MIN_TURNS * k)), Math.round(baseLimit * LIA_TURNS_SHARE * k));
+};
+
+/** Límite de movimientos de un tablero de mínimo `opt` para ese héroe y camino. */
+export const heroLimit = (heroId, opt, start = 1, level = 1) => {
+  const base = moveLimit(opt, start, level);
+  return base + bonusTurns(heroId, base, start);
+};
+
+/** Foto del tablero para repetirlo desde el principio con 0 movimientos (la usa el revivir). */
 export function snapshotRescue(G) {
   return {
     level: G.n,
@@ -35,21 +73,16 @@ export function snapshotRescue(G) {
   };
 }
 
-/** Gasta la vida extra de Lía y guarda el tablero para repetirlo. */
-export function useRescue(run, G) {
-  run.lifeUsed = true;
-  run.rescue = { ...snapshotRescue(G), kind: 'lia' };
-}
-
 /* ───────────── Jean: tres pasos atrás gratis por tablero ───────────── */
 
 /** Deshacer gratis que le quedan a Jean en `level` (0 para los demás héroes). */
-export function freeUndosLeft(heroId, run, level) {
+export function freeUndosLeft(heroId, run, level, opt) {
   if (!run || heroId !== 'jean') return 0;
+  const total = freeUndosFor(opt, run.start);
   let used = 0;
-  if (run.undoUsedLevel === level) used = Math.max(0, Math.min(FREE_UNDOS, run.undoUsedCount || 0));
+  if (run.undoUsedLevel === level) used = Math.max(0, Math.min(total, run.undoUsedCount || 0));
   else if (run.undoUsedAt === level) used = 1; // compatibilidad con partidas guardadas antiguas
-  return FREE_UNDOS - used;
+  return total - used;
 }
 
 /**
@@ -58,12 +91,12 @@ export function freeUndosLeft(heroId, run, level) {
  *  - Jean con deshacer gratis: quita el movimiento y gasta uno de sus tres.
  *  - Resto: deshacer cuenta como 1 movimiento más.
  */
-export function applyUndo({ heroId, run, mode, level, moves }) {
+export function applyUndo({ heroId, run, mode, level, moves, opt }) {
   const practice = isPractice(mode);
-  const left = freeUndosLeft(heroId, run, level);
+  const left = freeUndosLeft(heroId, run, level, opt);
   const free = practice || left > 0;
   if (!practice && free) {
-    run.undoUsedCount = FREE_UNDOS - left + 1;
+    run.undoUsedCount = freeUndosFor(opt, run.start) - left + 1;
     run.undoUsedLevel = level;
     run.undoUsedAt = level;
   }
@@ -73,19 +106,20 @@ export function applyUndo({ heroId, run, mode, level, moves }) {
 /* ───────────── Pistas: base para todos + pista gratis de Juth ───────────── */
 
 /** Pistas gratis que le quedan a Juth en `level` (0 para los demás héroes). No gastan tu reserva de pistas. */
-export function freeHintsLeft(heroId, run, level) {
+export function freeHintsLeft(heroId, run, level, opt) {
   if (!run || heroId !== 'van') return 0;
-  const used = run.freeHintLevel === level ? Math.max(0, Math.min(JUTH_FREE_HINTS, run.freeHintCount || 0)) : 0;
-  return JUTH_FREE_HINTS - used;
+  const total = juthActive(level, run.start) ? freeHintsFor(opt, run.start) : 0;
+  const used = run.freeHintLevel === level ? Math.max(0, Math.min(total, run.freeHintCount || 0)) : 0;
+  return total - used;
 }
 
 /**
  * Gasta una pista: la gratis de Juth si le queda en este tablero; si no, una de la reserva.
  * Devuelve {ok, free}. (ok=false si no hay ninguna.) En Práctica no gasta nada.
  */
-export function spendHint({ heroId, run, mode, level }) {
+export function spendHint({ heroId, run, mode, level, opt }) {
   if (isPractice(mode)) return { ok: true, free: true };
-  if (freeHintsLeft(heroId, run, level) > 0) {
+  if (freeHintsLeft(heroId, run, level, opt) > 0) {
     run.freeHintCount = (run.freeHintLevel === level ? run.freeHintCount || 0 : 0) + 1;
     run.freeHintLevel = level;
     return { ok: true, free: true };
@@ -98,7 +132,7 @@ export function spendHint({ heroId, run, mode, level }) {
 }
 
 /** ¿Se puede pedir una pista ahora? (gratis o de la reserva) */
-export const canHint = (heroId, run, mode, level) => isPractice(mode) || freeHintsLeft(heroId, run, level) > 0 || (run.hints || 0) > 0;
+export const canHint = (heroId, run, mode, level, opt) => isPractice(mode) || freeHintsLeft(heroId, run, level, opt) > 0 || (run.hints || 0) > 0;
 
 /**
  * Pistas ganadas al completar `level`; suma a run.hints y devuelve cuántas.

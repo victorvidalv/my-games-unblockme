@@ -1,7 +1,8 @@
 import { Music, setTensionFx } from '../audio/music.js';
 import { $, cssUrl } from '../dom.js';
 import { saveRun } from '../game/session.js';
-import { HEROES, canHint, freeHintsLeft } from '../game/heroes.js';
+import { HEROES, canHint, freeHintsLeft, bonusTurns } from '../game/heroes.js';
+import { moveLimit } from '../engine/difficulty.js';
 import { reviveCost } from '../game/shop.js';
 import { S, undosLeft, heroOf, pathOf, persist, store } from '../state.js';
 import { boardEl, layout, updateHud } from './board.js';
@@ -28,8 +29,8 @@ export function chooseHero(start,mode){
 export function updateHeroHud(){
  if(!S.run||!S.G)return;const h=heroOf(),prac=S.run.mode==='p';
  $('heroHudImg').src=`heroes/${h.id}.webp`;$('heroHudImg').alt=h.name;$('heroHudName').textContent=h.name;
- $('heroHudPower').textContent=prac?'Práctica · ayudas ilimitadas':h.id==='lia'?(S.run.lifeUsed?'Segunda oportunidad usada':'Segunda oportunidad disponible'):h.id==='jean'?`${undosLeft()} deshacer gratis`:(freeHintsLeft(h.id,S.run,S.G.n)>0?'Pista gratis disponible':'Pista gratis usada');
- $('hintN').textContent=prac?'∞':freeHintsLeft(h.id,S.run,S.G.n)>0?'gratis':S.run.hints;$('bHint').disabled=!canHint(h.id,S.run,S.run.mode,S.G.n);
+ $('heroHudPower').textContent=prac?'Práctica · ayudas ilimitadas':h.id==='lia'?`+${bonusTurns('lia',moveLimit(S.G.opt,S.run.start,S.run.level),S.run.start)} turnos de reserva`:h.id==='jean'?`${undosLeft()} deshacer gratis`:(freeHintsLeft(h.id,S.run,S.G.n,S.G.opt)>0?'Pista gratis disponible':'Pista gratis usada');
+ $('hintN').textContent=prac?'∞':freeHintsLeft(h.id,S.run,S.G.n,S.G.opt)>0?'gratis':S.run.hints;$('bHint').disabled=!canHint(h.id,S.run,S.run.mode,S.G.n,S.G.opt);
  $('bUndo').querySelector('em').textContent=prac?'gratis':h.id==='jean'&&undosLeft()>0?undosLeft()+' gratis':'+1 mov';
 }
 /** Pantalla de «otra oportunidad»: la vida gratis de Lía o un revivir comprado (se repite el tablero con 0 movimientos). */

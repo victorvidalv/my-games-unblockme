@@ -113,9 +113,9 @@ describe('codificación', () => {
 });
 
 describe('dificultad', () => {
-  it('rateAt sube linealmente de la dificultad inicial a 100', () => {
+  it('rateAt sube sin bajar nunca desde la dificultad inicial de cada camino hasta 100', () => {
     for (const start of [1, 50, 75]) {
-      expect(rateAt(start, 1)).toBe(start);
+      expect(rateAt(start, 1)).toBe(start === 1 ? 1 : start === 50 ? 35 : 55);
       expect(rateAt(start, MAX_LEVEL)).toBe(100);
       for (let l = 2; l <= MAX_LEVEL; l++) expect(rateAt(start, l)).toBeGreaterThanOrEqual(rateAt(start, l - 1));
     }

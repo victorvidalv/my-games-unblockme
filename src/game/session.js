@@ -3,7 +3,7 @@ import { sfx, tone } from '../audio/sound.js';
 import { HERO_TALK } from '../data/story.js';
 import { ZONES, zoneIdx, zoneOf, zoneStep } from '../data/zones.js';
 import { $ } from '../dom.js';
-import { MAX_LEVEL, moveLimit, rateAt, startHintsFor } from '../engine/difficulty.js';
+import { MAX_LEVEL, rateAt, startHintsFor } from '../engine/difficulty.js';
 import { hash32 } from '../engine/rng.js';
 import { playReviveEffect, playSkipEffect } from '../ui/turns.js';
 import { startCoach } from '../ui/coach.js';
@@ -14,7 +14,7 @@ import { levelPlan, tutorialFor } from './mechanics.js';
 import { decodeBoard } from '../engine/board.js';
 import { minMoves } from '../engine/solver.js';
 import { baseScore } from '../engine/scoring.js';
-import { canRescue, clearRewards, useRescue } from './heroes.js';
+import { clearRewards, heroLimit } from './heroes.js';
 import { canPaidRevive, hasRevive, payRevive, useRevive } from './shop.js';
 import { S, gainNow, heroOf, persist, rkey, store, undosLeft } from '../state.js';
 import { boardEl, buildPieces, cellPx, fitBoard, layout, recLine, syncRouteStyle, updateHud } from '../ui/board.js';
@@ -56,8 +56,8 @@ export async function startLevel(){
    const board=varyBoard(base,rate,hash32(S.run.seed,S.run.level,7));   // variante propia de cada partida
    lvl=buildLevel(board,{rating:rate,adj:S.run.adj,brave:S.run.route==='brave'});
   }
-  S.G={n:S.run.level,rate,pieces:lvl.pieces,pos:lvl.pos,walls:lvl.walls||[],start:lvl.pos.slice(),opt:lvl.opt,limit:moveLimit(lvl.opt,S.run.start),moves:0,hist:[],done:false,els:[],plan,family:base.family,tutorial:tut?tut.mech:null};
-  if(S.run.rescue&&S.run.rescue.level===S.run.level){const r=S.run.rescue;S.G={...S.G,rate:r.rate,pieces:r.pieces,walls:(r.walls||[]).map(w=>w.slice()),pos:r.start.slice(),start:r.start.slice(),opt:r.opt,limit:moveLimit(r.opt,S.run.start)}}
+  S.G={n:S.run.level,rate,pieces:lvl.pieces,pos:lvl.pos,walls:lvl.walls||[],start:lvl.pos.slice(),opt:lvl.opt,limit:heroLimit(S.run.hero,lvl.opt,S.run.start,S.run.level),moves:0,hist:[],done:false,els:[],plan,family:base.family,tutorial:tut?tut.mech:null};
+  if(S.run.rescue&&S.run.rescue.level===S.run.level){const r=S.run.rescue;S.G={...S.G,rate:r.rate,pieces:r.pieces,walls:(r.walls||[]).map(w=>w.slice()),pos:r.start.slice(),start:r.start.slice(),opt:r.opt,limit:heroLimit(S.run.hero,r.opt,S.run.start,S.run.level)}}
   const saved=S.run.board;
   if(!S.run.rescue&&saved?.level===S.run.level&&saved.pieces?.length===saved.pos?.length&&saved.start?.length===saved.pos.length){
    S.G={...S.G,rate:saved.rate,pieces:saved.pieces.map(p=>({...p})),walls:(saved.walls||[]).map(w=>w.slice()),pos:saved.pos.slice(),start:saved.start.slice(),opt:saved.opt,limit:saved.limit,bought:saved.bought||0,tutorial:saved.tutorial||null,moves:saved.moves||0,hist:(saved.hist||[]).map(p=>p.slice())};
@@ -180,7 +180,7 @@ async function offerPaidRevive(why){
   if(accepted){
     const r=payRevive(S.run);
     if(r.ok){
-      S.G.pos=S.G.start.slice();S.G.moves=0;S.G.hist=[];S.G.done=false;S.G.bought=0;S.G.limit=moveLimit(S.G.opt);
+      S.G.pos=S.G.start.slice();S.G.moves=0;S.G.hist=[];S.G.done=false;S.G.bought=0;S.G.limit=heroLimit(S.run.hero,S.G.opt,S.run.start,S.run.level);
       $('score').textContent=S.run.score.toLocaleString('de-DE');$('lim').textContent=S.G.limit;recLine();
       saveRun();boardEl.classList.remove('board-lock');S.busy=false;$('bUndo').disabled=true;layout();updateHud();
       Music.duck(1);playReviveEffect('¡RENACER!',false);$('msg').textContent=`Renaciste (−${r.cost.toLocaleString('de-DE')} pts). ¡Este tablero empieza de nuevo!`;
@@ -191,7 +191,6 @@ async function offerPaidRevive(why){
 }
 function finalFail(why){
   if(S.G.done)return;
-  if(canRescue(heroOf().id,S.run,S.run.mode)){useRescue(S.run,S.G);saveRun();showRescue('lia');return}      // primero la vida gratis de Lía
   if(hasRevive(S.run)){useRevive(S.run,S.G);saveRun();showRescue('revive');return}                           // compatibilidad con cargas antiguas
   if(canPaidRevive(S.run,S.run.mode)){S.run.pendingRevive=why||'limit';saveRun();offerPaidRevive(why);return}
   triggerGameOver(why);

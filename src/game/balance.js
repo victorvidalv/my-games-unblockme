@@ -1,8 +1,8 @@
 import { mulberry32, hash32 } from '../engine/rng.js';
 import { curve, rateAt, moveLimit, startHintsFor, MAX_LEVEL } from '../engine/difficulty.js';
 import { calcGain } from '../engine/scoring.js';
-import { FREE_UNDOS, JUTH_FREE_HINTS, HINT_EVERY, CITY_EVERY } from './heroes.js';
-import { MAX_REVIVES, REVIVE_SHARE } from './shop.js';
+import { freeUndosFor, freeHintsFor, juthActive, HINT_EVERY, CITY_EVERY, bonusTurns } from './heroes.js';
+import { MAX_REVIVES, REVIVE_SHARE, priceOf, extraTurns } from './shop.js';
 
 /**
  * Modelo de equilibrio: simula miles de partidas de jugadores de distinta habilidad para medir cuánto ayuda
@@ -23,6 +23,7 @@ export const MODEL = {
   unnoticedCost: 3,      // si no te das cuenta, recuperarte cuesta ~3 movimientos (y no se arregla con deshacer gratis)
   hintMinD: 10,
   startHints: 3,
+  shopReserve: 3,        // el jugador solo compra una pista si le quedan puntos para 3 más (no se arruina por ella)
   minigamePrizes: [0, 0, 1, 1, 1, 2, 2, 3],   // premio medio ≈ 1.25 pistas
 };
 
@@ -30,8 +31,18 @@ export const HEROES_SIM = ['none', 'lia', 'jean', 'van'];   // «none» = sin po
 
 const isBonusLevel = (level) => level >= 15 && level < 100 && level % 10 === 5;
 
-function playBoard(rng, { skill, d, start = 1, hints, undos, freeHints = 0 }) {
-  const limit = moveLimit(d, start);
+/**
+ * Jugador que usa la tienda (`shop = {score, rating}`): al quedarse sin turnos compra los turnos más baratos que le alcancen,
+ * y si no le quedan pistas en un tablero duro compra una, pero solo si le sobran puntos (MODEL.shopReserve veces el precio).
+ */
+function playBoard(rng, { hero, skill, d, start = 1, level = 1, hints, undos, freeHints = 0, shop = null }) {
+  const baseLimit = moveLimit(d, start, level);
+  let limit = baseLimit + bonusTurns(hero, baseLimit, start);
+  let spent = 0;
+  let boughtTurns = 0;
+  let boughtHints = 0;
+  const afford = (id, reserve = 1) => shop && shop.score - spent >= priceOf(id, shop.rating, start) * reserve;
+  const pay = (id) => { spent += priceOf(id, shop.rating, start); };
   const err = Math.min(0.85, (1 - skill) * MODEL.err * (1 + d / 25));
   let moves = 0;
   let h = hints;
@@ -39,6 +50,7 @@ function playBoard(rng, { skill, d, start = 1, hints, undos, freeHints = 0 }) {
   let f = freeHints;                               // pistas gratis de ESTE tablero (poder de Juth): no gastan tu reserva
   for (let step = 0; step < d; step++) {
     if (rng() < err) {
+      if (h === 0 && f === 0 && d >= MODEL.hintMinD && afford('hint', MODEL.shopReserve)) { pay('hint'); h++; boughtHints++; }
       if (f > 0 && rng() < MODEL.hintAware) {
         f--;                                       // pista gratis del tablero: evita el error
       } else if (h > 0 && d >= MODEL.hintMinD && rng() < MODEL.hintAware) {
@@ -53,9 +65,17 @@ function playBoard(rng, { skill, d, start = 1, hints, undos, freeHints = 0 }) {
       }
     }
     moves += 1;
-    if (moves > limit || (moves >= limit && step < d - 1)) return { ok: false, moves, hints: h };
+    const dead = () => moves > limit || (moves >= limit && step < d - 1);
+    while (dead()) {
+      const id = ['moves3', 'moves'].find((x) => afford(x));      // lo más barato que alcance
+      if (!id) break;
+      pay(id);
+      limit += extraTurns(id, limit);
+      boughtTurns++;
+    }
+    if (dead()) return { ok: false, moves, hints: h, spent, boughtTurns, boughtHints };
   }
-  return { ok: true, moves, hints: h };
+  return { ok: true, moves, hints: h, spent, boughtTurns, boughtHints };
 }
 
 /**
@@ -65,24 +85,23 @@ function playBoard(rng, { skill, d, start = 1, hints, undos, freeHints = 0 }) {
  * @param {number} o.start       dificultad inicial del camino (1, 50, 75)
  * @param {number} o.skill       habilidad 0-1
  * @param {number} o.seed
- * @param {object} [o.powers]   {undos, juthHints, juthFree, juthEvery, lives}: para probar otros valores sin tocar el juego
+ * @param {object} [o.powers]   {undos, juthHints, juthFree, juthEvery}: para probar otros valores sin tocar el juego
  * @param {string} [o.revive]    'none' | 'city': comprar un revivir al empezar cada ciudad (desde la 3ª) mientras queden
  * @returns {{cleared:number, score:number, completed:boolean, revivesBought:number}}
  */
-export function simulateRun({ hero, start, skill, seed, revive = 'none', powers = {} }) {
-  const undosPerBoard = powers.undos ?? FREE_UNDOS;
+export function simulateRun({ hero, start, skill, seed, revive = 'none', powers = {}, shop = false }) {
   const juthHints = powers.juthHints ?? 0;              // (el poder antiguo de Juth: pistas extra por ciudad)
-  const lives = powers.lives ?? 1;
-  const juthFree = powers.juthFree ?? JUTH_FREE_HINTS;
   const juthEvery = powers.juthEvery ?? 1;           // la pista gratis llega cada N tableros
   const rng = mulberry32(seed);
   let hints = startHintsFor(start);
   let score = 0;
   let streak = 0;
   let adj = 0;
-  let livesUsed = 0;
   let charges = 0;
   let bought = 0;
+  let spentTotal = 0;
+  let turnsBought = 0;
+  let hintsBought = 0;
   for (let level = 1; level <= MAX_LEVEL; level++) {
     if (revive === 'city' && level % CITY_EVERY === 1 && level > 20 && bought < MAX_REVIVES && score > 0) {
       score -= Math.round(score * REVIVE_SHARE);
@@ -93,12 +112,15 @@ export function simulateRun({ hero, start, skill, seed, revive = 'none', powers 
     const d = Math.max(1, curve(rating).target + adj);
     let res;
     for (;;) {
-      res = playBoard(rng, { skill, d, start, hints, undos: hero === 'jean' ? undosPerBoard : 0, freeHints: hero === 'van' && level % juthEvery === 0 ? juthFree : 0 });
+      res = playBoard(rng, { hero, skill, d, start, level, hints, undos: hero === 'jean' ? (powers.undos ?? freeUndosFor(d, start)) : 0, shop: shop ? { score, rating } : null, freeHints: hero === 'van' && level % juthEvery === 0 && juthActive(level, start) ? (powers.juthFree ?? freeHintsFor(d, start)) : 0 });
       hints = res.hints;
+      score -= res.spent;
+      spentTotal += res.spent;
+      turnsBought += res.boughtTurns;
+      hintsBought += res.boughtHints;
       if (res.ok) break;
-      if (hero === 'lia' && livesUsed < lives) { livesUsed++; continue; }
       if (charges > 0) { charges--; continue; }
-      return { cleared: level - 1, score, completed: false, revivesBought: bought };
+      return { cleared: level - 1, score, completed: false, revivesBought: bought, spent: spentTotal, turnsBought, hintsBought };
     }
     const gain = calcGain(rating, res.moves, d, streak);
     score += gain.total;
@@ -108,22 +130,28 @@ export function simulateRun({ hero, start, skill, seed, revive = 'none', powers 
     if (hero === 'van' && level % CITY_EVERY === 0) hints += juthHints;
     if (isBonusLevel(level)) hints += MODEL.minigamePrizes[Math.floor(rng() * MODEL.minigamePrizes.length)];
   }
-  return { cleared: MAX_LEVEL, score, completed: true, revivesBought: bought };
+  return { cleared: MAX_LEVEL, score, completed: true, revivesBought: bought, spent: spentTotal, turnsBought, hintsBought };
 }
 
 /** Media de `runs` partidas (semillas deterministas) para una combinación héroe/camino/habilidad. */
-export function averageRuns({ hero, start, skill, runs = 300, revive = 'none', salt = 0, powers = {} }) {
+export function averageRuns({ hero, start, skill, runs = 300, revive = 'none', salt = 0, powers = {}, shop = false }) {
   let cleared = 0;
   let score = 0;
+  let spent = 0;
+  let turns = 0;
+  let hintsB = 0;
   let done = 0;
   for (let i = 0; i < runs; i++) {
     // misma semilla para todos los héroes en la misma habilidad/camino: comparación justa (mismos «dados»)
-    const r = simulateRun({ hero, start, skill, revive, powers, seed: hash32(i, start, Math.round(skill * 100), salt) });
+    const r = simulateRun({ hero, start, skill, revive, powers, shop, seed: hash32(i, start, Math.round(skill * 100), salt) });
     cleared += r.cleared;
     score += r.score;
+    spent += r.spent;
+    turns += r.turnsBought;
+    hintsB += r.hintsBought;
     if (r.completed) done++;
   }
-  return { cleared: cleared / runs, score: score / runs, completion: done / runs };
+  return { cleared: cleared / runs, score: score / runs, completion: done / runs, spent: spent / runs, turnsBought: turns / runs, hintsBought: hintsB / runs };
 }
 
 export const SKILLS = [0.4, 0.6, 0.8, 0.92];

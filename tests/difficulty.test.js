@@ -7,19 +7,28 @@ const PATHS = { Normal: 1, Difícil: 50, Experto: 75 };
 const targetAt = (start, level) => curve(rateAt(start, level)).target;
 
 describe('dificultad: la curva se siente apropiada', () => {
-  it('en Normal, desde el nivel 30 hay que pensar (≥ 11 movimientos mínimos) y los primeros niveles enseñan', () => {
-    for (let l = 1; l <= 10; l++) expect(targetAt(1, l)).toBeLessThanOrEqual(3);
-    expect(targetAt(1, 30)).toBeGreaterThanOrEqual(11);
-    expect(targetAt(1, 30)).toBeGreaterThanOrEqual(3 * targetAt(1, 10));
+  it('en Normal, desde el nivel 20 hay que pensar (≥ 11 movimientos mínimos) y los primeros niveles enseñan', () => {
+    for (let l = 1; l <= 10; l++) expect(targetAt(1, l)).toBeLessThanOrEqual(5);
+    expect(targetAt(1, 20)).toBeGreaterThanOrEqual(11);
+    expect(targetAt(1, 20)).toBeGreaterThanOrEqual(2 * targetAt(1, 10));
   });
   it('llegar al nivel 100 es desafiante (≥ 35 movimientos mínimos) en todos los caminos', () => {
     for (const start of Object.values(PATHS)) expect(targetAt(start, 100)).toBeGreaterThanOrEqual(35);
   });
-  it('Difícil empieza como el nivel 50 de Normal y Experto como el nivel 75 de Normal', () => {
-    expect(targetAt(50, 1)).toBe(targetAt(1, 50));
-    expect(targetAt(75, 1)).toBe(targetAt(1, 75));
-    expect(targetAt(50, 1)).toBeGreaterThanOrEqual(19);
-    expect(targetAt(75, 1)).toBeGreaterThanOrEqual(29);
+  it('Difícil y Experto empiezan donde Normal ya exige pensar, y Experto más arriba que Difícil', () => {
+    expect(targetAt(50, 1)).toBeGreaterThanOrEqual(11);
+    expect(targetAt(75, 1)).toBeGreaterThanOrEqual(targetAt(50, 1) + 5);
+    expect(targetAt(50, 1)).toBeLessThan(targetAt(1, 100));
+  });
+  it('sus curvas son mucho más empinadas: llegan al máximo antes que Normal (Experto antes que Difícil)', () => {
+    const first = (start) => { for (let l = 1; l <= MAX_LEVEL; l++) if (targetAt(start, l) >= 37) return l; return MAX_LEVEL + 1; };
+    expect(first(75)).toBeLessThan(first(50));
+    expect(first(50)).toBeLessThan(first(1));
+    expect(first(75)).toBeLessThanOrEqual(45);
+    expect(first(50)).toBeLessThanOrEqual(60);
+    expect(first(1)).toBeGreaterThanOrEqual(95);
+    // en el nivel 50 la diferencia entre caminos se nota claramente
+    expect(targetAt(50, 50) - targetAt(1, 50)).toBeGreaterThanOrEqual(8);
   });
   it('cada camino es más difícil que el anterior en el mismo nivel', () => {
     for (let l = 1; l <= MAX_LEVEL; l += 3) {

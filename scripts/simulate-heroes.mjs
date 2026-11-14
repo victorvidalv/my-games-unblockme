@@ -3,10 +3,10 @@
  *   npm run simulate
  */
 import { balanceReport, averageRuns, SKILLS, PATHS, MODEL } from '../src/game/balance.js';
-import { FREE_UNDOS, JUTH_FREE_HINTS } from '../src/game/heroes.js';
+import { JEAN_UNDO_SHARE, JUTH_HINT_EVERY } from '../src/game/heroes.js';
 
 const runs = Number(process.argv[2] || 400);
-console.log(`Poderes: Lía 1 vida · Jean ${FREE_UNDOS} deshacer gratis por tablero · Juth ${JUTH_FREE_HINTS} pista gratis por tablero (modelo err=${MODEL.err}, ${runs} partidas por celda)\n`);
+console.log(`Poderes: Lía +19 % de turnos · Jean ${Math.round(JEAN_UNDO_SHARE * 100)} % del mínimo en deshacer gratis (1–6) · Juth 1 pista gratis cada ${JUTH_HINT_EVERY} movimientos del mínimo (1–3) (modelo err=${MODEL.err}, ${runs} partidas por celda)\n`);
 const names = { 1: 'Normal', 50: 'Difícil', 75: 'Experto' };
 const rows = balanceReport({ runs });
 console.log('camino   hab.  sin poder |  +Lía  +Jean  +Juth   (niveles extra frente a no tener poder)');
@@ -20,4 +20,12 @@ for (const start of PATHS) for (const skill of SKILLS) {
   const a = averageRuns({ hero: 'none', start, skill, runs });
   const b = averageRuns({ hero: 'none', start, skill, runs, revive: 'city' });
   console.log(`${names[start].padEnd(8)} ${skill.toFixed(2)}  niveles ${a.cleared.toFixed(1)} → ${b.cleared.toFixed(1)}   puntos ${Math.round(a.score).toLocaleString('es')} → ${Math.round(b.score).toLocaleString('es')}`);
+}
+
+console.log('\nTienda (el jugador compra turnos al quedarse sin ellos y una pista si le sobran puntos): niveles, puntos y gasto');
+console.log('camino   hab.   niveles sin → con tienda   puntos sin → con   gastado   compras (turnos/pistas)');
+for (const start of PATHS) for (const skill of SKILLS) {
+  const a = averageRuns({ hero: 'none', start, skill, runs });
+  const b = averageRuns({ hero: 'none', start, skill, runs, shop: true });
+  console.log(`${names[start].padEnd(8)} ${skill.toFixed(2)}   ${a.cleared.toFixed(1).padStart(5)} → ${b.cleared.toFixed(1).padStart(5)}   ${Math.round(a.score).toLocaleString('es').padStart(8)} → ${Math.round(b.score).toLocaleString('es').padStart(8)}   ${Math.round(b.spent).toLocaleString('es').padStart(8)}   ${b.turnsBought.toFixed(1)}/${b.hintsBought.toFixed(1)}`);
 }

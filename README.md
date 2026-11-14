@@ -5,7 +5,7 @@ y devuelve la luz al Faro del Alba. Funciona en el navegador y se puede instalar
 
 - **Objetivo:** desliza los bloques y saca la llave roja por la derecha en el menor número de movimientos.
   Un arrastre largo cuenta como **1** movimiento.
-- **Límite:** tienes el doble del mínimo en turnos. Al agotarlos sin sacar la llave **ya no se puede mover** y la aventura termina (ganar en el último turno vale).
+- **Límite:** tienes de margen al principio el doble del mínimo en turnos y se aprieta hasta ×1,3 en el nivel 100 (Difícil y Experto, aún menos). Al agotarlos sin sacar la llave **ya no se puede mover** y la aventura termina (ganar en el último turno vale).
 - **Tres caminos** de 100 niveles: Normal, Difícil y Experto (cambia dónde empieza la dificultad).
 - **Tres héroes**, cada uno con un poder (ver [Héroes](#héroes-y-poderes)).
 
@@ -110,8 +110,8 @@ Por eso el «Mínimo» que ve el jugador y la pista son siempre exactos.
 
 ### Dificultad
 
-`rateAt(inicio, nivel)` da una dificultad de 1 a 100 que sube linealmente hasta 100 en el nivel 100
-(**Normal** empieza en 1, **Difícil** en 50, **Experto** en 75). `curve(dificultad)` fija el mínimo de movimientos
+`rateAt(camino, nivel)` da una dificultad de 1 a 100 con una curva propia por camino (`PATH_CURVES`): Normal llega a 100 en el nivel 100, Difícil en el 55 y Experto en el 40
+(**Normal** empieza en 1 (2 movimientos y ya hay que pensar en el nivel 20), **Difícil** en 35 (~13 movimientos), **Experto** en 55 (~21)). `curve(dificultad)` fija el mínimo de movimientos
 objetivo con unos puntos de control (entre ellos se interpola) en `src/engine/difficulty.js`:
 
 | Dificultad | Mínimo objetivo | Qué se siente |
@@ -119,12 +119,12 @@ objetivo con unos puntos de control (entre ellos se interpola) en `src/engine/di
 | 1–10 | 2–3 movimientos | tutorial |
 | 20 | 6 | se aprende a planificar |
 | 30 | 11 | **en Normal, aquí hay que pensar** |
-| 50 | 19 | **donde empieza Difícil** |
+| 50 | 19 | Normal en el nivel ~40 |
 | 75 | 29 | **donde empieza Experto** |
 | 100 | 37 | desafiante de verdad |
 
-`tests/difficulty.test.js` comprueba esa forma (Normal ≥ 11 en el nivel 30, ≥ 35 al final, Difícil y Experto empiezan
-como los niveles 50 y 75 de Normal, nunca bajan ni dan saltos de más de 2 movimientos).
+`tests/difficulty.test.js` comprueba esa forma (Normal ≥ 11 en el nivel 20, ≥ 35 al final, Difícil y Experto empiezan
+donde Normal ya exige pensar y suben mucho más rápido, nunca bajan ni dan saltos de más de 2 movimientos).
 
 ### Piezas especiales
 
@@ -166,7 +166,7 @@ falta una familia usa otra), `varyBoard()` crea una variante propia de cada part
 - **Adaptativo:** si juegas con ≥ 90 % de eficiencia el ajuste sube (máx. +1 hasta el nivel 10, +2 después);
   si < 40 %, baja (mín. −2).
 - **Ruta aventurera** (al terminar una ciudad): la siguiente distancia mayor y +10 % de puntos.
-- Siempre dentro de ±3 del objetivo, y el límite de movimientos es el doble del mínimo.
+- Siempre dentro de ±3 del objetivo, y el límite de movimientos baja de ×2 a ×1,3 del mínimo entre el nivel 1 y el 100 (`limitFactor`).
 
 > Si cambias `curve()` o las reglas de generación, ejecuta `npm run levels:all` y `npm test`
 > y haz commit de los nuevos `levels.json` y `special.json`.
@@ -190,9 +190,9 @@ Elegir héroe es permanente durante la aventura. Las reglas están en [`src/game
 
 | Héroe | Poder | Función |
 |---|---|---|
-| **Lía** | Una segunda oportunidad: repite un tablero al caer, una vez por aventura, sin perder puntos. | `canRescue`, `useRescue` |
-| **Jean** | Tres pasos atrás: 3 deshacer gratis por tablero (el movimiento se descuenta). | `freeUndosLeft`, `applyUndo` |
-| **Juth** | Una luz en cada tablero: 1 pista gratis por tablero (no gasta tu reserva). | `freeHintsLeft`, `spendHint` |
+| **Lía** | Turnos de reserva: +19 % de turnos en cada tablero (mínimo 2), calibrado con `npm run simulate` para igualar a Jean y Juth. | `bonusTurns`, `heroLimit` |
+| **Jean** | Pasos atrás: deshacer gratis en proporción al tablero (15 % del mínimo, entre 1 y 6; el movimiento se descuenta). | `freeUndosLeft`, `applyUndo` |
+| **Juth** | Una luz en cada tablero: pistas gratis en proporción al tablero (1 por cada ~24 movimientos del mínimo, entre 1 y 3: 2 desde ~36); no gasta tu reserva. | `freeHintsLeft`, `spendHint` |
 
 Reglas comunes: sin poder, deshacer cuesta **+1 movimiento**; todos ganan **+1 pista cada 5 niveles**.
 En **Práctica** todo es gratis y no se gasta nada. Los poderes se leen del objeto `run`, así que sobreviven
@@ -209,21 +209,22 @@ a recargar la página y a las partidas guardadas antiguas.
 - **Banco de niveles:** las 100 dificultades × 12 tableros son válidos, resolubles y alcanzan su objetivo.
 - **Construcción de niveles:** el mínimo anunciado es el real para cada ajuste adaptativo y ruta, y crece a lo largo de cada camino.
 - **Partida completa:** 3 caminos × 100 niveles jugados de forma óptima; siempre se gana con el mínimo y puntos perfectos.
-- **Poderes:** vida única de Lía, tres deshacer de Jean por tablero (y migración de guardados antiguos), bono de Juth sin duplicarse, Práctica sin consumo.
+- **Poderes:** turnos de reserva de Lía, deshacer de Jean proporcional al tablero (y migración de guardados antiguos), bono de Juth sin duplicarse, Práctica sin consumo.
 - **Reglas:** movimientos restantes y estados ok / aviso / último / eliminado.
 
 ## Tienda
 
 El botón **🛒 Tienda** (junto a Deshacer y Pista) vende ayudas que se pagan con los **puntos de la aventura**: lo que gastas
-se resta de tu puntaje, así que cada compra duele. Los precios se miden en «niveles ganados»: un nivel vale 1,5 × los puntos base (lo que da un nivel perfecto con algo de racha) a la dificultad actual, por lo que suben a medida que avanzas y siempre equivalen al mismo esfuerzo. Los precios son **fijos**: no suben al comprar ni dependen de cómo juegues.
+se resta de tu puntaje, así que cada compra duele. Los precios son **proporcionales**: se miden en «niveles» (los puntos base de un nivel a la dificultad actual), así que suben a medida que avanzas, y además el camino los encarece (Normal ×1, Difícil ×1,25, Experto ×1,5). No suben al comprar ni dependen de cómo juegues. Están calibrados con el simulador (`npm run simulate`, sección Tienda): un jugador que compra a fondo gana unos 20 niveles en Normal y unos 8 en Experto, pero su puntaje se hunde: ayuda y duele.
 Los turnos comprados aparecen como cristales de hielo bajo el medidor, y se «derriten» uno a uno al usarlos. Rehacer rebobina el tablero y saltar nivel lo lanza fuera de la pantalla, ambos con efecto:
 
 | Objeto | Precio | Efecto |
 |---|---|---|
-| 💡 Pista | 2 niveles | Una pista extra |
-| ↺ Rehacer tablero | 2 niveles | Reinicia el tablero con 0 movimientos (conserva los turnos comprados) |
-| ⏳ +5 turnos | 8 niveles | Sube 5 el límite de movimientos del tablero |
-| ⏭ Saltar nivel | 10 niveles | Pasa al siguiente sin puntos y sin racha |
+| 💡 Pista | 3 niveles | Una pista extra |
+| ↺ Rehacer tablero | 4 niveles | Reinicia el tablero con 0 movimientos (conserva los turnos comprados) |
+| ⏳ +10 % de turnos | 6 niveles | Sube el límite un 10 % (mínimo 2 turnos) |
+| ⏳ +20 % de turnos | 10 niveles | Sube el límite un 20 % (mínimo 3 turnos) |
+| ⏭ Saltar nivel | 16 niveles | Pasa al siguiente sin puntos y sin racha |
 
 Si te pasas del límite de movimientos la aventura termina: **no se ofrece comprar turnos al perder**, hay que comprarlos antes.
 Toda compra pide confirmación y la lógica está en [`src/game/shop.js`](src/game/shop.js), con pruebas.

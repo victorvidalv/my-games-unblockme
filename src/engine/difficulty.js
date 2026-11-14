@@ -3,11 +3,29 @@ export const MAX_LEVEL = 100;
 export const MAX_RATING = 100;
 
 /**
- * Dificultad (1-100) del nivel `level` en un camino que empieza en `start`.
- * Sube linealmente hasta 100 en el último nivel.
+ * Puntos de control nivel → dificultad (1-100) de cada camino (entre ellos se interpola linealmente).
+ * La clave es el identificador del camino (1 = Normal, 50 = Difícil, 75 = Experto; no cambia: lo usan los récords guardados).
+ *   Normal  : empieza en 2 movimientos y en el nivel 20 ya hay que pensar (11); llega al máximo en el 100.
+ *   Difícil : empieza donde Normal ya exige pensar (~12 mov.) y sube mucho más rápido: máximo al llegar al nivel 55.
+ *   Experto : empieza en ~21 movimientos y alcanza el máximo (37) en el nivel 40; el resto aprieta el límite de turnos.
  */
-export const rateAt = (start, level) =>
-  Math.round(start + (MAX_RATING - start) * (level - 1) / (MAX_LEVEL - 1));
+export const PATH_CURVES = {
+  1: [[1, 1], [20, 30], [45, 55], [70, 78], [100, 100]],
+  50: [[1, 35], [25, 65], [55, 100], [100, 100]],
+  75: [[1, 55], [20, 85], [40, 100], [100, 100]],
+};
+
+/** Dificultad (1-100) del nivel `level` en el camino `start` (1, 50 o 75). */
+export function rateAt(start, level) {
+  const knots = PATH_CURVES[start >= 75 ? 75 : start >= 50 ? 50 : 1];
+  const l = Math.max(1, Math.min(MAX_LEVEL, level));
+  for (let i = 1; i < knots.length; i++) {
+    const [l1, r1] = knots[i];
+    const [l0, r0] = knots[i - 1];
+    if (l <= l1) return Math.round(r0 + ((r1 - r0) * (l - l0)) / (l1 - l0));
+  }
+  return knots[knots.length - 1][1];
+}
 
 /**
  * Movimientos mínimos objetivo por dificultad (puntos de control; entre ellos se interpola).
@@ -56,8 +74,16 @@ export const WINDOW = 3;
 /** Pistas iniciales según la dificultad del camino (Experto empieza más justo). */
 export const startHintsFor = (start = 1) => (start >= 75 ? 2 : 3);
 
-/** Factor de límite de movimientos según el camino: Normal ×2, Difícil ×1.75, Experto ×1.55. */
-export const limitFactor = (start = 1) => (start >= 75 ? 1.55 : start >= 50 ? 1.75 : 2);
+/**
+ * Factor de límite de movimientos: empieza holgado y se aprieta hasta el nivel 100, así la dificultad se siente subir.
+ *   Normal ×2 → ×1,3 · Difícil ×1,7 → ×1,15 · Experto ×1,5 → ×1,1   (interpolación lineal entre el nivel 1 y el 100)
+ */
+export const LIMIT_FACTORS = { 1: [2, 1.3], 50: [1.7, 1.15], 75: [1.5, 1.1] };
+export const limitFactor = (start = 1, level = 1) => {
+  const [from, to] = LIMIT_FACTORS[start >= 75 ? 75 : start >= 50 ? 50 : 1];
+  const t = Math.max(0, Math.min(1, (level - 1) / (MAX_LEVEL - 1)));
+  return from + (to - from) * t;
+};
 
-/** Límite de movimientos permitido para completar un tablero de mínimo `opt` en ese camino. */
-export const moveLimit = (opt, start = 1) => Math.max(opt + 2, Math.round(opt * limitFactor(start)));
+/** Límite de movimientos permitido para completar un tablero de mínimo `opt` en ese camino y nivel (nivel 1 si no se indica). */
+export const moveLimit = (opt, start = 1, level = 1) => Math.max(opt + 2, Math.round(opt * limitFactor(start, level)));

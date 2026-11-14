@@ -1,23 +1,42 @@
 import { describe, it, expect } from 'vitest';
-import { SHOP_ITEMS, EXTRA_MOVES, EXTRA_MOVES_3, REVIVE_SHARE, MAX_REVIVES, reviveCost, canPaidRevive, payRevive, hasRevive, useRevive, priceOf, availability, buy } from '../src/game/shop.js';
+import { SHOP_ITEMS, extraTurns, pathPrice, REVIVE_SHARE, MAX_REVIVES, reviveCost, canPaidRevive, payRevive, hasRevive, useRevive, priceOf, availability, buy } from '../src/game/shop.js';
 import { moveStatus } from '../src/engine/rules.js';
+import { baseScore } from '../src/engine/scoring.js';
 
 const mk = (score, over = {}) => ({
   run: { score, hints: 3, mode: 'c', spent: 0 },
   G: { n: 10, rate: 10, opt: 5, limit: 10, moves: 4, hist: [[1], [2]], pos: [3], start: [0], done: false, ...over },
 });
 
-describe('tienda: precios', () => {
-  it('incluye pista, +3 turnos, +5 turnos, rehacer y saltar (sin revivir)', () => {
+describe('tienda: precios proporcionales', () => {
+  it('incluye pista, +10 %, +20 % de turnos, rehacer y saltar (sin revivir)', () => {
     expect(SHOP_ITEMS.map((i) => i.id)).toEqual(['hint', 'moves3', 'moves', 'redo', 'skip']);
   });
-  it('los precios fijos son iguales en cualquier dificultad', () => {
-    const expected = { hint: 500, redo: 1500, moves3: 3000, moves: 4500, skip: 6000 };
+  it('el precio es N niveles de esa dificultad: sube con el nivel y es proporcional a lo que se gana', () => {
+    const levels = { hint: 3, redo: 4, moves3: 6, moves: 10, skip: 16 };
     for (const rating of [1, 25, 50, 100]) {
-      for (const [id, price] of Object.entries(expected)) expect(priceOf(id, rating)).toBe(price);
+      for (const [id, n] of Object.entries(levels)) expect(priceOf(id, rating)).toBe(Math.round((n * baseScore(rating)) / 10) * 10);
     }
+    for (const id of Object.keys(levels)) expect(priceOf(id, 80)).toBeGreaterThan(priceOf(id, 10));
+    expect(priceOf('hint', 20)).toBeLessThan(priceOf('redo', 20));
+    expect(priceOf('redo', 20)).toBeLessThan(priceOf('moves3', 20));
     expect(priceOf('moves3', 20)).toBeLessThan(priceOf('moves', 20));
     expect(priceOf('moves', 20)).toBeLessThan(priceOf('skip', 20));
+  });
+  it('cuesta más cuanto más difícil es el camino: Normal ×1, Difícil ×1,25, Experto ×1,5', () => {
+    expect([1, 50, 75].map(pathPrice)).toEqual([1, 1.25, 1.5]);
+    for (const id of ['hint', 'moves', 'skip']) {
+      expect(priceOf(id, 40, 50)).toBeGreaterThan(priceOf(id, 40, 1));
+      expect(priceOf(id, 40, 75)).toBeGreaterThan(priceOf(id, 40, 50));
+    }
+  });
+  it('los turnos comprados son un % del límite del tablero (mínimo 2 y 3)', () => {
+    expect(extraTurns('moves3', 4)).toBe(2);
+    expect(extraTurns('moves', 4)).toBe(3);
+    expect(extraTurns('moves3', 40)).toBe(4);
+    expect(extraTurns('moves', 40)).toBe(8);
+    expect(extraTurns('moves', 80)).toBe(16);
+    expect(extraTurns('hint', 40)).toBe(0);
   });
 });
 
@@ -29,23 +48,23 @@ describe('tienda: compras', () => {
     expect(run.score).toBe(priceOf('moves', 10) - 1);
     expect(G.limit).toBe(10);
   });
-  it('turnos extra (+3): sube el límite en 3, descuenta 3000 y registra bought', () => {
+  it('turnos extra pequeños (+10 %, mín. 2): suben el límite, descuentan el precio y registran bought', () => {
     const { run, G } = mk(100000, { moves: 11, limit: 10 });
     expect(moveStatus(G.moves, G.limit)).toBe('over');
     const r = buy('moves3', { run, G });
-    expect(r).toEqual({ ok: true, price: 3000 });
-    expect(G.limit).toBe(10 + EXTRA_MOVES_3);
-    expect(G.bought).toBe(EXTRA_MOVES_3);
-    expect(run.score).toBe(97000);
-    expect(run.spent).toBe(3000);
+    expect(r).toEqual({ ok: true, price: priceOf('moves3', 10) });
+    expect(G.limit).toBe(10 + 2);
+    expect(G.bought).toBe(2);
+    expect(run.score).toBe(100000 - priceOf('moves3', 10));
+    expect(run.spent).toBe(priceOf('moves3', 10));
     expect(moveStatus(G.moves, G.limit)).not.toBe('over');
   });
-  it('turnos extra (+5): sube el límite en 5, descuenta el precio y el jugador deja de estar eliminado', () => {
+  it('turnos extra grandes (+20 %, mín. 3): sube el límite, descuenta el precio y el jugador deja de estar eliminado', () => {
     const { run, G } = mk(100000, { moves: 11, limit: 10 });
     expect(moveStatus(G.moves, G.limit)).toBe('over');
     const r = buy('moves', { run, G });
     expect(r.ok).toBe(true);
-    expect(G.limit).toBe(10 + EXTRA_MOVES);
+    expect(G.limit).toBe(10 + extraTurns('moves', 10));
     expect(run.score).toBe(100000 - priceOf('moves', 10));
     expect(run.spent).toBe(priceOf('moves', 10));
     expect(moveStatus(G.moves, G.limit)).not.toBe('over');
@@ -55,19 +74,28 @@ describe('tienda: compras', () => {
     expect(buy('hint', { run, G }).ok).toBe(true);
     expect(run.hints).toBe(4);
   });
-  it('cada pista descuenta exactamente 500 puntos y exige saldo suficiente', () => {
-    const { run, G } = mk(1000, { rate: 100 });
+  it('cada pista descuenta su precio y exige saldo suficiente', () => {
+    const price = priceOf('hint', 10);
+    const { run, G } = mk(price * 2);
     for (let purchase = 1; purchase <= 2; purchase++) {
-      expect(buy('hint', { run, G })).toEqual({ ok: true, price: 500 });
-      expect(run.score).toBe(1000 - 500 * purchase);
-      expect(run.spent).toBe(500 * purchase);
+      expect(buy('hint', { run, G })).toEqual({ ok: true, price });
+      expect(run.score).toBe(price * (2 - purchase));
+      expect(run.spent).toBe(price * purchase);
       expect(run.hints).toBe(3 + purchase);
     }
     expect(buy('hint', { run, G }).ok).toBe(false);
     expect(run.hints).toBe(5);
-    const poor = mk(499);
+    const poor = mk(price - 1);
     expect(buy('hint', poor).ok).toBe(false);
-    expect(poor.run.score).toBe(499);
+    expect(poor.run.score).toBe(price - 1);
+  });
+  it('el camino encarece la compra real', () => {
+    const normal = mk(1e6);
+    const expert = mk(1e6);
+    expert.run.start = 75;
+    buy('hint', normal);
+    buy('hint', expert);
+    expect(1e6 - expert.run.score).toBeGreaterThan(1e6 - normal.run.score);
   });
   it('rehacer: vuelve al inicio con 0 movimientos y conserva los turnos comprados', () => {
     const { run, G } = mk(100000);

@@ -15,7 +15,7 @@ $('bToMenu').onclick=()=>{$('over').classList.remove('show');openMenu()};
 /* ---------- Botones del juego ---------- */
 $('bUndo').onclick=()=>{
   if(!S.G||S.G.done||S.busy||!S.G.hist.length)return;
-  const undo=applyUndo({heroId:heroOf().id,run:S.run,mode:S.run.mode,level:S.G.n,moves:S.G.moves}),free=undo.free;
+  const undo=applyUndo({heroId:heroOf().id,run:S.run,mode:S.run.mode,level:S.G.n,moves:S.G.moves,opt:S.G.opt}),free=undo.free;
   S.G.pos=S.G.hist.pop();S.G.moves=undo.moves;layout();sfx.move();updateHud();$('bUndo').disabled=!S.G.hist.length;
   saveRun();
   if(free&&S.run.mode!=='p')$('msg').textContent=`Un paso atrás. Quedan ${undosLeft()} deshacer gratis.`;   // en Desafío deshacer cuesta 1 movimiento; en Práctica es gratis
@@ -24,10 +24,10 @@ $('bUndo').onclick=()=>{
 };
 $('bShop').onclick=openShop;
 $('bHint').onclick=()=>{
-  if(!S.G||S.G.done||S.busy||!canHint(heroOf().id,S.run,S.run.mode,S.G.n))return;
+  if(!S.G||S.G.done||S.busy||!canHint(heroOf().id,S.run,S.run.mode,S.G.n,S.G.opt))return;
   const h=hintMove(S.G.pieces,S.G.pos,S.G.walls);
   if(!h){$('msg').textContent='No encuentro pista desde aquí.';return}
-  spendHint({heroId:heroOf().id,run:S.run,mode:S.run.mode,level:S.G.n});saveRun();updateHeroHud();
+  spendHint({heroId:heroOf().id,run:S.run,mode:S.run.mode,level:S.G.n,opt:S.G.opt});saveRun();updateHeroHud();
   const p=S.G.pieces[h.i],n=Math.abs(h.to-h.from);
   const dir=p.o==='h'?(h.to>h.from?'derecha':'izquierda'):(h.to>h.from?'abajo':'arriba');
   $('msg').textContent=`Mueve la pieza brillante ${n} casilla${n>1?'s':''} hacia ${dir}. Quedan ${h.left} movimientos.`;

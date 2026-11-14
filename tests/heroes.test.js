@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
+import { moveLimit } from '../src/engine/difficulty.js';
 import {
-  HEROES, canRescue, useRescue, freeUndosLeft, applyUndo, clearRewards, FREE_UNDOS, JUTH_FREE_HINTS, freeHintsLeft, spendHint, canHint } from '../src/game/heroes.js';
+  HEROES, bonusTurns, heroLimit, freeUndosLeft, applyUndo, clearRewards, freeUndosFor, freeHintsFor, powerScale, juthActive, freeHintsLeft, spendHint, canHint } from '../src/game/heroes.js';
 
 const newRun = (extra = {}) => ({ hints: 3, lifeUsed: false, undoUsedAt: 0, undoUsedLevel: 0, undoUsedCount: 0, vanAwardedAt: 0, ...extra });
 
@@ -11,72 +12,96 @@ describe('héroes', () => {
   });
 });
 
-describe('Lía · segunda oportunidad', () => {
-  it('solo Lía puede ser rescatada, una vez, y no en Práctica', () => {
-    const run = newRun();
-    expect(canRescue('lia', run, 'c')).toBe(true);
-    expect(canRescue('jean', run, 'c')).toBe(false);
-    expect(canRescue('van', run, 'c')).toBe(false);
-    expect(canRescue('lia', run, 'p')).toBe(false);
+describe('Lía · turnos de reserva', () => {
+  it('solo Lía recibe turnos extra: el 23 % del límite, mínimo 2', () => {
+    expect(bonusTurns('lia', 8)).toBe(2);
+    expect(bonusTurns('lia', 40)).toBe(9);
+    expect(bonusTurns('lia', 74)).toBe(17);
+    expect(bonusTurns('jean', 40)).toBe(0);
+    expect(bonusTurns('van', 40)).toBe(0);
   });
-  it('gastarla guarda el tablero inicial y no se puede repetir', () => {
-    const run = newRun();
-    const G = { n: 12, rate: 12, pieces: [{ o: 'h', len: 2, fix: 2 }], start: [1], pos: [3], opt: 5 };
-    useRescue(run, G);
-    expect(run.lifeUsed).toBe(true);
-    expect(run.rescue).toMatchObject({ level: 12, start: [1], opt: 5 });
-    expect(run.rescue.pieces).not.toBe(G.pieces); // copia, no referencia
-    expect(canRescue('lia', run, 'c')).toBe(false);
+  it('heroLimit suma el bonus al límite normal y para el resto de héroes no cambia', () => {
+    for (const opt of [2, 7, 20, 37]) {
+      expect(heroLimit('jean', opt, 1)).toBe(moveLimit(opt, 1));
+      expect(heroLimit('lia', opt, 1)).toBe(moveLimit(opt, 1) + bonusTurns('lia', moveLimit(opt, 1)));
+      expect(heroLimit('lia', opt, 75)).toBeGreaterThan(moveLimit(opt, 75));
+    }
   });
 });
 
-describe('Jean · tres pasos atrás', () => {
-  it('tiene 3 deshacer gratis por tablero; los demás héroes, 0', () => {
-    expect(freeUndosLeft('jean', newRun(), 5)).toBe(FREE_UNDOS);
+describe('poderes por camino: Normal 100 %, Difícil 75 %, Experto 50 %', () => {
+  it('powerScale baja con la dificultad del camino', () => {
+    expect([1, 50, 75].map(powerScale)).toEqual([1, 0.75, 0.5]);
+  });
+  it('Lía, Jean y Juth dan menos en Difícil y menos aún en Experto (nunca cero)', () => {
+    for (const opt of [14, 25, 37]) {
+      expect(freeUndosFor(opt, 75)).toBeLessThanOrEqual(freeUndosFor(opt, 50));
+      expect(freeUndosFor(opt, 50)).toBeLessThanOrEqual(freeUndosFor(opt, 1));
+      expect(freeUndosFor(opt, 75)).toBeGreaterThanOrEqual(1);
+      expect(bonusTurns('lia', 60, 75)).toBeLessThan(bonusTurns('lia', 60, 50));
+      expect(bonusTurns('lia', 60, 50)).toBeLessThan(bonusTurns('lia', 60, 1));
+      expect(heroLimit('lia', opt, 75)).toBeGreaterThan(moveLimit(opt, 75));
+    }
+  });
+  it('la pista gratis de Juth llega a todos los tableros de Normal y a una parte de los de Difícil y Experto', () => {
+    const share = (start) => Array.from({ length: 100 }, (_, i) => juthActive(i + 1, start)).filter(Boolean).length;
+    expect(share(1)).toBe(100);
+    expect(share(50)).toBeLessThan(100);
+    expect(share(75)).toBeLessThan(share(50));
+    expect(share(75)).toBeGreaterThanOrEqual(70);
+  });
+});
+
+describe('Jean · pasos atrás proporcionales', () => {
+  it('tiene deshacer gratis (22 % del mínimo, 1–6); los demás héroes, 0', () => {
+    expect(freeUndosLeft('jean', newRun(), 5, 14)).toBe(freeUndosFor(14));
     expect(freeUndosLeft('lia', newRun(), 5)).toBe(0);
     expect(freeUndosLeft('van', newRun(), 5)).toBe(0);
   });
-  it('cada uso gratis quita el movimiento y gasta uno de los tres', () => {
+  it('cada uso gratis quita el movimiento y gasta uno de los suyos (14 de mínimo → 3)', () => {
     const run = newRun();
     let moves = 6;
     for (let used = 1; used <= 3; used++) {
-      const r = applyUndo({ heroId: 'jean', run, mode: 'c', level: 5, moves });
+      const r = applyUndo({ heroId: 'jean', run, mode: 'c', level: 5, moves, opt: 14 });
       expect(r.free).toBe(true);
       expect(r.moves).toBe(moves - 1);
       moves = r.moves;
-      expect(freeUndosLeft('jean', run, 5)).toBe(3 - used);
+      expect(freeUndosLeft('jean', run, 5, 14)).toBe(3 - used);
     }
   });
-  it('agotados los tres, deshacer cuesta +1 movimiento', () => {
+  it('agotados los gratis, deshacer cuesta +1 movimiento', () => {
     const run = newRun();
-    for (let i = 0; i < 3; i++) applyUndo({ heroId: 'jean', run, mode: 'c', level: 5, moves: 6 });
-    const r = applyUndo({ heroId: 'jean', run, mode: 'c', level: 5, moves: 6 });
+    for (let i = 0; i < 3; i++) applyUndo({ heroId: 'jean', run, mode: 'c', level: 5, moves: 6, opt: 14 });
+    const r = applyUndo({ heroId: 'jean', run, mode: 'c', level: 5, moves: 6, opt: 14 });
     expect(r.free).toBe(false);
     expect(r.moves).toBe(7);
-    expect(freeUndosLeft('jean', run, 5)).toBe(0);
+    expect(freeUndosLeft('jean', run, 5, 14)).toBe(0);
   });
   it('se reinicia en cada tablero nuevo', () => {
     const run = newRun();
-    for (let i = 0; i < 3; i++) applyUndo({ heroId: 'jean', run, mode: 'c', level: 5, moves: 6 });
-    expect(freeUndosLeft('jean', run, 5)).toBe(0);
-    expect(freeUndosLeft('jean', run, 6)).toBe(3);
+    for (let i = 0; i < 3; i++) applyUndo({ heroId: 'jean', run, mode: 'c', level: 5, moves: 6, opt: 14 });
+    expect(freeUndosLeft('jean', run, 5, 14)).toBe(0);
+    expect(freeUndosLeft('jean', run, 6, 14)).toBe(3);
+  });
+  it('crece con el tablero: pocos en los fáciles, más en los largos, con tope', () => {
+    expect([3, 10, 20, 37, 60].map(freeUndosFor)).toEqual([1, 2, 4, 6, 6]);
   });
   it('lee partidas guardadas con el formato antiguo (1 uso en ese nivel)', () => {
-    expect(freeUndosLeft('jean', newRun({ undoUsedAt: 9, undoUsedLevel: 0 }), 9)).toBe(2);
+    expect(freeUndosLeft('jean', newRun({ undoUsedAt: 9, undoUsedLevel: 0 }), 9, 14)).toBe(2);
   });
   it('para el resto de héroes deshacer cuesta +1 movimiento', () => {
-    const r = applyUndo({ heroId: 'lia', run: newRun(), mode: 'c', level: 5, moves: 4 });
+    const r = applyUndo({ heroId: 'lia', run: newRun(), mode: 'c', level: 5, moves: 4, opt: 14 });
     expect(r).toEqual({ free: false, moves: 5 });
   });
   it('en Práctica siempre es gratis y no gasta nada', () => {
     const run = newRun();
     for (const heroId of ['lia', 'jean', 'van']) {
-      expect(applyUndo({ heroId, run, mode: 'p', level: 5, moves: 4 })).toEqual({ free: true, moves: 3 });
+      expect(applyUndo({ heroId, run, mode: 'p', level: 5, moves: 4, opt: 14 })).toEqual({ free: true, moves: 3 });
     }
-    expect(freeUndosLeft('jean', run, 5)).toBe(3);
+    expect(freeUndosLeft('jean', run, 5, 14)).toBe(3);
   });
   it('el contador de movimientos nunca baja de 0', () => {
-    expect(applyUndo({ heroId: 'jean', run: newRun(), mode: 'c', level: 1, moves: 0 }).moves).toBe(0);
+    expect(applyUndo({ heroId: 'jean', run: newRun(), mode: 'c', level: 1, moves: 0, opt: 14 }).moves).toBe(0);
   });
 });
 
@@ -91,7 +116,7 @@ describe('pistas · recompensas de nivel y la pista gratis de Juth', () => {
     }
   });
   it('Juth tiene 1 pista gratis por tablero; los demás héroes, ninguna', () => {
-    expect(JUTH_FREE_HINTS).toBe(1);
+    expect(freeHintsFor(3)).toBe(1);
     expect(freeHintsLeft('van', newRun(), 7)).toBe(1);
     expect(freeHintsLeft('lia', newRun(), 7)).toBe(0);
     expect(freeHintsLeft('jean', newRun(), 7)).toBe(0);

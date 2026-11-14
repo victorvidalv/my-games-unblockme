@@ -1,5 +1,5 @@
 import { $ } from '../dom.js';
-import { SHOP_ITEMS, availability, buy, itemById, priceOf } from '../game/shop.js';
+import { SHOP_ITEMS, availability, buy, extraTurns, itemById, priceOf } from '../game/shop.js';
 import { saveRun, skipLevel } from '../game/session.js';
 import { S } from '../state.js';
 import { layout, recLine, updateHud } from './board.js';
@@ -9,6 +9,9 @@ import { icon } from './icons.js';
 import { playBuyEffect, playRewindEffect } from './turns.js';
 
 const fmt = (n) => n.toLocaleString('de-DE');
+/** Nombre con los turnos reales que da en este tablero (son un % del límite). */
+const nameOf = (item) => (item.share ? `+${extraTurns(item.id, S.G.limit)} turnos` : item.name);
+const priceNow = (id) => priceOf(id, S.G.rate, S.run.start);
 
 /** Refleja en pantalla la compra ya cobrada. */
 function applyEffects(id) {
@@ -16,11 +19,11 @@ function applyEffects(id) {
   recLine();
   if (id === 'hint') {
     updateHeroHud();
-  } else if (itemById(id)?.moves) {
+  } else if (itemById(id)?.share) {
     $('lim').textContent = S.G.limit;
     updateHud();
     playBuyEffect();
-    $('msg').textContent = `${itemById(id).name}: ahora el límite es ${S.G.limit}.`;
+    $('msg').textContent = `${nameOf(itemById(id))}: ahora el límite es ${S.G.limit}.`;
   } else if (id === 'redo') {
     playRewindEffect();
     layout();
@@ -34,9 +37,9 @@ function applyEffects(id) {
 /** Compra con confirmación (los precios son altos). Devuelve true si se compró. */
 export async function confirmBuy(id) {
   const item = itemById(id);
-  const price = priceOf(id, S.G.rate, S.run.score);
+  const price = priceNow(id);
   const ok = await ask({
-    ico: item.icon, title: `${item.name} · ${fmt(price)} pts`,
+    ico: item.icon, title: `${nameOf(item)} · ${fmt(price)} pts`,
     text: `${item.detail}<br><br>Tienes <b>${fmt(S.run.score)}</b> puntos y te quedarían <b>${fmt(S.run.score - price)}</b>.`,
     yes: 'Comprar', no: 'Ahora no',
   });
@@ -51,8 +54,8 @@ export async function confirmBuy(id) {
 const SAY = {
   greet: ['¡Pasen, pasen! Todo tiene precio… y el mío es justo.', 'Mmm… huelo puntos en tu bolsillo.', 'Ayudas, atajos y milagros. ¡Todo a su precio!'],
   hint: 'Una pista: el mejor movimiento, susurrado por mí. Barato… para lo que vale.',
-  moves3: '¿Falta poco? Tres turnos más para salir del apuro.',
-  moves: '¿Sin turnos? Cinco más. Eso no se regala, amigo.',
+  moves3: '¿Falta poco? Unos turnos más para salir del apuro.',
+  moves: '¿Sin turnos? Y bastantes. Eso no se regala, amigo.',
   redo: 'Rebobino el tablero. Mi tiempo vale oro.',
   skip: '¿Saltar un nivel? Es un lujo. Y los lujos se pagan.',
   poor: ['¿Eso es todo lo que tienes? Vuelve con más monedas.', 'Sin monedas no hay milagros.', 'Mi bolsa está llena; la tuya… no tanto.'],
@@ -60,7 +63,8 @@ const SAY = {
   decline: ['Piénsalo… los precios no bajan.', 'Tú decides. El oro no huye.'],
   nothing: ['Aún no has movido nada. ¿Qué voy a rebobinar?'],
 };
-const SHORT = { hint: 'Te enseña el mejor movimiento', moves3: '+3 al límite de este tablero', moves: '+5 al límite de este tablero', redo: 'Empieza de cero con 0 movimientos', skip: 'Pasa de nivel sin puntos ni racha' };
+const SHORT = { hint: 'Te enseña el mejor movimiento', moves3: '+10 % al límite de este tablero', moves: '+20 % al límite de este tablero', redo: 'Empieza de cero con 0 movimientos', skip: 'Pasa de nivel sin puntos ni racha' };
+const shortOf = (id) => SHORT[id];
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 function say(text, mood) {
@@ -82,8 +86,8 @@ function render() {
   $('shopList').innerHTML = SHOP_ITEMS.map((i) => {
     const a = availability(i.id, { run: S.run, G: S.G });
     return `<button class="shop-item${a.ok ? '' : ' off'}" data-id="${i.id}" aria-disabled="${!a.ok}">
-      <span class="ico">${icon(i.icon)}</span><span><b>${i.name}</b><small>${a.ok || !a.reason ? SHORT[i.id] : a.reason}</small></span>
-      <span class="price">${fmt(priceOf(i.id, S.G.rate, S.run.score))}</span></button>`;
+      <span class="ico">${icon(i.icon)}</span><span><b>${nameOf(i)}</b><small>${a.ok || !a.reason ? shortOf(i.id) : a.reason}</small></span>
+      <span class="price">${fmt(priceNow(i.id))}</span></button>`;
   }).join('');
 }
 
@@ -123,7 +127,7 @@ export function openShop() {
       return;
     }
     render();
-    if (id === 'redo' || itemById(id)?.moves) setTimeout(close, 650);   // un instante para ver a Don Dublón contento
+    if (id === 'redo' || itemById(id)?.share) setTimeout(close, 650);   // un instante para ver a Don Dublón contento
   };
   $('shopClose').focus();
 }
