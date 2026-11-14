@@ -29,3 +29,12 @@ for (const start of PATHS) for (const skill of SKILLS) {
   const b = averageRuns({ hero: 'none', start, skill, runs, shop: true });
   console.log(`${names[start].padEnd(8)} ${skill.toFixed(2)}   ${a.cleared.toFixed(1).padStart(5)} → ${b.cleared.toFixed(1).padStart(5)}   ${Math.round(a.score).toLocaleString('es').padStart(8)} → ${Math.round(b.score).toLocaleString('es').padStart(8)}   ${Math.round(b.spent).toLocaleString('es').padStart(8)}   ${b.turnsBought.toFixed(1)}/${b.hintsBought.toFixed(1)}`);
 }
+
+console.log('\nRutas (Tranquila vs Aventurera durante TODA la partida): niveles y puntos');
+console.log('camino   hab.   niveles tranquila → aventurera   puntos tranquila → aventurera (×)');
+for (const start of PATHS) for (const skill of SKILLS) {
+  const a = averageRuns({ hero: 'none', start, skill, runs });
+  const b = averageRuns({ hero: 'none', start, skill, runs, route: 'brave' });
+  console.log(`${names[start].padEnd(8)} ${skill.toFixed(2)}   ${a.cleared.toFixed(1).padStart(5)} → ${b.cleared.toFixed(1).padStart(5)}   ${Math.round(a.score).toLocaleString('es').padStart(8)} → ${Math.round(b.score).toLocaleString('es').padStart(8)}  ×${(b.score / a.score).toFixed(2)}`);
+}
+

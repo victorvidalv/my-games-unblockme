@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { averageRuns, simulateRun, PATHS, SKILLS } from '../src/game/balance.js';
 import { freeUndosFor, freeHintsFor } from '../src/game/heroes.js';
 import { MAX_REVIVES, REVIVE_SHARE } from '../src/game/shop.js';
+import { braveExtra, moveLimit } from '../src/engine/difficulty.js';
 
 const RUNS = 400;
 const MID = [0.5, 0.65, 0.8];
@@ -122,5 +123,33 @@ describe('tienda (simulación)', () => {
   });
   it('el jugador perfecto casi no necesita comprar', () => {
     expect(gain(1, 0.92).levels).toBeLessThan(15);
+  });
+});
+
+describe('ruta aventurera vs tranquila (simulación)', () => {
+  const pair = (start, skill) => ({
+    calm: averageRuns({ hero: 'none', start, skill, runs: RUNS }),
+    brave: averageRuns({ hero: 'none', start, skill, runs: RUNS, route: 'brave' }),
+  });
+  it('es un riesgo real: el jugador medio llega a menos niveles con la ruta aventurera', () => {
+    for (const start of PATHS) {
+      const { calm, brave } = pair(start, 0.6);
+      expect(brave.cleared, `camino ${start}`).toBeLessThan(calm.cleared);
+    }
+  });
+  it('pero no es un castigo: pierde menos de un tercio de los niveles y el jugador hábil gana más puntos en Normal', () => {
+    for (const start of PATHS) {
+      const { calm, brave } = pair(start, 0.7);
+      expect(brave.cleared / calm.cleared, `camino ${start}`).toBeGreaterThan(0.67);
+    }
+    const skilled = pair(1, 0.9);
+    expect(skilled.brave.score).toBeGreaterThan(skilled.calm.score * 1.05);
+  });
+  it('el tablero aventurero pide más movimientos y su límite es más estricto', () => {
+    expect(braveExtra(2)).toBe(1);
+    expect(braveExtra(37)).toBe(4);
+    for (const opt of [15, 30, 37]) {
+      expect(moveLimit(opt + braveExtra(opt), 1, 50, true)).toBeLessThan(moveLimit(opt + braveExtra(opt), 1, 50, false));
+    }
   });
 });

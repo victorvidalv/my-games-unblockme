@@ -73,3 +73,110 @@
 .ff.caught{animation:ff-pop .32s ease-out forwards!important;pointer-events:none}
 @keyframes ff-pop{0%{transform:scale(1)}40%{transform:scale(1.7);opacity:1}100%{transform:scale(2.6);opacity:0}}
 @media(prefers-reduced-motion:reduce){.ff{animation:ff-rise var(--t,3s) linear forwards}}
+
+/* ---------- La ruleta del destino (entrada al minijuego), con los colores del juego: tinta, verde petróleo, oro y terracota ---------- */
+#bonus .bonuscard{position:relative;overflow-x:hidden}
+.bfate{--fr:min(60vw,236px);position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:0;padding:14px 12px 14px;border-radius:inherit;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 38%,#1d3a45 0,#12262f 55%,#0a141a 100%);animation:fate-in .45s ease-out}
+.bfate::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 15% 85%,#b66a5333,#0000 42%),radial-gradient(circle at 88% 12%,#f1ce8226,#0000 40%);animation:fate-mist 7s ease-in-out infinite alternate}
+.bfate.leave{animation:fate-out .4s ease-in forwards}
+@keyframes fate-in{from{opacity:0;transform:scale(1.06)}to{opacity:1;transform:scale(1)}}
+@keyframes fate-out{to{opacity:0;transform:scale(1.12);filter:blur(5px)}}
+@keyframes fate-mist{to{transform:translate(-2%,1.5%) scale(1.06);opacity:.75}}
+.fate-title{position:relative;margin:2px 0 0;font:900 15px Georgia,serif;letter-spacing:.22em;color:#f1ce82;text-shadow:0 2px 0 #091118}
+.fate-sub{position:relative;margin:4px 0 0;font-size:11.5px;letter-spacing:.04em;color:#c8bd9c}
+.fate-stage{position:relative;width:var(--fr);height:var(--fr);margin:34px auto 0}
+.fate-wheel{display:block;width:100%;height:100%;border-radius:50%;box-shadow:0 0 0 6px #0b1a21,0 0 0 8px #b8a16d99,0 10px 30px #000a;touch-action:none;cursor:grab;filter:drop-shadow(0 2px 4px #0006)}
+.fate-wheel .sec{stroke:#091118;stroke-width:2.2}
+.fate-wheel .glyph{font:900 34px Georgia,serif;fill:#f6e8c0;paint-order:stroke;stroke:#091118;stroke-width:4px;stroke-linejoin:round}
+.fate-wheel .sec.chosen{filter:brightness(1.5) drop-shadow(0 0 8px #f1ce82);animation:fate-win .6s ease-in-out infinite alternate}
+@keyframes fate-win{to{filter:brightness(1.8) drop-shadow(0 0 16px #ffe9b0)}}
+.fate-lights{position:absolute;inset:-14px;border-radius:50%;border:4px dotted #f1ce82;opacity:.55;pointer-events:none}
+.bfate.spinning .fate-lights{animation:lights .3s steps(2) infinite}
+.fate-hub{position:absolute;left:50%;top:50%;width:62px;height:62px;margin:-31px;border-radius:50%;display:grid;place-items:center;padding:0;cursor:pointer;
+  font:900 11px Georgia,serif;letter-spacing:.14em;color:#3a1a08;background:radial-gradient(circle at 35% 28%,#ffe9ad,#d9a24a 55%,#8a5a25);border:2px solid #091118;box-shadow:0 4px 0 #091118,0 0 20px #f1ce8288;animation:fate-core 1.5s ease-in-out infinite alternate}
+@keyframes fate-core{to{transform:scale(1.07);box-shadow:0 4px 0 #091118,0 0 32px #ffe9ad}}
+.bfate.spinning .fate-hub,.bfate.landed .fate-hub{display:none}
+.fate-pointer{position:absolute;left:50%;top:-30px;transform:translateX(-50%);font-size:34px;line-height:1;color:#f1ce82;text-shadow:0 3px 0 #091118,0 0 14px #f1ce8299;z-index:3;transform-origin:50% 20%}
+.fate-pointer.tick{animation:fate-tick .14s ease-out}
+@keyframes fate-tick{0%{transform:translateX(-50%) rotate(0)}40%{transform:translateX(-50%) rotate(-20deg)}100%{transform:translateX(-50%) rotate(0)}}
+.fate-line{position:relative;margin:26px 0 0;min-height:24px;text-align:center;font:900 15px Georgia,serif;letter-spacing:.12em;color:#e9ddc3;text-shadow:0 2px 0 #091118}
+.bfate.landed .fate-line{font-size:18px;color:#ffe9b0;text-shadow:0 0 18px #f1ce82,0 2px 0 #091118}
+.fate-spin{position:relative;margin-top:10px;min-width:170px}
+.fate-skip{position:relative;margin-top:6px;padding:5px 14px;min-height:0;font-size:11px;letter-spacing:.08em;background:#ffffff0d;border:1px solid #ffffff26;color:#c8bd9c;box-shadow:none}
+@media(max-height:640px){.bfate{--fr:min(46vw,190px)}.fate-stage{margin-top:26px}.fate-line{margin-top:18px}}
+@media(prefers-reduced-motion:reduce){.bfate::before,.fate-hub{animation:none}}
+
+/* ---------- Cartas: reparto, flotar y premio ---------- */
+.bcard{animation:deal .55s cubic-bezier(.2,1.3,.4,1) backwards;animation-delay:calc(var(--i)*70ms)}
+@keyframes deal{from{opacity:0;transform:translateY(-60px) rotate(-14deg) scale(.5)}}
+.bcard:not(.on):hover .bb{filter:brightness(1.12);transform:translateY(-3px)}
+.bcard .bb{transition:transform .2s,filter .2s}
+.bgrid.won .bcard.winc .bf{box-shadow:0 0 0 3px var(--pc),0 0 34px var(--pc),0 8px 0 #0a0d25}
+
+/* ---------- Rueda: números, destellos y flecha que chasquea ---------- */
+.wheel-num{font:900 21px Georgia,serif;fill:#fff3d0;paint-order:stroke;stroke:#0008;stroke-width:3px}
+.wheel-num.nil{fill:#9aa3b5;font-size:19px}
+.prize-wheel path.win{animation:sector-win .6s ease-in-out infinite alternate}
+@keyframes sector-win{to{filter:brightness(1.6) drop-shadow(0 0 10px #fff3b0)}}
+.wheel-pointer.tick{animation:ptick .12s ease-out;transform-origin:50% 20%}
+@keyframes ptick{0%{transform:translateX(-50%) rotate(0)}45%{transform:translateX(-50%) rotate(-16deg)}100%{transform:translateX(-50%) rotate(0)}}
+.wheel-lights{position:absolute;inset:-12px;border-radius:50%;pointer-events:none;border:4px dotted #ffe9b0;opacity:.5}
+.wheel-shell.spinning .wheel-lights{animation:lights .35s steps(2) infinite}
+@keyframes lights{50%{opacity:1;filter:drop-shadow(0 0 6px #ffd24a)}}
+
+/* ---------- Altar de los ecos: rodillos que se paran con el dedo ---------- */
+.reel{padding:0;border:0;cursor:pointer;display:block}
+.reel-line{position:absolute;left:0;right:0;top:calc(50% - 1px);height:2px;background:#d64a3a88;pointer-events:none;z-index:2}
+.reel .reel-strip{will-change:transform}
+.spinning .reel:not(.stopped) .reel-strip{filter:blur(1.6px)}
+.reel.stopped{box-shadow:inset 0 0 0 3px #7fe3c6,inset 0 4px 9px #0006}
+.reel.match{animation:reel-win .5s ease-in-out infinite alternate}
+@keyframes reel-win{to{filter:brightness(1.25)}}
+.machine-lights{animation:marquee 1s steps(2) infinite}
+@keyframes marquee{50%{opacity:.5}}
+.amulet-machine.jackpot{animation:jackpot .4s ease-in-out 4}
+@keyframes jackpot{50%{transform:scale(1.04)}}
+.spinning ~ .machine-lights,.spinning .machine-lights{animation-duration:.25s}
+
+/* ---------- Luciérnagas: combo, ritmo y estela ---------- */
+.catch-combo{font-weight:900;color:#9fe4c8;opacity:.9;transition:transform .15s}
+.catch-combo.hot{color:#ffd24a;transform:scale(1.25);text-shadow:0 0 12px #ffb300}
+.catch-field.combo-flash{animation:combo-flash .4s}
+@keyframes combo-flash{0%{box-shadow:inset 0 0 60px #ffd24acc}100%{box-shadow:inset 0 0 40px #000a}}
+.catch-field.miss{animation:miss-shake .25s}
+@keyframes miss-shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.catch-field.playing{background:radial-gradient(ellipse at 50% 120%,hsl(calc(150 - var(--hot,0) * 120) 40% 24%),#0c1a22 70%)}
+.catch-end small{display:block;font:700 13px system-ui,sans-serif;color:#cfe;margin-top:4px;text-shadow:none}
+.catch-end{flex-direction:column}
+
+/* ---------- Runas de memoria (Simón) ---------- */
+.runes-board{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(100%,290px);margin:6px auto 12px;aspect-ratio:1}
+.rune-pad{--rc:#43e0c1;border-radius:22px;border:3px solid color-mix(in srgb,var(--rc) 70%,#000);color:var(--rc);cursor:pointer;display:grid;place-items:center;padding:0;
+  background:radial-gradient(circle at 30% 25%,color-mix(in srgb,var(--rc) 28%,#14182e),#0e1224 70%);box-shadow:0 6px 0 #070914,0 0 0 #0000;transition:transform .12s,box-shadow .15s,filter .15s}
+.rune-pad .rune-icon{width:54%;height:54%;filter:drop-shadow(0 0 6px var(--rc))}
+.rune-pad:disabled{cursor:default;opacity:.85}
+.rune-pad.lit{transform:scale(1.06);filter:brightness(1.7);background:radial-gradient(circle,#fff,var(--rc));box-shadow:0 0 36px var(--rc),0 6px 0 #070914;color:#07121c}
+.runes-board.your-turn .rune-pad:not(:disabled):hover{filter:brightness(1.25)}
+.rune-pad.wrong{animation:rune-wrong .4s;border-color:#ff4a6a}
+@keyframes rune-wrong{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.runes-orb{position:absolute;left:50%;top:50%;width:34%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(circle,#3a2670,#150d2e);border:2px solid #ffd98a88;box-shadow:0 0 24px #b18cff66;text-align:center;pointer-events:none}
+.runes-orb small{font-size:8px;letter-spacing:.16em;color:#cdbdf5}.runes-orb b{font:900 26px Georgia,serif;color:#fff3b0;line-height:1}.runes-orb span{font-size:10px;color:#d9cdf5;margin-top:2px}
+.runes-board.your-turn .runes-orb{border-color:#7fe3c6;box-shadow:0 0 26px #43e0c199}
+
+/* ---------- Péndulo del tiempo ---------- */
+.pend-field{padding:10px 6px 4px}
+.pend-top{display:flex;justify-content:space-between;font-weight:800;font-size:13px;letter-spacing:.06em;color:#d9cdf5;margin-bottom:10px}.pend-top b{color:#fff3b0;font-size:18px}
+.pend-track{position:relative;height:86px;border-radius:44px;background:linear-gradient(#0b1230,#16204a);border:2px solid #ffd98a66;box-shadow:inset 0 4px 14px #000a,0 0 24px #b18cff33;touch-action:manipulation;cursor:pointer;overflow:hidden}
+.pend-track::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,#ffffff0d 0 2px,#0000 2px 22px)}
+.pend-zone{position:absolute;left:50%;top:0;bottom:0;transform:translateX(-50%);background:linear-gradient(90deg,#ffd24a00,#ffd24a66,#ffd24a00);border-left:2px solid #ffd24a;border-right:2px solid #ffd24a;transition:width .3s}
+.pend-zone i{position:absolute;left:50%;top:0;bottom:0;width:30%;transform:translateX(-50%);background:#fff3b055}
+.pend-ball{position:absolute;top:50%;left:50%;width:46px;height:46px;margin:-23px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#9fd0ff 40%,#4c7fd6);box-shadow:0 0 22px #8fb9ff,0 6px 10px #0008}
+.pend-ball.pop{animation:ballpop .35s}
+@keyframes ballpop{50%{transform:scale(1.35)}}
+.pend-marks{display:flex;justify-content:center;gap:10px;margin-top:12px}
+.pend-marks i{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:900;border:2px dashed #ffffff33;color:#fff}
+.pend-marks .perfect{border:2px solid #ffd24a;background:#ffd24a33;color:#ffd24a;animation:ballpop .35s}.pend-marks .ok{border:2px solid #7fe3c6;background:#43e0c133;color:#7fe3c6}.pend-marks .miss{border:2px solid #ff6a8a;background:#ff4a6a22;color:#ff6a8a}
+@media(prefers-reduced-motion:reduce){.bcard{animation:none}}
+#bonus.fating .bonuscard>*:not(.bfate){visibility:hidden}

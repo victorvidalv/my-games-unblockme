@@ -22,8 +22,8 @@ export const MAX_REVIVES = 1;
 
 export const SHOP_ITEMS = [
   { id: 'hint', icon: 'hint', name: 'Pista', levels: 3, detail: 'Una pista que te enseña el mejor movimiento.' },
-  { id: 'moves3', icon: 'hourglass', name: '+10 % de turnos', levels: 6, share: 0.1, min: 2, detail: 'Sube el límite de este tablero para no perder.' },
-  { id: 'moves', icon: 'hourglass', name: '+20 % de turnos', levels: 10, share: 0.2, min: 3, detail: 'Sube bastante el límite de este tablero para no perder.' },
+  { id: 'moves3', icon: 'hourglass', name: 'Turnos extra', levels: 6, share: 0.1, min: 2, detail: 'Más turnos para este tablero.' },
+  { id: 'moves', icon: 'hourglass', name: 'Muchos turnos extra', levels: 10, share: 0.2, min: 3, detail: 'Bastantes más turnos para este tablero.' },
   { id: 'redo', icon: 'rewind', name: 'Rehacer tablero', levels: 4, detail: 'Empieza este tablero de cero con 0 movimientos (conservas los turnos comprados).' },
   { id: 'skip', icon: 'skip', name: 'Saltar nivel', levels: 16, detail: 'Pasa al siguiente nivel sin puntos y sin racha.' },
 ];

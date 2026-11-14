@@ -1,10 +1,10 @@
 import { Music } from '../audio/music.js';
 import { sfx } from '../audio/sound.js';
 import { CHAPTERS, HERO_LORE } from '../data/story.js';
+import { WORLD } from '../data/lore.js';
 import { ZONES, zoneOf, zoneStep } from '../data/zones.js';
 import { $, cssUrl } from '../dom.js';
 import { S, heroOf } from '../state.js';
-import { heroMarkup } from './heroes.js';
 let curZone=-1;
 
 function paintScenery(i){
@@ -63,13 +63,13 @@ export function showMap(fromI,toI,{travel=false,overview=false}={}){
    const num=mk('text',{x:x-w/2+15,y:y-h/2+19,'text-anchor':'middle',fill:'#ffdf9f','font-size':11,'font-weight':800},g);num.textContent=i<open?'✓':i+1;
    return g;
   });
-  const hero=mk('g',{class:'atlas-traveler'});hero.innerHTML=heroMarkup(heroOf(),'map');
-  const art=hero.firstElementChild;art.style.width='44px';art.style.height='64px';art.setAttribute('width','44');art.setAttribute('height','64');art.setAttribute('x','-22');art.setAttribute('y','-70');
+  const hero=mk('g',{class:'atlas-traveler'}),heroId=heroOf().id,still=`heroes/${heroId}-mapa.png`;
+  const art=mk('image',{href:still,x:-24,y:-70,width:48,height:64,preserveAspectRatio:'xMidYMax meet'},hero);
   const place=(x,y)=>hero.setAttribute('transform',`translate(${x} ${y-27})`);place(...pts[open]);
   el.style.setProperty('--atlas-scene',cssUrl(`backgrounds/zone-${toI+1}.webp`));
   $('mTag').textContent=travel?`EL ATLAS DE ${heroOf().name.toUpperCase()} · UN NUEVO HORIZONTE`:`EL ATLAS DE ${heroOf().name.toUpperCase()} · CIUDAD ${toI+1} DE 10`;
   $('mName').textContent=travel?`Hasta pronto, ${ZONES[fromI].n}`:ZONES[toI].n;
-  $('mSub').textContent=overview?`Nivel actual ${S.run.level} de 100 · Umbral ${zoneStep(S.run.level)} de 10 en este reino`:travel?CHAPTERS[fromI].end:`Diez umbrales, un sello antiguo. Nivel ${S.run.level} de 100.`;
+  $('mSub').textContent=overview?`Nivel actual ${S.run.level} de 100 · Umbral ${zoneStep(S.run.level)} de 10 en este reino`:travel?CHAPTERS[fromI].end:`Thyes, año ${WORLD.year} · Nivel ${S.run.level} de 100 · Diez reinos, diez sellos`;
   el.setAttribute('role',overview?'dialog':'status');if(overview)el.setAttribute('aria-modal','true');else el.removeAttribute('aria-modal');el.setAttribute('aria-labelledby','mName');$('mapClose').hidden=!overview;
   el.classList.remove('out');el.classList.add('show');Music.duck(.35);
   let finished=false,frame=0,timer=0,ready=!travel;
@@ -77,12 +77,15 @@ export function showMap(fromI,toI,{travel=false,overview=false}={}){
   const key=e=>{if(overview){if(e.key==='Escape'){e.preventDefault();end()}else if(e.key==='Tab'){e.preventDefault();$('mapClose').focus()}}else if(e.key==='Enter'||e.key===' '){e.preventDefault();end()}};
   if(!overview){el.addEventListener('pointerdown',end);el.addEventListener('keydown',key)}else document.addEventListener('keydown',key);el.removeAttribute('tabindex');$('mapClose').onclick=end;if(overview)$('mapClose').focus();
   if(travel){
-   sfx.journey();const path=paths[fromI],length=path.getTotalLength(),t0=performance.now(),duration=matchMedia('(prefers-reduced-motion: reduce)').matches?0:1400;
-   art.classList.add('walking');
+   sfx.journey();const path=paths[fromI],length=path.getTotalLength(),t0=performance.now(),duration=matchMedia('(prefers-reduced-motion: reduce)').matches?0:3200;
+   if(duration)art.setAttribute('href',`heroes/${heroId}-caminando.gif`);
+   const x0=pts[fromI][0],early=path.getPointAtLength(length*.2).x;let faceX=x0,face=Math.abs(early-x0)>6?(early>x0?1:-1):(pts[toI][0]>=x0?1:-1);      // los sprites miran a la DERECHA; a la izquierda se invierten
+   art.setAttribute('transform',`scale(${face} 1)`);
    function step(t){const k=duration?Math.min(1,(t-t0)/duration):1,e=k*k*(3-2*k),p=path.getPointAtLength(length*e);place(p.x,p.y);
-    if(k<1)frame=requestAnimationFrame(step);else{art.classList.remove('walking');applyZone(toI);cards[fromI].classList.remove('current');cards[fromI].querySelectorAll('text')[1].textContent='COMPLETADA';cards[fromI].querySelector('rect').setAttribute('stroke','#73bfaa');cards[toI].classList.remove('undiscovered');cards[toI].classList.add('current');const pic=cards[toI].querySelector('image');pic.setAttribute('opacity',1);cards[toI].querySelector('rect').setAttribute('stroke','#ffdb8f');const texts=cards[toI].querySelectorAll('text');texts[1].textContent='ESTÁS AQUÍ';$('mName').textContent=ZONES[toI].n;$('mSub').textContent=`${heroOf().name}: ${HERO_LORE[heroOf().id].quote}`;ready=true;timer=setTimeout(end,matchMedia('(prefers-reduced-motion: reduce)').matches?100:450);sfx.win()}}
+    if(Math.abs(p.x-faceX)>6){const f=p.x>faceX?1:-1;if(f!==face){face=f;art.setAttribute('transform',`scale(${f} 1)`)}faceX=p.x}   // 6 px de margen: sin parpadeos en las curvas
+    if(k<1)frame=requestAnimationFrame(step);else{art.setAttribute('href',still);applyZone(toI);cards[fromI].classList.remove('current');cards[fromI].querySelectorAll('text')[1].textContent='COMPLETADA';cards[fromI].querySelector('rect').setAttribute('stroke','#73bfaa');cards[toI].classList.remove('undiscovered');cards[toI].classList.add('current');const pic=cards[toI].querySelector('image');pic.setAttribute('opacity',1);cards[toI].querySelector('rect').setAttribute('stroke','#ffdb8f');const texts=cards[toI].querySelectorAll('text');texts[1].textContent='ESTÁS AQUÍ';$('mName').textContent=ZONES[toI].n;$('mSub').textContent=`${heroOf().name}: ${HERO_LORE[heroOf().id].quote}`;ready=true;timer=setTimeout(end,matchMedia('(prefers-reduced-motion: reduce)').matches?100:1600);sfx.win()}}
    frame=requestAnimationFrame(step);
-  }else{applyZone(toI);if(!overview){sfx.start();timer=setTimeout(end,650)}}
+  }else{applyZone(toI);if(!overview){sfx.start();timer=setTimeout(end,matchMedia("(prefers-reduced-motion: reduce)").matches?300:2300)}}
  });
 }
 

@@ -3,7 +3,7 @@ import { ZONES, zoneIdx } from '../data/zones.js';
 import { $, cssUrl } from '../dom.js';
 import { heroOf } from '../state.js';
 export function heroArt(id,pose='start'){return pose==='start'?`heroes/${id}.webp`:`heroes/${id}-${pose}.webp`}
-export function storyFor(id,level){const i=zoneIdx(level),c=CHAPTERS[i],h=heroOf(id),l=HERO_LORE[h.id];return {chapter:i+1,level:i*10+1,city:ZONES[i].n,title:c.title,body:c.opening,cityLines:c.cityLines,action:l.chapterLines[i],quote:l.quote,seal:c.seal}}
+export function storyFor(id,level){const i=zoneIdx(level),c=CHAPTERS[i],h=heroOf(id),l=HERO_LORE[h.id];return {chapter:i+1,level:i*10+1,city:ZONES[i].n,title:c.title,body:c.opening,cityLines:c.cityLines,action:l.chapterLines[i],quote:l.quote,seal:c.seal,inscription:c.inscription}}
 export function endingStory(victory,id,level){
  const h=heroOf(id),l=HERO_LORE[h.id],bg=`backgrounds/zone-${zoneIdx(level)+1}.webp`;
  if(!victory){

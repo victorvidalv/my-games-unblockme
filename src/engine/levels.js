@@ -1,7 +1,7 @@
 import { decodeBoard, mutate } from './board.js';
 import { analyze, maxDistance } from './solver.js';
 import { mulberry32 } from './rng.js';
-import { curve, WINDOW } from './difficulty.js';
+import { braveExtra, curve, WINDOW } from './difficulty.js';
 import { hash32 } from './rng.js';
 
 /**
@@ -84,7 +84,8 @@ export function buildLevel(board, { rating, adj = 0, brave = false, rng = Math.r
   const want = Math.max(1, target + adj + boost);
   const normal = ds.reduce((a, b) => (Math.abs(b - want) < Math.abs(a - want) ? b : a));
   const higher = ds.filter((v) => v > normal);
-  const opt = brave && higher.length ? Math.min(...higher) : normal;
+  const wantBrave = normal + braveExtra(normal);                   // ruta aventurera: más movimientos, el más cercano disponible
+  const opt = brave && higher.length ? higher.reduce((a, b) => (Math.abs(b - wantBrave) < Math.abs(a - wantBrave) ? b : a)) : normal;
   const keys = byDist.get(opt);
   const key = keys[Math.floor(rng() * keys.length)];
   const pos = [];

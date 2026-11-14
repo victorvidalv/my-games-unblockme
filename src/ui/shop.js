@@ -1,3 +1,4 @@
+import { sfx } from '../audio/sound.js';
 import { $ } from '../dom.js';
 import { SHOP_ITEMS, availability, buy, extraTurns, itemById, priceOf } from '../game/shop.js';
 import { saveRun, skipLevel } from '../game/session.js';
@@ -10,7 +11,7 @@ import { playBuyEffect, playRewindEffect } from './turns.js';
 
 const fmt = (n) => n.toLocaleString('de-DE');
 /** Nombre con los turnos reales que da en este tablero (son un % del límite). */
-const nameOf = (item) => (item.share ? `+${extraTurns(item.id, S.G.limit)} turnos` : item.name);
+const nameOf = (item) => (item.share ? `+${extraTurns(item.id, S.G.limit)} turnos` : item.name);   // la cifra real, nunca un porcentaje
 const priceNow = (id) => priceOf(id, S.G.rate, S.run.start);
 
 /** Refleja en pantalla la compra ya cobrada. */
@@ -51,23 +52,46 @@ export async function confirmBuy(id) {
 }
 
 /* ---------- Don Dublón habla ---------- */
+/* Don Dublón, vendedor sarcástico: varias frases por situación, elegidas al azar sin repetir la anterior. */
 const SAY = {
-  greet: ['¡Pasen, pasen! Todo tiene precio… y el mío es justo.', 'Mmm… huelo puntos en tu bolsillo.', 'Ayudas, atajos y milagros. ¡Todo a su precio!'],
-  hint: 'Una pista: el mejor movimiento, susurrado por mí. Barato… para lo que vale.',
-  moves3: '¿Falta poco? Unos turnos más para salir del apuro.',
-  moves: '¿Sin turnos? Y bastantes. Eso no se regala, amigo.',
-  redo: 'Rebobino el tablero. Mi tiempo vale oro.',
-  skip: '¿Saltar un nivel? Es un lujo. Y los lujos se pagan.',
-  poor: ['¿Eso es todo lo que tienes? Vuelve con más monedas.', 'Sin monedas no hay milagros.', 'Mi bolsa está llena; la tuya… no tanto.'],
-  bought: ['¡Un placer hacer negocios!', '¡Excelente compra! No hay devoluciones.', '¡Cling, cling! Eso suena bien.'],
-  decline: ['Piénsalo… los precios no bajan.', 'Tú decides. El oro no huye.'],
-  nothing: ['Aún no has movido nada. ¿Qué voy a rebobinar?'],
+  greet: [
+    'Ah, un cliente. Qué sorpresa… y qué poco he dormido.',
+    'Pasa, pasa. El que no compra, al menos admira mi mercancía… cara.',
+    'Bienvenido a la única tienda de Thyes abierta en plena Noche Larga. Sí, tengo monopolio.',
+    '¿Perdiendo otra vez? Tranquilo, tengo remedio para eso. Con recargo.',
+    'Mi oro es anterior a Tri. Mis precios, también. Y no han bajado.',
+    '¿Solo mirando? Mirar es gratis. Lo demás… no tanto.',
+    'Vhorn apagó el Faro, pero mi caja sigue brillando.',
+    'Huelo ecos en tu bolsillo. Ven, que no muerdo. Cobro.',
+    '¿Un milagro? Estás en la tienda correcta. ¿Descuentos? En la de enfrente. No hay de enfrente.',
+    'Ayudas, atajos y milagros. Todos garantizados por mí mismo. Es decir, por nadie.',
+    'Los Kogn me pagan en perlas, los Sahrim en agua… tú me pagarás en puntos.',
+    'Un consejo gratis: no te metas en deudas. Salvo conmigo, claro.',
+  ],
+  hint: ['Una pista: susurro lo obvio, pero a precio de oro.', 'Un empujoncito. Los empujones baratos no existen.', 'Pista en camino. Qué pena que el tablero no traiga instrucciones; para eso estoy yo.'],
+  moves3: ['Unos turnos más para quien planifica con optimismo.', 'Más turnos, mismos errores, pero con más margen para repetirlos.', 'El futuro es caro. Este trocito, algo menos.'],
+  moves: ['¿Muchos turnos? Alguien juega con confianza. Excesiva.', 'Un colchón de turnos. Cómodo, como mi margen de beneficio.', 'Paciencia comprada: la mejor, porque no se agota. El dinero sí.'],
+  redo: ['Rebobino el tablero. Borrón y cuenta nueva… la cuenta, tuya.', '¿Empezar de cero? Qué humildad tan rentable.', 'El tiempo no vuelve atrás, pero el tablero sí. A cambio de oro.'],
+  skip: ['¿Saltarte un nivel? Los atajos son para quien puede pagarlos. Qué casualidad.', 'Un lujo, amigo. Y los lujos se pagan, hasta en el año 4133.', 'Saltar un nivel: porque sufrir gratis ya no está de moda.'],
+  poor: ['¿Eso es todo? Vuelve cuando tu bolsillo haga ruido.', 'Sin ecos no hay milagros. Esto no es una obra de caridad.', 'Mi bolsa está llena; la tuya… resuena a hueco.', 'Fiado no. Tri me lo prohibió. Seguro que fue por mi culpa.'],
+  bought: ['¡Cling, cling! Eso suena a Faro encendido.', 'Un placer. No hay devoluciones, ni para Vhorn.', 'Excelente compra. Diría que inteligente, pero no quiero adular.', 'Gracias por tu generosidad involuntaria.', 'Negocio cerrado. Como los diez reinos, pero de mejor humor.'],
+  decline: ['Piénsalo, los precios no bajan. Spoiler.', 'Tú decides. El oro no huye de Thyes… ni yo de mi caja.', 'Vuelve cuando la tentación pese más que el bolsillo.'],
+  nothing: ['Aún no has movido nada. ¿Qué voy a rebobinar? ¿Tu optimismo?'],
 };
-const SHORT = { hint: 'Te enseña el mejor movimiento', moves3: '+10 % al límite de este tablero', moves: '+20 % al límite de este tablero', redo: 'Empieza de cero con 0 movimientos', skip: 'Pasa de nivel sin puntos ni racha' };
+const SHORT = { hint: 'Te enseña el mejor movimiento', moves3: 'Más turnos en este tablero', moves: 'Muchos más turnos en este tablero', redo: 'Empieza de cero con 0 movimientos', skip: 'Pasa de nivel sin puntos ni racha' };
 const shortOf = (id) => SHORT[id];
-const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const lastIdx = new Map();
+/** Elige una frase al azar sin repetir la anterior de la misma lista. */
+const pick = (arr) => {
+  if (typeof arr === 'string') return arr;
+  let i = Math.floor(Math.random() * arr.length);
+  if (arr.length > 1 && i === lastIdx.get(arr)) i = (i + 1 + Math.floor(Math.random() * (arr.length - 1))) % arr.length;
+  lastIdx.set(arr, i);
+  return arr[i];
+};
 
-function say(text, mood) {
+function say(text, mood, talk = true) {
+  if (talk) sfx.merchantTalk(text);
   const b = $('shopBubble');
   b.textContent = text;
   b.classList.remove('say');
@@ -104,23 +128,23 @@ export function openShop() {
   };
   render();
   modal.classList.add('show');
-  say(pick(SAY.greet), 'happy');
+  sfx.merchantBell(); say(pick(SAY.greet), 'happy');
   $('shopClose').onclick = close;
   const list = $('shopList');
   const lineFor = (b) => {
     if (b.classList.contains('off')) return b.dataset.id === 'redo' && S.G.moves === 0 ? pick(SAY.nothing) : pick(SAY.poor);
-    return SAY[b.dataset.id];
+    return pick(SAY[b.dataset.id]);
   };
-  list.onpointerover = (e) => { const b = e.target.closest('.shop-item'); if (b && e.pointerType === 'mouse') say(lineFor(b)); };
-  list.onfocusin = (e) => { const b = e.target.closest('.shop-item'); if (b) say(lineFor(b)); };
+  list.onpointerover = (e) => { const b = e.target.closest('.shop-item'); if (b && e.pointerType === 'mouse') say(lineFor(b), undefined, false); };
+  list.onfocusin = (e) => { const b = e.target.closest('.shop-item'); if (b) say(lineFor(b), undefined, false); };
   list.onclick = async (e) => {
     const b = e.target.closest('.shop-item');
     if (!b) return;
-    if (b.classList.contains('off')) { say(lineFor(b), 'nope'); return; }
+    if (b.classList.contains('off')) { sfx.merchantNope(); say(lineFor(b), 'nope'); return; }
     const id = b.dataset.id;
-    say(SAY[id]);
-    if (!(await confirmBuy(id))) { say(pick(SAY.decline)); return; }
-    say(pick(SAY.bought), 'happy');
+    say(pick(SAY[id]));
+    if (!(await confirmBuy(id))) { sfx.merchantNope(); say(pick(SAY.decline)); return; }
+    sfx.merchantCoin(); say(pick(SAY.bought), 'happy');
     if (id === 'skip') {
       close();
       skipLevel();

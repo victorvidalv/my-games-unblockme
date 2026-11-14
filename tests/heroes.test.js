@@ -149,3 +149,14 @@ describe('pistas · recompensas de nivel y la pista gratis de Juth', () => {
     expect(run.hints).toBe(0);
   });
 });
+
+describe('al elegir héroe solo se describe el poder, sin cifras', () => {
+  it('ningún texto del héroe lleva números ni «según el tablero»', () => {
+    for (const h of HEROES) {
+      expect(`${h.power} ${h.short} ${h.detail}`, h.id).not.toMatch(/\d/);
+      expect(`${h.short} ${h.detail}`.toLowerCase()).not.toContain('según el tablero');
+      expect(h.short.length).toBeGreaterThan(8);
+      expect(h.detail.length).toBeGreaterThan(30);
+    }
+  });
+});

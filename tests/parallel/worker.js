@@ -6,7 +6,7 @@
 import { parentPort } from 'node:worker_threads';
 import { readFileSync } from 'node:fs';
 import {
-  N, decode, decodeBoard, isValidState, analyze, expand, slideRange, maxDistance, isWon, curve, minReach, rateAt, pickBoard,
+  N, decode, decodeBoard, isValidState, analyze, expand, slideRange, maxDistance, isWon, curve, minReach, rateAt, braveExtra, pickBoard,
   buildLevel, varyBoard, mulberry32, hash32, WINDOW, generateBoard, decorateBoard, FAMILIES, hintMove, moveLimit,
 } from '../../src/engine/index.js';
 import { levelPlan } from '../../src/game/mechanics.js';
@@ -150,7 +150,7 @@ const tasks = {
         const normal = clamp(Math.max(1, target + adj));
         rows.push({
           adj, brave, opt: lvl.opt, real: an?.dist.get(an.k0), valid: isValidState(lvl.pieces, lvl.pos), won0: isWon(lvl.pos),
-          expected: brave ? (normal < hi ? normal + 1 : normal) : normal,
+          expected: brave ? (normal < hi ? Math.min(hi, normal + braveExtra(normal)) : normal) : normal,
         });
       }
     }

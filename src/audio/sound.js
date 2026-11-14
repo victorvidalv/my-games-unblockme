@@ -49,6 +49,15 @@ export const sfx={
     [1318.5,1568,2093].forEach((f,i)=>tone(f,.55,'triangle',.06,.38+i*.06));
   },
   warn:()=>tone(220,.16,'sine',.04),
+  // Don Dublón: su «voz» es un balbuceo de notas graves (más larga la frase, más dura) y tintineos de caja
+  merchantTalk:(text='')=>{const n=Math.min(28,Math.max(6,Math.round(text.length/3.3)));for(let i=0;i<n;i++){const f=118+((i*37+text.charCodeAt(i%Math.max(1,text.length)))%7)*21,t=i*.072;tone(f,.07,'sawtooth',.04,t);tone(f*2.01,.05,'triangle',.018,t+.012)}},
+  merchantCoin:()=>{[1568,2093,2637,3136].forEach((f,i)=>tone(f,.16,'sine',.06,i*.05));tone(880,.3,'triangle',.04,.05)},
+  merchantNope:()=>{tone(196,.3,'sawtooth',.055,0,-70);tone(147,.4,'sawtooth',.05,.2,-50)},
+  merchantBell:()=>{[1319,1760,2093].forEach((f,i)=>tone(f,.5,'sine',.05,i*.08));tone(660,.6,'triangle',.03,.02)},
+  // ruleta del destino: arranque con soplo ascendente, «tac» de madera y oro por sector y campanada de cierre
+  fateSpin:()=>{tone(150,1.1,'sawtooth',.025,0,420);tone(300,1.1,'triangle',.035,.05,800);[392,523,659].forEach((f,i)=>tone(f,.5,'sine',.05,.1+i*.07))},
+  fateTick:(k=0)=>{const n=k%6;tone(1600+n*70,.03,'square',.03);tone(520+n*34,.07,'triangle',.075);tone(2400,.02,'sine',.03,.005)},
+  fateLand:()=>{tone(110,1.6,'sine',.11,0,-30);[523,784,1047,1568].forEach((f,i)=>tone(f,1,'sine',.075,.04+i*.085));tone(2093,.7,'sine',.035,.32);tone(2637,.5,'triangle',.02,.4)},
   fanfare:()=>{[523,659,784,1047,1319,1568,2093].forEach((f,i)=>tone(f,.45,'sine',.12,i*.11));[523,659,784,1047].forEach(f=>tone(f,1.6,'triangle',.07,.85))},
   journey:()=>{[392,494,587,784].forEach((f,i)=>tone(f,.5,'sine',.08,i*.35));tone(98,1.6,'triangle',.06,0,40);[1175,1568].forEach((f,i)=>tone(f,.4,'sine',.05,2+i*.12))},
 };

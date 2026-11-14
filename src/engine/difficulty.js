@@ -85,5 +85,14 @@ export const limitFactor = (start = 1, level = 1) => {
   return from + (to - from) * t;
 };
 
+/**
+ * Ruta aventurera: el tablero pide más movimientos (+BRAVE_SHARE del mínimo, como poco +1) y el límite es más estricto
+ * (el factor baja BRAVE_LIMIT_CUT). A cambio da +10 % de puntos. Calibrado con `npm run simulate` (sección Rutas).
+ */
+export const BRAVE_SHARE = 0.1;
+export const BRAVE_LIMIT_CUT = 0.04;
+export const braveExtra = (opt) => Math.max(1, Math.round(opt * BRAVE_SHARE));
+
 /** Límite de movimientos permitido para completar un tablero de mínimo `opt` en ese camino y nivel (nivel 1 si no se indica). */
-export const moveLimit = (opt, start = 1, level = 1) => Math.max(opt + 2, Math.round(opt * limitFactor(start, level)));
+export const moveLimit = (opt, start = 1, level = 1, brave = false) =>
+  Math.max(opt + 2, Math.round(opt * (limitFactor(start, level) - (brave ? BRAVE_LIMIT_CUT : 0))));

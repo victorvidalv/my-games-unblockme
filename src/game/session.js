@@ -1,6 +1,8 @@
 import { Music, setTensionFx } from '../audio/music.js';
 import { sfx, tone } from '../audio/sound.js';
 import { HERO_TALK } from '../data/story.js';
+import { LORE_PORTRAITS, WORLD, lorePortraitSrc } from '../data/lore.js';
+import { playVoice, stopVoice, voiceActive } from '../audio/voice.js';
 import { ZONES, zoneIdx, zoneOf, zoneStep } from '../data/zones.js';
 import { $ } from '../dom.js';
 import { MAX_LEVEL, rateAt, startHintsFor } from '../engine/difficulty.js';
@@ -37,7 +39,7 @@ export async function startRun(start,mode){
   if(S.run) recordBest(true);                         // si abandonas, lo logrado cuenta
   const seed=Math.floor(Math.random()*2**31);
   S.G=null;
-  S.run={seed,level:1,start,mode,hero:chosen,lifeUsed:false,revive:0,revivesBought:0,undoUsedAt:0,undoUsedLevel:0,undoUsedCount:0,vanAwardedAt:0,score:0,hints:startHintsFor(start),adj:0,streak:0,recBroken:false};
+  S.run={seed,level:1,start,mode,hero:chosen,voiceCity:0,lifeUsed:false,revive:0,revivesBought:0,undoUsedAt:0,undoUsedLevel:0,undoUsedCount:0,vanAwardedAt:0,score:0,hints:startHintsFor(start),adj:0,streak:0,recBroken:false};
   syncHero();syncRouteStyle();applyZone(0);saveRun();
   S.run.route='normal';S.run.routeZone=0;S.run.travelFrom=0;saveRun();await resumeAdventure();
 }
@@ -56,8 +58,8 @@ export async function startLevel(){
    const board=varyBoard(base,rate,hash32(S.run.seed,S.run.level,7));   // variante propia de cada partida
    lvl=buildLevel(board,{rating:rate,adj:S.run.adj,brave:S.run.route==='brave'});
   }
-  S.G={n:S.run.level,rate,pieces:lvl.pieces,pos:lvl.pos,walls:lvl.walls||[],start:lvl.pos.slice(),opt:lvl.opt,limit:heroLimit(S.run.hero,lvl.opt,S.run.start,S.run.level),moves:0,hist:[],done:false,els:[],plan,family:base.family,tutorial:tut?tut.mech:null};
-  if(S.run.rescue&&S.run.rescue.level===S.run.level){const r=S.run.rescue;S.G={...S.G,rate:r.rate,pieces:r.pieces,walls:(r.walls||[]).map(w=>w.slice()),pos:r.start.slice(),start:r.start.slice(),opt:r.opt,limit:heroLimit(S.run.hero,r.opt,S.run.start,S.run.level)}}
+  S.G={n:S.run.level,rate,pieces:lvl.pieces,pos:lvl.pos,walls:lvl.walls||[],start:lvl.pos.slice(),opt:lvl.opt,limit:heroLimit(S.run.hero,lvl.opt,S.run.start,S.run.level,S.run.route==='brave'),moves:0,hist:[],done:false,els:[],plan,family:base.family,tutorial:tut?tut.mech:null};
+  if(S.run.rescue&&S.run.rescue.level===S.run.level){const r=S.run.rescue;S.G={...S.G,rate:r.rate,pieces:r.pieces,walls:(r.walls||[]).map(w=>w.slice()),pos:r.start.slice(),start:r.start.slice(),opt:r.opt,limit:heroLimit(S.run.hero,r.opt,S.run.start,S.run.level,S.run.route==='brave')}}
   const saved=S.run.board;
   if(!S.run.rescue&&saved?.level===S.run.level&&saved.pieces?.length===saved.pos?.length&&saved.start?.length===saved.pos.length){
    S.G={...S.G,rate:saved.rate,pieces:saved.pieces.map(p=>({...p})),walls:(saved.walls||[]).map(w=>w.slice()),pos:saved.pos.slice(),start:saved.start.slice(),opt:saved.opt,limit:saved.limit,bought:saved.bought||0,tutorial:saved.tutorial||null,moves:saved.moves||0,hist:(saved.hist||[]).map(p=>p.slice())};
@@ -71,12 +73,21 @@ export async function startLevel(){
   $('bUndo').disabled=!S.G.hist.length;
   $('msg').textContent=S.G.n===1?'Desliza los bloques y saca la llave roja ➜ Cada movimiento cuenta.':tipFor(S.G);
   buildPieces();updateHud();sfx.start();S.busy=true;
-  fitBoard();Music.setLevel(S.G.n,S.G.rate);setTensionFx(0,false);Music.duck(1);Music.muffle(false);Music.start();
+  fitBoard();Music.setLevel(S.G.n,S.G.rate);setTensionFx(0,false);Music.duck(voiceActive()?.35:1);Music.muffle(false);Music.start();
   if(S.run.rescue){showRescue();return}
   if(S.run.pendingRevive&&canPaidRevive(S.run,S.run.mode)){offerPaidRevive(S.run.pendingRevive);return}
   delete S.run.pendingRevive;
   S.busy=false;boardEl.classList.remove('board-lock');saveRun();banner();
+  greetCity();
   startCoach();                                        // avisos y guía de los primeros niveles / mecánicas nuevas
+}
+/** Voz del héroe al empezar la aventura (Valle). Las demás ciudades se saludan en el diálogo de elegir camino (travelDialog). */
+function greetCity(){
+  if(!S.run||!S.G||S.G.n%10!==1||S.run.mode==='p')return;
+  const city=zoneIdx(S.G.n);
+  if(S.run.voiceCity===city)return;
+  S.run.voiceCity=city;saveRun();
+  playVoice(heroOf().id,city);
 }
 function tipFor(g){
   if(heroOf().id==='jean'&&undosLeft()>0)return `Jean puede deshacer ${undosLeft()} veces gratis en este tablero.`;
@@ -95,10 +106,12 @@ function travelDialog(){
  return new Promise(resolve=>{
   const session=S.run,modal=$('travel'),h=heroOf(),city=Math.min(9,Math.floor(S.run.pendingClear.level/10)),story=storyFor(h.id,city*10+1);
   $('travelScene').src=`backgrounds/zone-${city+1}.webp`;$('travelPortrait').src=heroArt(h.id,'story');$('travelPortrait').alt=h.name;
-  $('travelTag').textContent=`CAPÍTULO ${city+1} DE 10 · NIVELES ${city*10+1}–${(city+1)*10}`;
-  $('travelSeal').textContent=`Sello de ${story.seal}`;
+  $('travelTag').textContent=`THYES · AÑO ${WORLD.year} · CAPÍTULO ${city+1} DE 10 · NIVELES ${city*10+1}–${(city+1)*10}`;
+  $('travelSeal').textContent=`Sello de ${story.seal}`;$('travelInscription').textContent=`«${story.inscription}»`;
   const citySpan=document.createElement('span');citySpan.className='travel-city';citySpan.textContent=ZONES[city].n;
   $('travelTitle').replaceChildren('Elige cómo llegar a ',citySpan);
+  const portrait=LORE_PORTRAITS[city],loreBox=$('travelLore');loreBox.hidden=!portrait;
+  if(portrait){$('travelLoreImg').src=lorePortraitSrc(portrait.id);$('travelLoreImg').alt=portrait.name;$('travelLoreName').textContent=portrait.name;$('travelLoreCap').textContent=portrait.caption}
   const lines=story.cityLines||[story.body];
   $('travelText').replaceChildren(...lines.map(txt=>{const li=document.createElement('li');li.textContent=txt;return li}));
   $('travelHeroLine').textContent=`${h.name}: «${story.action}»`;
@@ -114,6 +127,7 @@ function travelDialog(){
    saveRun();modal.classList.remove('show');modal.removeEventListener('keydown',key);resolve();
   };
   buttons[0].onclick=()=>choose('normal');buttons[1].onclick=()=>choose('brave');modal.classList.add('show');modal.addEventListener('keydown',key);buttons[0].focus();
+  if(S.run.mode!=='p'){S.run.voiceCity=city;saveRun();playVoice(h.id,city)}   // el héroe saluda la ciudad mientras eliges el camino
  });
 }
 let advancingClear=false;
@@ -137,7 +151,7 @@ async function advanceClear(){
   delete S.run.pendingClear;saveRun();await resumeAdventure();
  }finally{advancingClear=false}
 }
-export function win(){
+export function win(){                                  // la voz del héroe NO se corta al ganar: termina su frase aunque el nivel sea rápido
  if(S.G.done)return;S.G.done=true;S.busy=true;boardEl.classList.add('board-lock');
  const gain=gainNow(),previous=S.run.score;
  S.run.score+=gain.total;S.run.cleared=(S.run.cleared||0)+1;S.run.streak=gain.eff>=.9?(S.run.streak||0)+1:0;
@@ -157,6 +171,7 @@ export function win(){
 /* ---------- Derrota ---------- */
 /** Al pasarte del límite la aventura termina (la tienda se usa antes, no al perder). */
 export function fail(why){
+  stopVoice();
   if(S.G.done)return;
   finalFail(why);
 }
@@ -180,7 +195,7 @@ async function offerPaidRevive(why){
   if(accepted){
     const r=payRevive(S.run);
     if(r.ok){
-      S.G.pos=S.G.start.slice();S.G.moves=0;S.G.hist=[];S.G.done=false;S.G.bought=0;S.G.limit=heroLimit(S.run.hero,S.G.opt,S.run.start,S.run.level);
+      S.G.pos=S.G.start.slice();S.G.moves=0;S.G.hist=[];S.G.done=false;S.G.bought=0;S.G.limit=heroLimit(S.run.hero,S.G.opt,S.run.start,S.run.level,S.run.route==='brave');
       $('score').textContent=S.run.score.toLocaleString('de-DE');$('lim').textContent=S.G.limit;recLine();
       saveRun();boardEl.classList.remove('board-lock');S.busy=false;$('bUndo').disabled=true;layout();updateHud();
       Music.duck(1);playReviveEffect('¡RENACER!',false);$('msg').textContent=`Renaciste (−${r.cost.toLocaleString('de-DE')} pts). ¡Este tablero empieza de nuevo!`;

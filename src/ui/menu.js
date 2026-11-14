@@ -1,12 +1,13 @@
 import { Music, setTensionFx } from '../audio/music.js';
 import { soundLabel, toggleSound } from '../audio/sound.js';
-import { zoneIdx, zoneOf } from '../data/zones.js';
+import { zoneIdx } from '../data/zones.js';
 import { $ } from '../dom.js';
 import { recordBest, resumeAdventure, saveRun, startRun } from '../game/session.js';
 import { PATHS, S, heroOf, pathOf, persist, store } from '../state.js';
 import { syncRouteStyle } from './board.js';
 import { syncHero } from './heroes.js';
 import { showMap } from './map.js';
+import { stopVoice } from '../audio/voice.js';
 /* ---------- Menú: elegir camino ---------- */
 const MODE_INFO={
   c:'Sube puntos nivel a nivel. Si agotas los turnos (el doble del mínimo) sin sacar la llave, la partida termina.',
@@ -20,11 +21,10 @@ function renderPaths(){
     const rec=store.paths[mode+p.s],lvl=rec?rec.level:0,prog=lvl?Math.max(4,lvl):0;
     const big=mode==='c'?(rec&&rec.score?rec.score.toLocaleString('de-DE'):'—'):(lvl?lvl:'—');
     const lbl=mode==='c'?'RÉCORD':'NIVEL MÁX.';
-    let txt='Aún sin jugar';
-    if(rec&&lvl) txt=(lvl>=100?'👑 Completado · ':'')+`Nivel máx. ${lvl}/100 · ${zoneOf(lvl).e} ${zoneOf(lvl).n}`+(rec.runs?` · ${rec.runs} partida${rec.runs>1?'s':''}`:'');
+    const txt=`${lvl>=100?'👑 ':''}Nivel máximo ${lvl}/100`;
     const d=document.createElement('div');d.className='path';d.style.setProperty('--pc',p.c);
     d.innerHTML=`<div class="ptop"><div class="pemo">${p.e}</div>
-      <div class="pinfo"><b>${p.n}</b><span>${p.d}</span></div>
+      <div class="pinfo"><b>${p.n}</b></div>
       <div class="pscore"><small>${lbl}</small><b>${big}</b></div></div>
       <div class="pach"><div class="pbar"><i style="width:${prog}%"></i></div><span>${txt}</span></div>`;
     d.onclick=()=>pickPath(p.s,mode);
@@ -76,11 +76,11 @@ $('pProgress').onclick=async()=>{
 };
 $('pSave').onclick=()=>{
  if(!S.run||!S.G||S.G.done)return;
- saveRun();S.G.done=true;S.run=null;S.busy=false;
+ saveRun();stopVoice();S.G.done=true;S.run=null;S.busy=false;
  $('pause').classList.remove('show');Music.stop(.2);setTensionFx(0,false);openMenu();
 };
 $('pQuit').onclick=()=>{
- if(!S.run)return;recordBest(true);store.run=null;if(S.G)S.G.done=true;S.run=null;S.busy=false;persist();
+ if(!S.run)return;stopVoice();recordBest(true);store.run=null;if(S.G)S.G.done=true;S.run=null;S.busy=false;persist();
  $('pause').classList.remove('show');Music.stop(.2);setTensionFx(0,false);openMenu();
 };
 $('pSound').onclick=toggleSound;

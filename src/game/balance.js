@@ -1,6 +1,6 @@
 import { mulberry32, hash32 } from '../engine/rng.js';
-import { curve, rateAt, moveLimit, startHintsFor, MAX_LEVEL } from '../engine/difficulty.js';
-import { calcGain } from '../engine/scoring.js';
+import { curve, rateAt, moveLimit, braveExtra, startHintsFor, MAX_LEVEL } from '../engine/difficulty.js';
+import { calcGain, gainFor } from '../engine/scoring.js';
 import { freeUndosFor, freeHintsFor, juthActive, HINT_EVERY, CITY_EVERY, bonusTurns } from './heroes.js';
 import { MAX_REVIVES, REVIVE_SHARE, priceOf, extraTurns } from './shop.js';
 
@@ -35,8 +35,8 @@ const isBonusLevel = (level) => level >= 15 && level < 100 && level % 10 === 5;
  * Jugador que usa la tienda (`shop = {score, rating}`): al quedarse sin turnos compra los turnos más baratos que le alcancen,
  * y si no le quedan pistas en un tablero duro compra una, pero solo si le sobran puntos (MODEL.shopReserve veces el precio).
  */
-function playBoard(rng, { hero, skill, d, start = 1, level = 1, hints, undos, freeHints = 0, shop = null }) {
-  const baseLimit = moveLimit(d, start, level);
+function playBoard(rng, { hero, skill, d, start = 1, level = 1, hints, undos, freeHints = 0, shop = null, brave = false }) {
+  const baseLimit = moveLimit(d, start, level, brave);
   let limit = baseLimit + bonusTurns(hero, baseLimit, start);
   let spent = 0;
   let boughtTurns = 0;
@@ -89,7 +89,7 @@ function playBoard(rng, { hero, skill, d, start = 1, level = 1, hints, undos, fr
  * @param {string} [o.revive]    'none' | 'city': comprar un revivir al empezar cada ciudad (desde la 3ª) mientras queden
  * @returns {{cleared:number, score:number, completed:boolean, revivesBought:number}}
  */
-export function simulateRun({ hero, start, skill, seed, revive = 'none', powers = {}, shop = false }) {
+export function simulateRun({ hero, start, skill, seed, revive = 'none', powers = {}, shop = false, route = 'normal' }) {
   const juthHints = powers.juthHints ?? 0;              // (el poder antiguo de Juth: pistas extra por ciudad)
   const juthEvery = powers.juthEvery ?? 1;           // la pista gratis llega cada N tableros
   const rng = mulberry32(seed);
@@ -109,10 +109,11 @@ export function simulateRun({ hero, start, skill, seed, revive = 'none', powers 
       bought++;
     }
     const rating = rateAt(start, level);
-    const d = Math.max(1, curve(rating).target + adj);
+    const d0 = Math.max(1, curve(rating).target + adj);
+    const d = route === 'brave' ? d0 + braveExtra(d0) : d0;
     let res;
     for (;;) {
-      res = playBoard(rng, { hero, skill, d, start, level, hints, undos: hero === 'jean' ? (powers.undos ?? freeUndosFor(d, start)) : 0, shop: shop ? { score, rating } : null, freeHints: hero === 'van' && level % juthEvery === 0 && juthActive(level, start) ? (powers.juthFree ?? freeHintsFor(d, start)) : 0 });
+      res = playBoard(rng, { hero, skill, d, start, level, brave: route === 'brave', hints, undos: hero === 'jean' ? (powers.undos ?? freeUndosFor(d, start)) : 0, shop: shop ? { score, rating } : null, freeHints: hero === 'van' && level % juthEvery === 0 && juthActive(level, start) ? (powers.juthFree ?? freeHintsFor(d, start)) : 0 });
       hints = res.hints;
       score -= res.spent;
       spentTotal += res.spent;
@@ -122,8 +123,8 @@ export function simulateRun({ hero, start, skill, seed, revive = 'none', powers 
       if (charges > 0) { charges--; continue; }
       return { cleared: level - 1, score, completed: false, revivesBought: bought, spent: spentTotal, turnsBought, hintsBought };
     }
-    const gain = calcGain(rating, res.moves, d, streak);
-    score += gain.total;
+    const gain = route === 'brave' ? gainFor(rating, res.moves, d, streak, { brave: true }) : calcGain(rating, res.moves, d, streak);
+    score += gain.total + (gain.routeBonus || 0);
     streak = gain.eff >= 0.9 ? streak + 1 : 0;
     adj = Math.max(-2, Math.min(level < 10 ? 1 : 2, adj + (gain.eff >= 0.9 ? 1 : gain.eff < 0.4 ? -1 : 0)));
     if (level % HINT_EVERY === 0) hints++;
@@ -134,7 +135,7 @@ export function simulateRun({ hero, start, skill, seed, revive = 'none', powers 
 }
 
 /** Media de `runs` partidas (semillas deterministas) para una combinación héroe/camino/habilidad. */
-export function averageRuns({ hero, start, skill, runs = 300, revive = 'none', salt = 0, powers = {}, shop = false }) {
+export function averageRuns({ hero, start, skill, runs = 300, revive = 'none', salt = 0, powers = {}, shop = false, route = 'normal' }) {
   let cleared = 0;
   let score = 0;
   let spent = 0;
@@ -143,7 +144,7 @@ export function averageRuns({ hero, start, skill, runs = 300, revive = 'none', s
   let done = 0;
   for (let i = 0; i < runs; i++) {
     // misma semilla para todos los héroes en la misma habilidad/camino: comparación justa (mismos «dados»)
-    const r = simulateRun({ hero, start, skill, revive, powers, shop, seed: hash32(i, start, Math.round(skill * 100), salt) });
+    const r = simulateRun({ hero, start, skill, revive, powers, shop, route, seed: hash32(i, start, Math.round(skill * 100), salt) });
     cleared += r.cleared;
     score += r.score;
     spent += r.spent;

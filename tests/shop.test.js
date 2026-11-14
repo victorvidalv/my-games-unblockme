@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { SHOP_ITEMS, extraTurns, pathPrice, REVIVE_SHARE, MAX_REVIVES, reviveCost, canPaidRevive, payRevive, hasRevive, useRevive, priceOf, availability, buy } from '../src/game/shop.js';
 import { moveStatus } from '../src/engine/rules.js';
 import { baseScore } from '../src/engine/scoring.js';
@@ -166,3 +167,34 @@ describe('revivir al caer (fuera de la tienda)', () => {
     expect(hasRevive(run)).toBe(false);
   });
 });
+
+describe('tienda: textos sin porcentajes (solo «esto vale tanto»)', () => {
+  it('ningún nombre ni descripción de la tienda habla de porcentajes', () => {
+    for (const i of SHOP_ITEMS) expect(`${i.name} ${i.detail}`, i.id).not.toMatch(/%|porcentaje/i);
+    const ui = readFileSync(new URL('../src/ui/shop.js', import.meta.url), 'utf8');
+    const lines = ui.split('\n').filter((l) => /SHORT|SAY|greet|moves3:|moves:/.test(l)).join('\n');
+    expect(lines).not.toMatch(/%/);
+  });
+});
+
+describe('Don Dublón: vendedor sarcástico con frases variadas', () => {
+  const src = readFileSync(new URL('../src/ui/shop.js', import.meta.url), 'utf8');
+  const pool = (name) => {
+    const m = new RegExp(`\\n  ${name}: \\[([\\s\\S]*?)\\],\\n`).exec(src);
+    return [...m[1].matchAll(/'((?:[^'\\\\]|\\\\.)*)'/g)].map((x) => x[1]);
+  };
+  it('al abrir la tienda hay 10 o más saludos distintos y al comprar 5 frases al azar', () => {
+    const greet = pool('greet');
+    expect(greet.length).toBeGreaterThanOrEqual(10);
+    expect(new Set(greet).size).toBe(greet.length);
+    expect(pool('bought')).toHaveLength(5);
+    for (const k of ['hint', 'moves3', 'moves', 'redo', 'skip']) expect(pool(k).length, k).toBeGreaterThanOrEqual(3);
+    expect(pool('poor').length).toBeGreaterThanOrEqual(4);
+  });
+  it('habla con sonido propio (balbuceo, campanilla, monedas y gesto de «no») y nunca repite la frase anterior', () => {
+    for (const fn of ['merchantTalk', 'merchantBell', 'merchantCoin', 'merchantNope']) expect(readFileSync(new URL('../src/audio/sound.js', import.meta.url), 'utf8')).toContain(fn);
+    expect(src).toContain('sfx.merchantTalk');
+    expect(src).toMatch(/sin repetir la anterior/);
+  });
+});
+

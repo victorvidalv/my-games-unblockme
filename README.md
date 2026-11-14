@@ -1,6 +1,6 @@
 # SLIDE & SLAY
 
-Un puzle de bloques con tres héroes y cien niveles. Abre el camino entre las diez ciudades de Tri
+Un puzle de bloques con tres héroes y cien niveles. Abre el camino entre los diez reinos de Thyes (año 4133)
 y devuelve la luz al Faro del Alba. Funciona en el navegador y se puede instalar como app (PWA, también sin conexión).
 
 - **Objetivo:** desliza los bloques y saca la llave roja por la derecha en el menor número de movimientos.
@@ -165,7 +165,7 @@ falta una familia usa otra), `varyBoard()` crea una variante propia de cada part
 - **Normal:** distancia = objetivo de la curva + ajuste adaptativo.
 - **Adaptativo:** si juegas con ≥ 90 % de eficiencia el ajuste sube (máx. +1 hasta el nivel 10, +2 después);
   si < 40 %, baja (mín. −2).
-- **Ruta aventurera** (al terminar una ciudad): la siguiente distancia mayor y +10 % de puntos.
+- **Ruta aventurera** (al terminar una ciudad): el tablero pide un 10 % más de movimientos (mínimo +1) y el límite de turnos es algo más estricto (−0,04 de factor), a cambio de +10 % de puntos. Calibrada con `npm run simulate` (sección Rutas): al jugador hábil en Normal le compensa; en Difícil y Experto es un riesgo real.
 - Siempre dentro de ±3 del objetivo, y el límite de movimientos baja de ×2 a ×1,3 del mínimo entre el nivel 1 y el 100 (`limitFactor`).
 
 > Si cambias `curve()` o las reglas de generación, ejecuta `npm run levels:all` y `npm test`
@@ -190,7 +190,7 @@ Elegir héroe es permanente durante la aventura. Las reglas están en [`src/game
 
 | Héroe | Poder | Función |
 |---|---|---|
-| **Lía** | Turnos de reserva: +19 % de turnos en cada tablero (mínimo 2), calibrado con `npm run simulate` para igualar a Jean y Juth. | `bonusTurns`, `heroLimit` |
+| **Lía** | Turnos de reserva: +23 % de turnos en cada tablero (mínimo 2), calibrado con `npm run simulate` para igualar a Jean y Juth. | `bonusTurns`, `heroLimit` |
 | **Jean** | Pasos atrás: deshacer gratis en proporción al tablero (15 % del mínimo, entre 1 y 6; el movimiento se descuenta). | `freeUndosLeft`, `applyUndo` |
 | **Juth** | Una luz en cada tablero: pistas gratis en proporción al tablero (1 por cada ~24 movimientos del mínimo, entre 1 y 3: 2 desde ~36); no gasta tu reserva. | `freeHintsLeft`, `spendHint` |
 
@@ -212,10 +212,23 @@ a recargar la página y a las partidas guardadas antiguas.
 - **Poderes:** turnos de reserva de Lía, deshacer de Jean proporcional al tablero (y migración de guardados antiguos), bono de Juth sin duplicarse, Práctica sin consumo.
 - **Reglas:** movimientos restantes y estados ok / aviso / último / eliminado.
 
+## Mundo e historia
+
+El juego transcurre en **Thyes, año 4133**, un mundo de diez reinos (las diez ciudades). La sombra de **Vhorn** apagó el Faro del Alba y **Tri**, guardiana del Faro, selló los reinos: todos creen que fue ella quien los encerró. Cada sello lleva grabada una frase; leídas en orden revelan por qué cerró Tri. Tres luces pueden despertar lo sellado —la Brasa (Lía), la Hora (Jean) y la Palabra (Juth)— y la llave roja abre cada cerrojo. Cuatro pueblos antiguos guardan pedazos de la historia: los **Kogn** (navegantes, en el Puerto), los **Sahrim** (caravaneros, en el Oasis), los **Ennari** (escribas de la corteza, en la Aldea) y los **Aluen** (tejedores de puentes bajo las estrellas, en la Ciudad Celeste).
+Los nombres y la trama están en [`src/data/lore.js`](src/data/lore.js) y los textos de cada capítulo y héroe en [`src/data/story.js`](src/data/story.js); `tests/lore.test.js` vigila que todo calce.
+
 ## Música
 
 Cada ciudad tiene UNA melodía central y, a medida que subes por sus 10 niveles, se le suman capas (nivel 1: melodía, cuerdas y bajo mínimo; 2: bajo completo; 3: percusión ligera; 4: acordes; 5: bombo y caja; 6: arpegio; 7: contramelodía; 8: orquesta; 9: melodía doblada una octava arriba; 10: todo). Al pasar a la ciudad siguiente cambia el tema y vuelve a la capa 1. Los temas y las capas están en [`src/audio/themes.js`](src/audio/themes.js) y el secuenciador en [`src/audio/music.js`](src/audio/music.js).
 Para escucharlas: `npm run melodies:html` genera `output/melodias.html` (un solo archivo, se abre con doble clic) con un deslizador de capa y un botón «Recorrer 1→10»; en desarrollo también está en `/melodies.html`.
+
+## Voces de los héroes
+
+Cada héroe saluda con su voz cada ciudad: la primera (el Valle) al empezar la aventura y las demás **al elegir el camino** (Tranquilo o Aventurero) al terminar la ciudad anterior, sin texto en pantalla y con la música más baja. Una frase por ciudad y héroe, una sola vez; respeta el botón de sonido. Los audios están en `public/voces/` (`lia-NN.m4a`, `jean-NN.m4a`, `juth-NN.m4a`, con NN = ciudad 01-10) y el guion en `output/voces/guion-voces.md`; el código en [`src/audio/voice.js`](src/audio/voice.js) y [`src/data/voices.js`](src/data/voices.js).
+
+## Minijuegos de descanso
+
+En los niveles 15, 25… 95 hay un descanso con un minijuego que da **pistas**. Una **ruleta del destino** mística (un anillo de seis sellos que gira y chasquea) anuncia cuál toca: las **cartas** del umbral, la **rueda** de los sellos, el **altar de los ecos** (una tragaperras en la que tú paras los tres rodillos), las **luciérnagas** (12 s, cada vez más rápidas y numerosas, con combos), las **runas de la memoria** (tipo «Simón») y el **péndulo del tiempo** (para la bola en la zona dorada). El premio máximo es proporcional al nivel: de 3 pistas en el nivel 15 a 10 en el 95. Reglas puras en [`src/game/minigames.js`](src/game/minigames.js) (con tests) e interfaz en [`src/ui/bonus.js`](src/ui/bonus.js).
 
 ## Tienda
 
@@ -227,8 +240,8 @@ Los turnos comprados aparecen como cristales de hielo bajo el medidor, y se «de
 |---|---|---|
 | 💡 Pista | 3 niveles | Una pista extra |
 | ↺ Rehacer tablero | 4 niveles | Reinicia el tablero con 0 movimientos (conserva los turnos comprados) |
-| ⏳ +10 % de turnos | 6 niveles | Sube el límite un 10 % (mínimo 2 turnos) |
-| ⏳ +20 % de turnos | 10 niveles | Sube el límite un 20 % (mínimo 3 turnos) |
+| ⏳ Turnos extra | 6 niveles | Unos turnos más para este tablero (la tienda muestra cuántos) |
+| ⏳ Muchos turnos extra | 10 niveles | Bastantes turnos más para este tablero |
 | ⏭ Saltar nivel | 16 niveles | Pasa al siguiente sin puntos y sin racha |
 
 Si te pasas del límite de movimientos la aventura termina: **no se ofrece comprar turnos al perder**, hay que comprarlos antes.

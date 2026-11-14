@@ -6,9 +6,9 @@ import { moveLimit } from '../engine/difficulty.js';
 
 /* Ojo: el identificador interno de Juth sigue siendo 'van' (imágenes heroes/van*.webp y partidas guardadas). Solo cambia el nombre que se ve. */
 export const HEROES = [
-  { id: 'lia', name: 'Lía', role: 'Portadora de la Brasa', icon: 'heart', color: '#68d8bd', power: 'Turnos de reserva', short: '+19 % de turnos en cada tablero', detail: 'Cada tablero te da un 19 % más de turnos (mínimo 2). Perdona los errores pequeños sin quitarte el reto.', quote: '«Incluso la ceniza recuerda el calor.»' },
-  { id: 'jean', name: 'Jean', role: 'Vigía del Péndulo', icon: 'clock', color: '#8fb9ff', power: 'Tres pasos atrás', short: 'Deshacer gratis según el tablero', detail: 'Desanda tus tres últimos movimientos sin penalización, uno a uno.', quote: '«Todo error deja una grieta por donde volver.»' },
-  { id: 'van', name: 'Juth', role: 'Escriba de las Runas', icon: 'stars', color: '#c5a2ff', power: 'Una luz en cada tablero', short: 'Pistas gratis según el tablero', detail: 'Revela un paso seguro en cada tablero sin gastar tu reserva de pistas.', quote: '«Lo que no se nombra sigue buscando salida.»' },
+  { id: 'lia', name: 'Lía', role: 'Portadora de la Brasa', icon: 'heart', color: '#68d8bd', power: 'Turnos de reserva', short: 'Más turnos en cada tablero', detail: 'Cada tablero te da un margen extra de turnos para perdonar los errores pequeños sin quitarte el reto.', quote: '«Incluso la ceniza recuerda el calor.»' },
+  { id: 'jean', name: 'Jean', role: 'Vigía del Péndulo', icon: 'clock', color: '#8fb9ff', power: 'Pasos atrás', short: 'Algunos deshacer gratis', detail: 'Desanda tus movimientos sin penalización: un error no tiene por qué costarte el tablero.', quote: '«Todo error deja una grieta por donde volver.»' },
+  { id: 'van', name: 'Juth', role: 'Escriba de las Runas', icon: 'stars', color: '#c5a2ff', power: 'Una luz en cada tablero', short: 'Algunas pistas gratis', detail: 'Revela un paso seguro sin gastar tu reserva de pistas.', quote: '«Lo que no se nombra sigue buscando salida.»' },
 ];
 
 export const heroById = (id) => HEROES.find((h) => h.id === id) || HEROES[0];
@@ -56,8 +56,8 @@ export const bonusTurns = (heroId, baseLimit, start = 1) => {
 };
 
 /** Límite de movimientos de un tablero de mínimo `opt` para ese héroe y camino. */
-export const heroLimit = (heroId, opt, start = 1, level = 1) => {
-  const base = moveLimit(opt, start, level);
+export const heroLimit = (heroId, opt, start = 1, level = 1, brave = false) => {
+  const base = moveLimit(opt, start, level, brave);
   return base + bonusTurns(heroId, base, start);
 };
 

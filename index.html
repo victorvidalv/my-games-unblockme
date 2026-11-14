@@ -69,6 +69,8 @@
      <div class="travel-lore-head">
       <span class="travel-seal" id="travelSeal"></span>
      </div>
+     <p class="travel-inscription" id="travelInscription"></p>
+     <figure class="travel-lore" id="travelLore" hidden><img id="travelLoreImg" alt="" width="64" height="96"><figcaption><b id="travelLoreName"></b><span id="travelLoreCap"></span></figcaption></figure>
      <ul class="travel-lines" id="travelText"></ul>
      <div class="travel-companion">
       <img class="travel-hero-thumb" id="travelPortrait" alt="">
@@ -95,23 +97,23 @@
  </div>
 </div>
 <div class="modal" id="heroSelect" role="dialog" aria-modal="true" aria-labelledby="heroSelectTitle"><div class="card hero-selector">
- <div class="tag" id="heroPath"></div><h2 id="heroSelectTitle">¿Quién abre el camino?</h2><p class="hero-subtitle">Un compañero. Un poder. Hasta el final.</p>
+ <div class="tag" id="heroPath" hidden></div><h2 id="heroSelectTitle">Elige tu compañero</h2>
  <div class="hero-cards" id="heroCards" role="radiogroup" aria-label="Elige un héroe"></div>
- <div class="hero-power"><span class="hero-power-icon" id="heroPowerIcon" aria-hidden="true"></span><div><h3 id="heroPowerTitle"></h3><strong id="heroPowerShort"></strong><p id="heroPowerDetail"></p></div></div>
- <p id="heroQuote"></p>
- <div class="hero-selector-actions"><button id="heroCancel">Volver al menú</button><button class="primary" id="heroConfirm">Comenzar la aventura ➜</button></div>
+ <div class="hero-power"><span class="hero-power-icon" id="heroPowerIcon" aria-hidden="true"></span><div><h3 id="heroPowerTitle" hidden></h3><strong id="heroPowerShort"></strong><p id="heroPowerDetail" hidden></p></div></div>
+ <p id="heroQuote" hidden></p>
+ <div class="hero-selector-actions"><button id="heroCancel">Menú</button><button class="primary" id="heroConfirm">Comenzar aventura ➜</button></div>
 </div></div>
 <div class="modal" id="rescue" role="dialog" aria-modal="true" aria-labelledby="rescueTitle"><div class="card rescue-card"><img class="rescue-portrait" id="rescueHero" alt="Lía protege la aventura"><span class="rescue-heart" id="rescueIcon" aria-hidden="true"></span><div class="tag" id="rescueTag"></div><h2 id="rescueTitle">La aventura sigue</h2><p id="rescueText"></p><button class="primary" id="rescueContinue">Activar poder</button></div></div>
 <div class="modal" id="reviveOffer" role="dialog" aria-modal="true" aria-labelledby="reviveTitle">
  <div class="revive-stage">
   <img class="revive-backdrop" src="backgrounds/dios-nordico-renacer.webp" alt="" aria-hidden="true">
-  <img class="revive-god" src="backgrounds/dios-nordico-renacer.webp" alt="Dios nórdico del renacer">
+  <img class="revive-god" src="backgrounds/dios-nordico-renacer.webp" alt="El Viejo de la Fragua, el dios del último aliento">
   <div class="revive-vignette" aria-hidden="true"></div>
   <div class="revive-shell">
    <header class="revive-top">
     <div class="tag">ÚLTIMO UMBRAL · SOLO 1 VEZ POR PARTIDA</div>
     <h2 id="reviveTitle">¿Renacer de las cenizas?</h2>
-    <p class="revive-cryptic">«El dios del fuego concede un aliento al caído, mas cobra un tercio de su gloria.»</p>
+    <p class="revive-cryptic">«El Viejo de la Fragua devuelve un aliento al caído, mas cobra un tercio de su gloria. Así se pactó antes del Cierre.»</p>
    </header>
    <aside class="revive-panel">
     <div class="revive-explain">
@@ -142,7 +144,7 @@
 
 
 <div class="modal" id="storyBook" role="dialog" aria-modal="true" aria-labelledby="storyTitle"><article class="storybook">
- <div class="book-illustration"><img class="book-scenery" id="storyScene" alt=""><div class="book-series"><small>LAS CRÓNICAS DE LA LLAVE ROJA</small>El Faro<br>del Alba<small style="margin-top:10px">LA SOMBRA DE TRI</small></div><img class="book-portrait" id="storyPortrait" alt=""></div>
+ <div class="book-illustration"><img class="book-scenery" id="storyScene" alt=""><div class="book-series"><small>LAS CRÓNICAS DE LA LLAVE ROJA</small>El Faro<br>del Alba<small style="margin-top:10px">LA SOMBRA DE VHORN · THYES, AÑO 4133</small></div><img class="book-portrait" id="storyPortrait" alt=""></div>
  <div class="book-leaf"><div class="book-chapter" id="storyChapter"></div><h2 id="storyTitle"></h2><p class="book-copy" id="storyBody"></p><p class="book-action" id="storyAction"></p><blockquote class="book-quote" id="storyQuote"></blockquote><div class="book-seal" id="storySeal"></div><div class="book-track" id="storyTrack"></div><button class="primary book-play" id="storyPlay">Abrir el camino ➜</button><nav class="book-pagination" aria-label="Páginas de la aventura"><button id="storyPrevious" aria-label="Página anterior">←</button><span id="storyPage"></span><button id="storyNext" aria-label="Página siguiente">→</button></nav></div>
 </article></div>
 
@@ -170,18 +172,16 @@
 <!-- Menú -->
 <div class="modal show" id="menu">
   <div class="card">
-    <div class="tag">LAS CRÓNICAS DE LA LLAVE ROJA</div>
     <h1 class="logo"><svg class="brand-key" viewBox="0 0 30 38" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><circle cx="15" cy="9" r="6"/><path d="M15 15v19h7m-7-6h5"/></svg>SLIDE &amp; SLAY</h1>
-    <p class="tagline">Tri selló diez reinos. La llave roja aún busca paso.</p>
+    <p class="menu-pick">Escoge el nivel</p>
     <button class="primary cont" id="bContinue" style="display:none"></button>
-    <div class="tag" style="margin-top:10px">ELIGE LA DIFICULTAD</div>
-    <p class="modeinfo" id="modeInfo"></p>
+    <p class="modeinfo" id="modeInfo" hidden></p>
     <div class="paths" id="paths"></div>
     <div class="stack">
       <button id="bResume" style="display:none">↩ Volver al juego</button>
       <button class="install optb">📲 Instalar app</button>
     </div>
-    <div class="ver" id="ver"></div>
+    <div class="ver" id="ver" hidden></div>
   </div>
 </div>
 
