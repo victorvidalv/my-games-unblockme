@@ -69,7 +69,7 @@ export function showMap(fromI,toI,{travel=false,overview=false}={}){
   el.style.setProperty('--atlas-scene',cssUrl(`backgrounds/zone-${toI+1}.webp`));
   $('mTag').textContent=travel?`EL ATLAS DE ${heroOf().name.toUpperCase()} · UN NUEVO HORIZONTE`:`EL ATLAS DE ${heroOf().name.toUpperCase()} · CIUDAD ${toI+1} DE 10`;
   $('mName').textContent=travel?`Hasta pronto, ${ZONES[fromI].n}`:ZONES[toI].n;
-  $('mSub').textContent=overview?`Nivel actual ${S.run.level} de 100 · Tramo ${zoneStep(S.run.level)} de 10 en esta ciudad`:travel?CHAPTERS[fromI].end:`Diez puzles, una ciudad y un nuevo capítulo. Nivel ${S.run.level} de 100.`;
+  $('mSub').textContent=overview?`Nivel actual ${S.run.level} de 100 · Umbral ${zoneStep(S.run.level)} de 10 en este reino`:travel?CHAPTERS[fromI].end:`Diez umbrales, un sello antiguo. Nivel ${S.run.level} de 100.`;
   el.setAttribute('role',overview?'dialog':'status');if(overview)el.setAttribute('aria-modal','true');else el.removeAttribute('aria-modal');el.setAttribute('aria-labelledby','mName');$('mapClose').hidden=!overview;
   el.classList.remove('out');el.classList.add('show');Music.duck(.35);
   let finished=false,frame=0,timer=0,ready=!travel;

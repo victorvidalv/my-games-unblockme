@@ -87,6 +87,12 @@ const BODIES = {
     <path d="M14.2 17.4l2.2-1.6v8" stroke="#ffffff" stroke-width="2.2"/>
     <path d="M6 24.2h20" stroke="${IRON_DK}" stroke-width="1.2"/>`,
 
+  /** Bloque de hielo con destello glacial: la pieza deslizante. */
+  ice: `<rect x="4.5" y="5.5" width="23" height="21" rx="4.5" fill="#90e3fb"/>
+    <path d="M8 9.2l4.6-2.2M7.6 15.2l8-8" stroke="#ffffff" stroke-width="1.7"/>
+    <path d="M16 9.5v13M10.4 12.7l11.2 6.6M21.6 12.7l-11.2 6.6" stroke="#185978" stroke-width="1.8"/>
+    <circle cx="16" cy="16" r="2.2" fill="#e9fcff" stroke="#185978" stroke-width="1.2"/>`,
+
   /** Corona: los jefes. */
   crown: `<path d="M4.6 24.2L3.2 10.6l6.6 5.6L16 6.4l6.2 9.8 6.6-5.6-1.4 13.6z" fill="#f3c75a"/>
     <rect x="4.6" y="24.2" width="22.8" height="3.6" rx="1.4" fill="${BRASS_DK}"/>

@@ -4,13 +4,12 @@ import { $ } from '../dom.js';
 import { hintMove } from '../engine/solver.js';
 import { applyUndo, canHint, spendHint } from '../game/heroes.js';
 import { updateHeroHud } from './heroes.js';
-import { fail, saveRun, startRun } from '../game/session.js';
-import { S, heroOf, persist, store, undosLeft } from '../state.js';
+import { fail, saveRun } from '../game/session.js';
+import { S, heroOf, undosLeft } from '../state.js';
 import { layout, updateHud } from './board.js';
 import { burst } from './fx.js';
 import { openShop } from './shop.js';
 import { openMenu } from './menu.js';
-$('bAgain').onclick=()=>{$('over').classList.remove('show');store.mode=S.lastCfg.mode;persist();startRun(S.lastCfg.start,S.lastCfg.mode)};
 $('bToMenu').onclick=()=>{$('over').classList.remove('show');openMenu()};
 
 /* ---------- Botones del juego ---------- */

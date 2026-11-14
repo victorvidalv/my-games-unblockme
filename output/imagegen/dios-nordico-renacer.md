@@ -1,0 +1,18 @@
+# Deidad nórdica del renacer
+
+Versión revisada con la herramienta de imágenes integrada. Deidad joven, sin barba, con alas, alma luminosa y fondo infernal.
+
+Referencias directas de estilo: `public/heroes/jean.webp`, `public/heroes/lia.webp` y `public/heroes/van.webp`. Contornos oscuros gruesos, rasgos expresivos, sombras planas y textura de impresión del juego original.
+
+Reemplaza `public/backgrounds/dios-nordico-renacer.webp`. WebP optimizado a 640 × 960 px, calidad 72. El original de alta resolución se conserva en el historial de imágenes generadas.
+
+## Prompt final
+
+Use case: style-transfer.
+Input images: Image 1 jean.webp, image 2 lia.webp, image 3 van.webp are STRICT STYLE REFERENCES. Image 4 dios-nordico-renacer.webp is the EDIT TARGET for scene, character role, Nordic identity and composition ONLY; its old face and detailed drawing style must be replaced.
+Primary request: Redraw the celestial resurrection deity in image 4 from scratch in the exact bold illustrated style of the three original hero references, and make him a YOUNG ADULT man around 23 years old, visibly youthful, CLEAN-SHAVEN with NO beard, NO moustache, NO wrinkles. Athletic youthful face, bright expressive eyes and a calm encouraging half-smile. Tousled silver-white medium-length hair with a small Nordic braid.
+CRITICAL STYLE MATCH: Images 1, 2 and 3 are the game's ORIGINAL HERO DRAWINGS and are the authoritative style references. Match their drawing language very closely, as if the same artist drew the next character in the same game: thick dark brown/black angular ink outlines, bold graphic anime/manga face construction, large sharply drawn expressive eyes, angular nose with only a few lines, stylized chunky hair locks, angular folds, flat limited colors and hard-edged cel shadows, sparse hatching, distressed vintage paper print and rough ink edges. Simplify details to the same level as these original hero drawings. The face must look like a character from this exact cast. Use strong readable graphic shapes and confident thick contour lines. NOT realistic, NOT semi-realistic, NOT soft painterly, NOT intricate fine-line engraving, NOT delicate thin-line illustration, NOT glossy or 3D. Do not copy the hero identities, clothes or props literally.
+Subject: Young male Nordic angelic god who revives the heroes. Ivory travel-like ceremonial cloak with a simple fur collar, restrained antique gold Nordic knot motifs and a small gold circlet. Two large feathered wings drawn with bold grouped feather shapes rather than hundreds of fine lines. A simple golden knotwork halo, faint turquoise spirit aura. One hand extends toward the player, the other holds a small human-shaped soul made of golden light. An unmistakable benevolent spiritual being, not an elderly sage.
+Backdrop: Preserve the infernal setting: stylized black basalt, red-orange lava rivers and distant ruined arches, dark charcoal-red sky. Render the background with the same graphic cel-shaded ink style and antique-paper texture. A soft shaft of holy ivory light around the deity.
+Composition: Portrait 2:3, opaque full bleed, waist-to-knees three-quarter figure, face large enough to read like the original hero portraits, both hands inside the frame, luminous wings and halo visible, readable infernal backdrop along the sides. Nordic spiritual identity and resurrection action must be clear.
+Constraints: Single illustration, one young god plus one abstract tiny soul. No text, symbols resembling lettering, logo, watermark, border, UI or weapons. Keep the scene's essential role and hell background; completely change the age and rendering to match the original heroes.

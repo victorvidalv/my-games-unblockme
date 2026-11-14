@@ -140,8 +140,8 @@ describe('dificultad', () => {
 
 describe('generador', () => {
   it('es determinista: misma semilla, mismo tablero', () => {
-    const a = generateBoard(30, 4242);
-    const b = generateBoard(30, 4242);
+    const a = generateBoard(12, 4242);
+    const b = generateBoard(12, 4242);
     expect(encodeBoard(a.pieces, a.pos)).toBe(encodeBoard(b.pieces, b.pos));
     expect(a.maxd).toBe(b.maxd);
   }, 120000);

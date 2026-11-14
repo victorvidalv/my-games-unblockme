@@ -38,10 +38,16 @@ export const sfx={
   hint:()=>{tone(880,.2,'sine',.1);tone(1320,.3,'sine',.08,.08)},
   gateMove:()=>{tone(740,.07,'square',.045);tone(520,.1,'triangle',.06,.05);tone(1480,.05,'sine',.03,.02)},          // metal: clic de cerradura y deslizar
   heavyMove:()=>{tone(95,.16,'triangle',.13);tone(70,.22,'sine',.1,.04,-25);tone(190,.06,'square',.04)},                  // golpe sordo y grave
+  iceMove:()=>{tone(1180,.07,'sine',.05,0,420);tone(1760,.11,'triangle',.045,.04,300);tone(2340,.08,'sine',.03,.08)},     // desliz cristalino sobre hielo
   unlock:()=>{[523,784,1047,1568].forEach((f,i)=>tone(f,.16,'triangle',.09,i*.05));tone(1976,.3,'sine',.06,.2)},
   locked:()=>{tone(150,.18,'square',.06);tone(120,.22,'square',.05,.1)},
   plate:()=>{tone(330,.1,'triangle',.08);tone(494,.14,'triangle',.07,.07)},
   start:()=>{tone(330,.12,'triangle',.08);tone(494,.18,'triangle',.08,.08)},
+  revive:()=>{
+    tone(130.8,.85,'triangle',.15,0,130.8);tone(196,.75,'triangle',.1,.06);
+    [261.6,329.6,392,523.2,659.3,784,1046.5].forEach((f,i)=>tone(f,.45,'sine',.11,i*.065));
+    [1318.5,1568,2093].forEach((f,i)=>tone(f,.55,'triangle',.06,.38+i*.06));
+  },
   warn:()=>tone(220,.16,'sine',.04),
   fanfare:()=>{[523,659,784,1047,1319,1568,2093].forEach((f,i)=>tone(f,.45,'sine',.12,i*.11));[523,659,784,1047].forEach(f=>tone(f,1.6,'triangle',.07,.85))},
   journey:()=>{[392,494,587,784].forEach((f,i)=>tone(f,.5,'sine',.08,i*.35));tone(98,1.6,'triangle',.06,0,40);[1175,1568].forEach((f,i)=>tone(f,.4,'sine',.05,2+i*.12))},

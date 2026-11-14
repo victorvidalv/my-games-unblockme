@@ -1,5 +1,6 @@
 /* ---------- Adaptación móvil ---------- */
-html{touch-action:manipulation;-webkit-text-size-adjust:100%}
+html,body{touch-action:manipulation;-webkit-text-size-adjust:100%}
+#board{touch-action:none}
 body{position:fixed;inset:0;width:100%}
 .card{max-height:94dvh;overflow-y:auto;overscroll-behavior:contain}
 button{min-height:44px}
@@ -16,8 +17,8 @@ button{min-height:44px}
 @media (min-aspect-ratio:13/10){
   #app{max-width:none;display:grid;grid-template-columns:minmax(240px,380px) auto;justify-content:center;align-content:center;align-items:center;column-gap:26px;row-gap:9px;
        padding:calc(env(safe-area-inset-top) + 8px) calc(env(safe-area-inset-right) + 40px) calc(env(safe-area-inset-bottom) + 8px) calc(env(safe-area-inset-left) + 18px)}
-  .top,.prog,.meter,.hint-text,.controls{grid-column:1;width:100%;max-width:none;justify-self:stretch}
-  .frame{grid-column:2;grid-row:1/7}
+  .top,.prog,.meter,.hint-text,.legend,.controls{grid-column:1;width:100%;max-width:none;justify-self:stretch}
+  .frame{grid-column:2;grid-row:1/8}
 }
 /* Tablet y escritorio: más aire y letra más grande */
 @media (min-width:700px) and (max-aspect-ratio:13/10){ #app{max-width:760px} }

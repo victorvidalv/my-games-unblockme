@@ -101,4 +101,14 @@ describe('arrastre: snapDrag', () => {
       }
     }
   });
+  it('con hielo (kind="ice"), cualquier arrastre válido lleva la pieza directo hasta el tope', () => {
+    for (let x0 = 0; x0 <= 4; x0++) for (let lo = 0; lo <= x0; lo++) for (let hi = x0; hi <= 4; hi++) {
+      for (let d = -5; d <= 5; d += 0.15) {
+        const r = snapDrag(x0, lo, hi, d, 'ice');
+        expect([x0, lo, hi]).toContain(r);
+        if (d > DRAG_MIN && hi > x0) expect(r).toBe(hi);
+        if (d < -DRAG_MIN && lo < x0) expect(r).toBe(lo);
+      }
+    }
+  });
 });

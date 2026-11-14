@@ -1,5 +1,5 @@
 import { mulberry32, hash32 } from '../engine/rng.js';
-import { curve, rateAt, moveLimit, MAX_LEVEL } from '../engine/difficulty.js';
+import { curve, rateAt, moveLimit, startHintsFor, MAX_LEVEL } from '../engine/difficulty.js';
 import { calcGain } from '../engine/scoring.js';
 import { FREE_UNDOS, JUTH_FREE_HINTS, HINT_EVERY, CITY_EVERY } from './heroes.js';
 import { MAX_REVIVES, REVIVE_SHARE } from './shop.js';
@@ -30,8 +30,8 @@ export const HEROES_SIM = ['none', 'lia', 'jean', 'van'];   // «none» = sin po
 
 const isBonusLevel = (level) => level >= 15 && level < 100 && level % 10 === 5;
 
-function playBoard(rng, { skill, d, hints, undos, freeHints = 0 }) {
-  const limit = moveLimit(d);
+function playBoard(rng, { skill, d, start = 1, hints, undos, freeHints = 0 }) {
+  const limit = moveLimit(d, start);
   const err = Math.min(0.85, (1 - skill) * MODEL.err * (1 + d / 25));
   let moves = 0;
   let h = hints;
@@ -76,7 +76,7 @@ export function simulateRun({ hero, start, skill, seed, revive = 'none', powers 
   const juthFree = powers.juthFree ?? JUTH_FREE_HINTS;
   const juthEvery = powers.juthEvery ?? 1;           // la pista gratis llega cada N tableros
   const rng = mulberry32(seed);
-  let hints = MODEL.startHints + Math.floor(start / 25);
+  let hints = startHintsFor(start);
   let score = 0;
   let streak = 0;
   let adj = 0;
@@ -93,7 +93,7 @@ export function simulateRun({ hero, start, skill, seed, revive = 'none', powers 
     const d = Math.max(1, curve(rating).target + adj);
     let res;
     for (;;) {
-      res = playBoard(rng, { skill, d, hints, undos: hero === 'jean' ? undosPerBoard : 0, freeHints: hero === 'van' && level % juthEvery === 0 ? juthFree : 0 });
+      res = playBoard(rng, { skill, d, start, hints, undos: hero === 'jean' ? undosPerBoard : 0, freeHints: hero === 'van' && level % juthEvery === 0 ? juthFree : 0 });
       hints = res.hints;
       if (res.ok) break;
       if (hero === 'lia' && livesUsed < lives) { livesUsed++; continue; }

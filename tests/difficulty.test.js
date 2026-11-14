@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { curve, rateAt, minReach, moveLimit, MAX_LEVEL, TARGET_KNOTS, targetFor } from '../src/engine/difficulty.js';
-import { levelPlan, BOSS_NAMES, BOSSES_ENABLED, CITY_FAMILY, mechanicsOfFamily } from '../src/game/mechanics.js';
-import { calcGain, gainFor, BOSS_POINTS } from '../src/engine/scoring.js';
+import { levelPlan, CITY_FAMILY, mechanicsOfFamily } from '../src/game/mechanics.js';
+import { calcGain, gainFor } from '../src/engine/scoring.js';
 
 const PATHS = { Normal: 1, Difícil: 50, Experto: 75 };
 const targetAt = (start, level) => curve(rateAt(start, level)).target;
@@ -50,57 +50,60 @@ describe('dificultad: la curva se siente apropiada', () => {
     }
     expect(minReach(30)).toBe(curve(30).target);
   });
-  it('el límite sigue siendo el doble del mínimo', () => {
+  it('el límite es el doble en Normal y se vuelve más estricto en Difícil y Experto', () => {
     expect(moveLimit(20)).toBe(40);
+    expect(moveLimit(20, 1)).toBe(40);
+    expect(moveLimit(20, 50)).toBeLessThan(moveLimit(20, 1));
+    expect(moveLimit(20, 75)).toBeLessThan(moveLimit(20, 50));
+    expect(moveLimit(20, 75)).toBeGreaterThan(20);
   });
 });
 
-describe('calendario de piezas especiales y jefes', () => {
-  it('los primeros niveles del Valle son normales (se aprende lo básico) y la primera roca llega en el 6', () => {
-    for (let l = 1; l <= 5; l++) expect(levelPlan(l).family).toBe('plain');
-    expect(levelPlan(6).family).toBe('walls');
-    expect(levelPlan(6).intro).toBe(true);
-  });
-  it('los jefes están desactivados de momento: ningún nivel es jefe, pero siguen definidos para reactivarlos', () => {
-    expect(BOSSES_ENABLED).toBe(false);
-    expect(BOSS_NAMES).toHaveLength(10);
-    for (let l = 1; l <= 100; l++) expect(levelPlan(l).boss, `nivel ${l}`).toBe(false);
-    // el nivel 10 de cada ciudad es un nivel normal más (con su pieza especial según el calendario)
+describe('calendario de piezas especiales', () => {
+  it('los primeros 9 niveles son normales; la primera roca llega en el 10', () => {
+    for (let l = 1; l <= 9; l++) expect(levelPlan(l).family, `nivel ${l}`).toBe('plain');
     expect(levelPlan(10).family).toBe('walls');
+    expect(levelPlan(10).intro).toBe(true);
   });
-  it('cada ciudad introduce su mecánica una sola vez y la repite en 5-6 niveles', () => {
+  it('ningún nivel tiene modo jefe y en todos los tramos hay respiros normales', () => {
+    for (let l = 1; l <= 100; l++) expect(levelPlan(l).boss, `nivel ${l}`).toBeUndefined();
     for (let c = 0; c < 10; c++) {
       const plans = Array.from({ length: 10 }, (_, k) => levelPlan(c * 10 + k + 1));
-      expect(plans.filter((p) => p.intro)).toHaveLength(1);
-      const specials = plans.filter((p) => p.family !== 'plain').length;
-      expect(specials).toBeGreaterThanOrEqual(4);
-      expect(specials).toBeLessThanOrEqual(6);
-      expect(plans.filter((p) => p.family === 'plain').length).toBeGreaterThanOrEqual(4);
+      expect(plans.filter((p) => p.family === 'plain').length, `tramo ${c + 1}`).toBeGreaterThanOrEqual(2);
     }
   });
-  it('no se usa una pieza antes de haberla enseñado: muros primero, luego candado, luego pesada', () => {
+  it('escalado exacto: rocas ≥10, pesada ≥20, candado ≥30, hielo ≥40; solo un tipo hasta el 50 y combinados >50', () => {
     const firstSeen = {};
     for (let l = 1; l <= 100; l++) {
       const p = levelPlan(l);
       for (const m of p.mechanics) if (!(m in firstSeen)) firstSeen[m] = l;
-      if (p.intro) for (const m of p.mechanics) expect(firstSeen[m], `${m} nivel ${l}`).toBeLessThanOrEqual(l);
+      if (l <= 50) expect(p.mechanics.length, `nivel ${l} solo 1 tipo`).toBeLessThanOrEqual(1);
     }
-    // los jefes mixtos (muros + candado + pesada) solo aparecen cuando ya se conocen las tres
-    const bossMixed = [30, 40, 50, 60, 70, 80, 90, 100].filter((l) => levelPlan(l).family === 'mixed');
-    expect(Math.min(...bossMixed)).toBeGreaterThanOrEqual(firstSeen.heavy);
-    expect(firstSeen.wall).toBeLessThan(firstSeen.gate);
-    expect(firstSeen.gate).toBeLessThan(firstSeen.heavy);
+    expect(firstSeen.wall).toBe(10);
+    expect(firstSeen.heavy).toBe(20);
+    expect(firstSeen.gate).toBe(30);
+    expect(firstSeen.ice).toBe(40);
+    const combos = Array.from({ length: 100 }, (_, i) => levelPlan(i + 1)).filter((p) => p.mechanics.length > 1);
+    expect(combos.length).toBeGreaterThan(20);
+    for (let l = 51; l <= 100; l++) {
+      const p = levelPlan(l);
+      if (p.family === 'duo' || p.family === 'mixed') expect(p.mechanics.length).toBeGreaterThanOrEqual(2);
+    }
+    // Densidad ascendente de combinados: segunda mitad (>70) combina más que 51..70
+    const midCombos = Array.from({ length: 20 }, (_, i) => levelPlan(51 + i)).filter((p) => p.mechanics.length > 1).length;
+    const lateCombos = Array.from({ length: 30 }, (_, i) => levelPlan(71 + i)).filter((p) => p.mechanics.length > 1).length;
+    expect(lateCombos / 30).toBeGreaterThan(midCombos / 20);
   });
   it('cada familia declara qué mecánicas contiene', () => {
     expect(CITY_FAMILY).toHaveLength(10);
     expect(mechanicsOfFamily('plain')).toEqual([]);
-    expect(mechanicsOfFamily('mixed')).toEqual(['wall', 'gate', 'heavy']);
+    expect(mechanicsOfFamily('ice')).toEqual(['ice']);
+    expect(mechanicsOfFamily('duo')).toEqual(['gate', 'heavy', 'ice']);
+    expect(mechanicsOfFamily('mixed')).toEqual(['wall', 'gate', 'heavy', 'ice']);
   });
-  it('el jefe da un 50 % más de puntos', () => {
+  it('calcGain y gainFor coinciden sin bonos extra', () => {
     const base = calcGain(40, 15, 15, 0).total;
-    const boss = gainFor(40, 15, 15, 0, { boss: true });
-    expect(boss.total).toBe(base + Math.round(base * (BOSS_POINTS - 1)));
-    expect(boss.bossBonus).toBeGreaterThan(0);
-    expect(gainFor(40, 15, 15, 0).bossBonus).toBe(0);
+    const g = gainFor(40, 15, 15, 0);
+    expect(g.total).toBe(base);
   });
 });

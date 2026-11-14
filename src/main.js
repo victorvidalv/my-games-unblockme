@@ -34,6 +34,19 @@ import './ui/controls.js';
 import './pwa.js';
 
 hydrateIcons();                       // iconos propios en el HTML estático (botones, avisos)
+// Evita zoom accidental por pellizco o doble toque en móvil, iPad y trackpad
+for (const ev of ['gesturestart', 'gesturechange', 'gestureend']) {
+  document.addEventListener(ev, (e) => e.preventDefault(), { passive: false });
+}
+document.addEventListener('touchstart', (e) => {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+document.addEventListener('touchmove', (e) => {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+document.addEventListener('wheel', (e) => {
+  if (e.ctrlKey) e.preventDefault();
+}, { passive: false });
 hooks.onSuspend = () => (S.run ? saveRun() : persist());
 syncHero(store.run?.hero || store.heroChoice || 'lia');
 fitBoard();

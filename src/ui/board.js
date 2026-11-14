@@ -39,6 +39,7 @@ if(window.visualViewport)visualViewport.addEventListener('resize',fitBoard);
 const LOCK_SVG='<svg class="lk shut" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><circle cx="12" cy="16" r="1.6" class="hole"/></svg>'
   +'<svg class="lk free" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/><circle cx="12" cy="16" r="1.6" class="hole"/></svg>';
 const HEAVY_MARK='<span class="mk heavy" title="Pesada: 1 casilla"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14.6" fill="#2b323a" stroke="#1c1208" stroke-width="1.4"/><circle cx="16" cy="16" r="12.6" fill="none" stroke="#f1e6c8" stroke-width="1.8"/><text x="16" y="19.6" text-anchor="middle" font-family="Georgia,serif" font-weight="900" font-size="17" fill="#fff3d0">1</text><path d="M8.2 25.4h5M10.6 23.6l-2.4 1.8 2.4 1.8M23.8 25.4h-5M21.4 23.6l2.4 1.8-2.4 1.8" fill="none" stroke="#ffd98a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+const ICE_MARK='<span class="mk ice" title="Hielo: patina hasta el tope"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14.5" fill="#133d54" stroke="#091118" stroke-width="1.6"/><circle cx="16" cy="16" r="12.2" fill="none" stroke="#baf1ff" stroke-width="1.4"/><path d="M16 7.5v17M8.6 11.7l14.8 8.6M23.4 11.7L8.6 20.3" stroke="#e9fcff" stroke-width="2" stroke-linecap="round"/><path d="M14 9.8l2 2 2-2M14 22.2l2-2 2 2" fill="none" stroke="#8de2fc" stroke-width="1.4" stroke-linecap="round"/><circle cx="16" cy="16" r="2.5" fill="#ffffff"/></svg></span>';
 const STRAPS='<span class="strap h"></span><span class="strap v"></span>';
 export function buildPieces(){
   boardEl.querySelectorAll('.piece,.wall,.plate,.links').forEach(e=>e.remove());
@@ -56,7 +57,7 @@ export function buildPieces(){
     const el=document.createElement('div');
     el.className='piece enter '+p.o+' '+(i===0?'red':'c'+S.G.colors[i%8])+(p.kind?' '+p.kind:'');
     el.style.setProperty('--dl',(i*18)+'ms');
-    el.innerHTML='<div class="face"></div>'+(p.kind==='gate'?STRAPS+'<span class="mk gate">'+LOCK_SVG+'</span>':p.kind==='heavy'?HEAVY_MARK:'');
+    el.innerHTML='<div class="face"></div>'+(p.kind==='gate'?STRAPS+'<span class="mk gate">'+LOCK_SVG+'</span>':p.kind==='heavy'?HEAVY_MARK:p.kind==='ice'?ICE_MARK:'');
     el.addEventListener('animationend',e=>{if(e.animationName==='enter')el.classList.remove('enter')});
     boardEl.appendChild(el);attach(el,i);return el;
   });
@@ -124,8 +125,8 @@ function attach(el,i){
       for(const t of ['pointermove','pointerup','pointercancel','lostpointercapture']) el.removeEventListener(t,handlers[t]);
       try{el.releasePointerCapture(e.pointerId)}catch(_){}
       el.classList.remove('drag');
-      const x=commit&&S.G&&!S.G.done?snapDrag(x0,lo,hi,delta):x0;
-      if(x!==x0){S.G.hist.push(S.G.pos.slice());S.G.pos[i]=x;S.G.moves++;(p.kind==='heavy'?sfx.heavyMove:p.kind==='gate'?sfx.gateMove:sfx.move)();$('bUndo').disabled=false}
+      const x=commit&&S.G&&!S.G.done?snapDrag(x0,lo,hi,delta,p.kind):x0;
+      if(x!==x0){S.G.hist.push(S.G.pos.slice());S.G.pos[i]=x;S.G.moves++;(p.kind==='heavy'?sfx.heavyMove:p.kind==='gate'?sfx.gateMove:p.kind==='ice'?sfx.iceMove:sfx.move)();$('bUndo').disabled=false;if(p.kind==='ice')flashEl(el,'sliding',220)}
       if(S.G&&S.G.els[i]===el){place(i);syncSpecials();updateLinks()}
       if(x!==x0) afterMove();
     };

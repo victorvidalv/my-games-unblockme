@@ -53,5 +53,11 @@ export const minReach = (rating) => curve(rating).target - (rating > 85 ? 3 : ra
 /** Margen (±) de movimientos mínimos alrededor del objetivo que se ofrece al jugador. */
 export const WINDOW = 3;
 
-/** Límite de movimientos: el doble del mínimo. */
-export const moveLimit = (opt) => opt * 2;
+/** Pistas iniciales según la dificultad del camino (Experto empieza más justo). */
+export const startHintsFor = (start = 1) => (start >= 75 ? 2 : 3);
+
+/** Factor de límite de movimientos según el camino: Normal ×2, Difícil ×1.75, Experto ×1.55. */
+export const limitFactor = (start = 1) => (start >= 75 ? 1.55 : start >= 50 ? 1.75 : 2);
+
+/** Límite de movimientos permitido para completar un tablero de mínimo `opt` en ese camino. */
+export const moveLimit = (opt, start = 1) => Math.max(opt + 2, Math.round(opt * limitFactor(start)));

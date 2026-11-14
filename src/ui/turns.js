@@ -1,4 +1,4 @@
-import { tone, vib } from '../audio/sound.js';
+import { sfx, tone, vib } from '../audio/sound.js';
 import { $ } from '../dom.js';
 import { isLow, isWon, movesLeft } from '../engine/rules.js';
 import { S } from '../state.js';
@@ -19,11 +19,11 @@ export function lowState() {
 function announceLow(last) {
   const G = S.G;
   const left = movesLeft(G.moves, G.limit);
-  $('lowTitle').textContent = last ? '¡ÚLTIMO TURNO!' : 'QUEDAN POCOS TURNOS';
-  $('lowSub').textContent = last ? 'Si no sacas la llave con este movimiento, termina' : `Te ${left === 1 ? 'queda' : 'quedan'} ${left} de ${G.limit}`;
+  $('lowTitle').textContent = last ? 'Último turno' : 'Pocos turnos';
+  $('lowSub').textContent = `${left} ${left === 1 ? 'restante' : 'restantes'}`;
   $('lowBanner').classList.toggle('last', last);
-  flash($('lowBanner'), 'show', 2600);
-  flash($('meter'), 'low-hit', 1200);
+  flash($('lowBanner'), 'show', 1700);
+  flash($('meter'), 'low-hit', 600);
 }
 
 /**
@@ -99,4 +99,21 @@ export function playSkipEffect() {
   vib([30, 30, 60]);
   if (!reduced()) { const [x, y] = center(board); burst(x, y, 40, ['#ffd24a', '#fff3b0', '#ff9a3c'], 9); }
   return new Promise((r) => setTimeout(() => { board.classList.remove('skipping'); r(); }, reduced() ? 400 : 1200));
+}
+
+/** Efecto destacado y simple al activar el poder de revivir: destello, onda expansiva y sonido épico. */
+export function playReviveEffect(label = '¡PODER ACTIVADO!', hero = true) {
+  const board = $('board');
+  const fx = $('reviveFx');
+  $('reviveFxLabel').textContent = label;
+  fx.classList.toggle('is-hero', hero);
+  board.classList.add('reviving');
+  flash(fx, 'go', 1100);
+  setTimeout(() => board.classList.remove('reviving'), 900);
+  sfx.revive();
+  vib([25, 35, 50]);
+  if (!reduced()) {
+    const [x, y] = center(board);
+    burst(x, y, 48, hero ? ['#68d8bd', '#ffe29a', '#ffffff', '#43e0c1'] : ['#ffd98a', '#ff9c66', '#ffffff', '#f5b65c'], 8);
+  }
 }

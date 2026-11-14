@@ -2,7 +2,7 @@ import { N, P8, WIN_POS, WALL, encode, gateOpen } from './board.js';
 
 /**
  * Llama cb(pieza, nuevaPos, nuevaClave) por cada movimiento posible (un arrastre de cualquier largo = 1 movimiento).
- * Respeta muros, candados (solo se mueven con la placa cubierta) y piezas pesadas (una casilla).
+ * Respeta muros, candados (solo se mueven con la placa cubierta), pesadas (una casilla) y hielo (hasta el tope).
  */
 export function expand(pieces, key, pos, g, cb, walls = []) {
   const n = pieces.length;
@@ -25,6 +25,11 @@ export function expand(pieces, key, pos, g, cb, walls = []) {
     let hi = x;
     while (lo > 0 && g[h ? f * N + lo - 1 : (lo - 1) * N + f] < 0) lo--;
     while (hi + p.len < N && g[h ? f * N + hi + p.len : (hi + p.len) * N + f] < 0) hi++;
+    if (p.kind === 'ice') {
+      if (lo < x) cb(i, lo, key + (lo - x) * P8[i]);
+      if (hi > x) cb(i, hi, key + (hi - x) * P8[i]);
+      continue;
+    }
     if (p.kind === 'heavy') { lo = Math.max(lo, x - 1); hi = Math.min(hi, x + 1); }
     for (let y = lo; y <= hi; y++) if (y !== x) cb(i, y, key + (y - x) * P8[i]);
   }
@@ -34,43 +39,88 @@ export function expand(pieces, key, pos, g, cb, walls = []) {
  * Explora TODA la componente alcanzable desde pos0 y calcula la distancia exacta
  * (nº mínimo de movimientos) de cada estado a la victoria. Devuelve null si no hay salida
  * o la componente supera `cap` estados.
+ * Con piezas de hielo el grafo es dirigido, así que guarda aristas invertidas para no asumir reversibilidad.
  */
 export function analyze(pieces, pos0, cap = 300000, walls = []) {
   const n = pieces.length;
   const k0 = encode(pos0);
   const pos = new Array(n).fill(0);
   const g = new Int8Array(N * N);
-  const seen = new Set([k0]);
+  const directed = pieces.some((p) => p.kind === 'ice');
   const list = [k0];
+  if (!directed) {
+    const seen = new Set([k0]);
+    for (let q = 0; q < list.length; q++) {
+      expand(pieces, list[q], pos, g, (i, y, nk) => {
+        if (!seen.has(nk)) {
+          seen.add(nk);
+          list.push(nk);
+        }
+      }, walls);
+      if (list.length > cap) return null;
+    }
+    const dist = new Map();
+    const queue = [];
+    for (const k of list) {
+      if (k % 8 === WIN_POS) {
+        dist.set(k, 0);
+        queue.push(k);
+      }
+    }
+    if (!queue.length) return null;
+    for (let q = 0; q < queue.length; q++) {
+      const k = queue[q];
+      const d = dist.get(k) + 1;
+      expand(pieces, k, pos, g, (i, y, nk) => {
+        if (!dist.has(nk)) {
+          dist.set(nk, d);
+          queue.push(nk);
+        }
+      }, walls);
+    }
+    return { k0, list, dist };
+  }
+  const idxOf = new Map([[k0, 0]]);
+  const rev = [[]];
   for (let q = 0; q < list.length; q++) {
     expand(pieces, list[q], pos, g, (i, y, nk) => {
-      if (!seen.has(nk)) {
-        seen.add(nk);
+      let vi = idxOf.get(nk);
+      if (vi === undefined) {
+        vi = list.length;
+        idxOf.set(nk, vi);
         list.push(nk);
+        rev.push([]);
       }
+      rev[vi].push(q);
     }, walls);
     if (list.length > cap) return null;
   }
-  const dist = new Map();
-  const queue = [];
-  for (const k of list) {
-    if (k % 8 === WIN_POS) {
-      dist.set(k, 0);
-      queue.push(k);
+  const distIdx = new Int32Array(list.length).fill(-1);
+  const winQ = [];
+  for (let i = 0; i < list.length; i++) {
+    if (list[i] % 8 === WIN_POS) {
+      distIdx[i] = 0;
+      winQ.push(i);
     }
   }
-  if (!queue.length) return null;
-  for (let q = 0; q < queue.length; q++) {
-    const k = queue[q];
-    const d = dist.get(k) + 1;
-    expand(pieces, k, pos, g, (i, y, nk) => {
-      if (!dist.has(nk)) {
-        dist.set(nk, d);
-        queue.push(nk);
+  if (!winQ.length) return null;
+  for (let q = 0; q < winQ.length; q++) {
+    const vi = winQ[q];
+    const d = distIdx[vi] + 1;
+    const parents = rev[vi];
+    for (let p = 0; p < parents.length; p++) {
+      const ui = parents[p];
+      if (distIdx[ui] < 0) {
+        distIdx[ui] = d;
+        winQ.push(ui);
       }
-    }, walls);
+    }
   }
-  return { k0, list, dist };
+  const dist = new Map();
+  for (let i = 0; i < list.length; i++) {
+    if (distIdx[i] >= 0) dist.set(list[i], distIdx[i]);
+  }
+  return dist.has(k0) ? { k0, list, dist } : null;
 }
 
 /** Mayor distancia a la victoria dentro de la componente (= lo difícil que puede llegar a ser el tablero). */

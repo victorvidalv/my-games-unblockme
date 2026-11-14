@@ -6,15 +6,17 @@ const board = (t) => decodeBoard(t.board);
 
 describe('tableros de aprendizaje', () => {
   it('uno por pieza especial, en el primer nivel donde aparece, y ese nivel es de esa mecánica', () => {
-    expect(Object.keys(TUTORIALS).sort()).toEqual(['gate', 'heavy', 'wall']);
+    expect(Object.keys(TUTORIALS).sort()).toEqual(['gate', 'heavy', 'ice', 'wall']);
     for (const [mech, t] of Object.entries(TUTORIALS)) {
       const plan = levelPlan(t.level);
       expect(plan.intro, `nivel ${t.level}`).toBe(true);
       expect(plan.mechanics, `nivel ${t.level}`).toContain(mech);
     }
-    // el orden de aprendizaje: muros → candado → pesada
-    expect(TUTORIALS.wall.level).toBeLessThan(TUTORIALS.gate.level);
-    expect(TUTORIALS.gate.level).toBeLessThan(TUTORIALS.heavy.level);
+    // el orden de aprendizaje: rocas (10) → pesada (20) → candado (30) → hielo (40)
+    expect(TUTORIALS.wall.level).toBe(10);
+    expect(TUTORIALS.heavy.level).toBe(20);
+    expect(TUTORIALS.gate.level).toBe(30);
+    expect(TUTORIALS.ice.level).toBe(40);
   });
 
   it('cada tablero es válido, se resuelve en exactamente 3 movimientos y contiene la pieza que enseña', () => {
@@ -25,6 +27,7 @@ describe('tableros de aprendizaje', () => {
       if (mech === 'wall') expect(b.walls.length).toBeGreaterThan(0);
       if (mech === 'gate') expect(b.pieces.some((p) => p.kind === 'gate')).toBe(true);
       if (mech === 'heavy') expect(b.pieces.some((p) => p.kind === 'heavy')).toBe(true);
+      if (mech === 'ice') expect(b.pieces.some((p) => p.kind === 'ice')).toBe(true);
       expect(t.steps.length, mech).toBe(3);
     }
   });
@@ -72,6 +75,20 @@ describe('tableros de aprendizaje', () => {
     expect(lo).toBe(b.pos[1]);
   });
 
+  it('hielo: tras apartar el tope, patina de golpe hasta el extremo sin detenerse a medias', () => {
+    const b = board(TUTORIALS.ice);
+    const ice = b.pieces.findIndex((p) => p.kind === 'ice');
+    expect(slideRange(b.pieces, b.pos, ice, b.walls)).toEqual([0, 0]);
+    const cleared = [0, 0, 0];
+    const [lo, hi] = slideRange(b.pieces, cleared, ice, b.walls);
+    expect([lo, hi]).toEqual([0, 3]);
+    const iceMoves = [];
+    expand(b.pieces, encode(cleared), new Array(3).fill(0), new Int8Array(N * N), (i, y) => {
+      if (i === ice) iceMoves.push(y);
+    }, b.walls);
+    expect(iceMoves).toEqual([3]);
+  });
+
   it('todos los estados de cada tablero de aprendizaje tienen movimientos (no se puede atascar)', () => {
     for (const [mech, t] of Object.entries(TUTORIALS)) {
       const b = board(t);
@@ -86,10 +103,12 @@ describe('tableros de aprendizaje', () => {
   });
 
   it('tutorialFor: solo la primera vez que se ve la pieza', () => {
-    expect(tutorialFor(6, {})?.mech).toBe('wall');
-    expect(tutorialFor(6, { wall: true })).toBeNull();
-    expect(tutorialFor(23, {})?.mech).toBe('gate');
-    expect(tutorialFor(33, {})?.mech).toBe('heavy');
+    expect(tutorialFor(10, {})?.mech).toBe('wall');
+    expect(tutorialFor(10, { wall: true })).toBeNull();
+    expect(tutorialFor(20, {})?.mech).toBe('heavy');
+    expect(tutorialFor(30, {})?.mech).toBe('gate');
+    expect(tutorialFor(40, {})?.mech).toBe('ice');
+    expect(tutorialFor(40, { ice: true })).toBeNull();
     expect(tutorialFor(7, {})).toBeNull();
     expect(decode(encode([1, 2, 3]), 3)).toEqual([1, 2, 3]);
   });

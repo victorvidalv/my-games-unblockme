@@ -1,9 +1,7 @@
 import { sfx } from '../audio/sound.js';
 import { $ } from '../dom.js';
 import { hintMove } from '../engine/solver.js';
-import { BOSS_BOOST, BOSS_HINTS, BOSS_NAMES, MECHANICS, TUTORIALS } from '../game/mechanics.js';
-import { BOSS_POINTS } from '../engine/scoring.js';
-import { zoneIdx } from '../data/zones.js';
+import { MECHANICS, TUTORIALS } from '../game/mechanics.js';
 import { S, heroOf, persist, store } from '../state.js';
 import { icon } from './icons.js';
 
@@ -19,15 +17,15 @@ export function mechanicsPresent(G) {
   if ((G.walls || []).length) out.push('wall');
   if (G.pieces.some((p) => p.kind === 'gate')) out.push('gate');
   if (G.pieces.some((p) => p.kind === 'heavy')) out.push('heavy');
+  if (G.pieces.some((p) => p.kind === 'ice')) out.push('ice');
   return out;
 }
 
-/** Leyenda de piezas especiales del nivel actual (y del jefe). */
+/** Leyenda de piezas especiales del nivel actual. */
 export function renderLegend() {
   const el = $('legend');
   const G = S.G;
   const chips = G ? mechanicsPresent(G).map((m) => `<span class="chip chip-${m}"><i>${icon(MECHANICS[m].icon)}</i>${MECHANICS[m].chip}</span>`) : [];
-  if (G?.boss) chips.push(`<span class="chip boss"><i>${icon('crown')}</i>Jefe +${Math.round((BOSS_POINTS - 1) * 100)} % · ${BOSS_HINTS} pistas</span>`);
   el.innerHTML = chips.join('');
   el.hidden = !chips.length;
   dispatchEvent(new Event('resize'));            // la leyenda ocupa sitio: el tablero se reajusta para no taparla
@@ -41,19 +39,17 @@ const DEMO = {
   wall: '<div class="mini"><div class="wall demo"><i></i></div><div class="mp red bump"></div></div>',
   gate: '<div class="mini gate-demo"><div class="plate demo"><i></i></div><div class="mp blk slide-onto"></div><div class="mp gate-p"><span class="lock-shut">🔒</span><span class="lock-free">🔓</span></div></div>',
   heavy: '<div class="mini heavy-demo"><div class="mp heavy-p"><b>1</b></div><span class="steps">▸ ▹ ▹</span></div>',
-  boss: `<div class="mini boss-demo">${icon('crown')}</div>`,
+  ice: '<div class="mini ice-demo"><div class="mp ice-p">❄</div><div class="wall demo"><i></i></div><span class="glide">» »</span></div>',
 };
 
 function tipFor(id) {
   if (MECHANICS[id]) return { tag: 'PIEZA NUEVA', title: `${icon(MECHANICS[id].icon)} ${MECHANICS[id].name}`, text: MECHANICS[id].tip, demo: id };
   const h = heroOf();
-  const c = S.G ? zoneIdx(S.G.n) : 0;
   return {
     drag: { tag: 'PRIMEROS PASOS', title: '¡Saca la llave roja!', text: 'Desliza los bloques para abrirle camino a la llave roja 🔑 hasta la salida ➜. <b>Arrastra el bloque que brilla.</b>', demo: 'drag' },
     score: { tag: 'PUNTOS', title: 'Cada movimiento cuenta', text: '<b>Mínimo</b> es la mejor solución: si la igualas, ¡<b>PERFECTO</b>! y más puntos. Si agotas los turnos del <b>Límite</b> (el doble del mínimo) sin sacar la llave, ya no puedes mover más y la aventura termina.', demo: 'score', glow: '#meter' },
     tools: { tag: 'AYUDAS', title: 'Si te atoras', text: `${icon('undo')} <b>Deshacer</b> vuelve atrás (cuesta 1 movimiento). ${icon('hint')} <b>Pista</b> te enseña el mejor movimiento. ${icon('purse')} <b>Tienda</b>: ayudas muy caras que se pagan con tus puntos.`, demo: 'tools', glow: '.controls' },
     hero: { tag: 'TU HÉROE', title: `${icon(h.icon)} ${h.name}: ${h.power}`, text: `${h.detail} <b>${h.short}.</b>`, demo: 'hero', glow: '#heroHudName' },
-    boss: { tag: 'JEFE DE LA CIUDAD', title: `${icon('crown')} ${BOSS_NAMES[c]}`, text: `Un tablero más difícil (pide ${BOSS_BOOST} movimientos mínimos más) con todo lo que has aprendido. Si lo superas: <b>+${Math.round((BOSS_POINTS - 1) * 100)} % de puntos</b> y <b>${BOSS_HINTS} pistas</b>.`, demo: 'boss' },
   }[id];
 }
 
@@ -120,7 +116,6 @@ export function startCoach() {
   if (G.n === 3) queue.push('tools');
   if (G.n === 4) queue.push('hero');
   queue.push(...mechanicsPresent(G));
-  if (G.boss) queue.push('boss');
   const todo = queue.filter((id) => !store.tips[id]);
   if (!todo.length) { guide(); return; }
   showing = true;

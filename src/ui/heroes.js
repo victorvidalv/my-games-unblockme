@@ -1,12 +1,13 @@
 import { Music, setTensionFx } from '../audio/music.js';
-import { sfx } from '../audio/sound.js';
 import { $, cssUrl } from '../dom.js';
 import { saveRun } from '../game/session.js';
 import { HEROES, canHint, freeHintsLeft } from '../game/heroes.js';
+import { reviveCost } from '../game/shop.js';
 import { S, undosLeft, heroOf, pathOf, persist, store } from '../state.js';
 import { boardEl, layout, updateHud } from './board.js';
 import { heroArt } from './story.js';
 import { icon } from './icons.js';
+import { playReviveEffect } from './turns.js';
 export function heroMarkup(h,pose='start'){return `<svg xmlns="http://www.w3.org/2000/svg" class="hero-art" viewBox="0 0 100 145" role="img" aria-label="${h.name}, ${h.role}"><defs><clipPath id="portrait-${h.id}-${pose}"><rect width="100" height="145" rx="16"/></clipPath></defs><image href="${heroArt(h.id,pose)}" width="100" height="145" preserveAspectRatio="xMidYMin slice" clip-path="url(#portrait-${h.id}-${pose})"/><rect x="1" y="1" width="98" height="143" rx="16" fill="none" stroke="${h.color}" stroke-opacity=".65" stroke-width="2"/></svg>`}
 export function syncHero(id=S.run?.hero){const h=heroOf(id);const art=document.querySelector('#travel .traveler>.hero-art');if(art)art.outerHTML=heroMarkup(h,'map');document.documentElement.style.setProperty('--hero-color',h.color)}
 export function chooseHero(start,mode){
@@ -28,7 +29,6 @@ export function updateHeroHud(){
  if(!S.run||!S.G)return;const h=heroOf(),prac=S.run.mode==='p';
  $('heroHudImg').src=`heroes/${h.id}.webp`;$('heroHudImg').alt=h.name;$('heroHudName').textContent=h.name;
  $('heroHudPower').textContent=prac?'Práctica · ayudas ilimitadas':h.id==='lia'?(S.run.lifeUsed?'Segunda oportunidad usada':'Segunda oportunidad disponible'):h.id==='jean'?`${undosLeft()} deshacer gratis`:(freeHintsLeft(h.id,S.run,S.G.n)>0?'Pista gratis disponible':'Pista gratis usada');
- if(S.run.revive>0&&!prac)$('heroHudPower').textContent+=` · Revivir ×${S.run.revive}`;
  $('hintN').textContent=prac?'∞':freeHintsLeft(h.id,S.run,S.G.n)>0?'gratis':S.run.hints;$('bHint').disabled=!canHint(h.id,S.run,S.run.mode,S.G.n);
  $('bUndo').querySelector('em').textContent=prac?'gratis':h.id==='jean'&&undosLeft()>0?undosLeft()+' gratis':'+1 mov';
 }
@@ -41,9 +41,32 @@ export function showRescue(kind=S.run?.rescue?.kind||'lia'){
  $('rescueTag').textContent=revive?'REVIVIR · COMPRADO CON TUS PUNTOS':'PODER DE LÍA · UNA VEZ POR PARTIDA';
  $('rescueTitle').textContent=revive?'¡Otra oportunidad!':'La aventura sigue';
  $('rescueText').textContent=revive?`Pagaste por revivir. Repites este mismo tablero desde cero y conservas tus puntos y tus pistas.${S.run.revive>0?` Te queda ${S.run.revive} revivir guardado.`:''}`:'Lía te da una segunda oportunidad. Repites este mismo tablero desde cero y conservas tus puntos y tus pistas.';
+ $('rescueContinue').textContent=revive?'Revivir':'Activar poder';
  $('rescue').classList.add('show');$('rescueContinue').focus();
  $('rescueContinue').onclick=()=>{
-  if(!S.run?.rescue)return;S.G.pos=S.G.start.slice();S.G.moves=0;S.G.hist=[];S.G.done=false;delete S.run.rescue;saveRun();
-  $('rescue').classList.remove('show');boardEl.classList.remove('board-lock');S.busy=false;$('bUndo').disabled=true;layout();updateHud();Music.duck(1);sfx.start();$('msg').textContent=revive?'Revivir usado. ¡Este tablero empieza de nuevo!':'Lía te dio otra oportunidad. ¡Este tablero empieza de nuevo!';
+  if(!S.run?.rescue)return;S.G.pos=S.G.start.slice();S.G.moves=0;S.G.hist=[];S.G.done=false;S.G.limit-=(S.G.bought||0);S.G.bought=0;delete S.run.rescue;saveRun();
+  $('rescue').classList.remove('show');boardEl.classList.remove('board-lock');S.busy=false;$('bUndo').disabled=true;layout();updateHud();Music.duck(1);
+  playReviveEffect(revive?'¡RENACER!':'¡PODER DE LÍA!',!revive);
+  $('msg').textContent=revive?'Revivir usado. ¡Este tablero empieza de nuevo!':'Poder de Lía activado. ¡Este tablero empieza de nuevo!';
  };
+}
+
+/** Pantalla completa del dios nórdico tras perder: elegir Revivir (−33 % pts, solo 1 vez) o Finalizar. */
+export function showReviveOffer(){
+ const modal=$('reviveOffer'),now=S.run?.score||0,cost=reviveCost(now),after=Math.max(0,now-cost),fmt=n=>n.toLocaleString('de-DE');
+ S.G.done=true;S.busy=true;boardEl.classList.add('board-lock');setTensionFx(0,false);Music.duck(.3);
+ $('reviveNow').textContent=fmt(now);
+ $('reviveCost').textContent=`−${fmt(cost)}`;
+ $('reviveAfter').textContent=fmt(after);
+ $('reviveBtnNote').textContent=`Pierdes ${fmt(cost)} pts · Reinicia el tablero (solo 1 vez)`;
+ return new Promise(resolve=>{
+  let picked=false;
+  const pick=yes=>{if(picked)return;picked=true;modal.classList.remove('show');modal.removeEventListener('keydown',onKey);resolve(yes)};
+  const onKey=e=>{if(e.key==='Escape')pick(false)};
+  $('reviveAccept').onclick=()=>pick(true);
+  $('reviveEnd').onclick=()=>pick(false);
+  modal.addEventListener('keydown',onKey);
+  modal.classList.add('show');
+  $('reviveAccept').focus();
+ });
 }

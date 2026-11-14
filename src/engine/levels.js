@@ -12,7 +12,15 @@ import { hash32 } from './rng.js';
  * (`npm run levels:decorate`); si falta una familia se usa el tablero normal.
  */
 /** Si una familia no tiene tableros a esa dificultad (los muros no se consiguen por encima de 85) se prueba con otra especial. */
-export const FALLBACK = { plain: ['plain'], walls: ['walls', 'gates'], gates: ['gates'], heavy: ['heavy'], mixed: ['mixed', 'walls', 'gates', 'heavy'] };
+export const FALLBACK = {
+  plain: ['plain'],
+  walls: ['walls', 'gates'],
+  gates: ['gates'],
+  heavy: ['heavy'],
+  ice: ['ice', 'gates'],
+  duo: ['duo', 'ice', 'gates', 'heavy'],
+  mixed: ['mixed', 'duo', 'ice', 'walls', 'gates', 'heavy'],
+};
 
 export function pickBoard(bank, rating, seed, level, family = 'plain', special = null) {
   let used = 'plain';
@@ -37,11 +45,12 @@ export function varyBoard(board, rating, seed, { tries = 8, changes = 3 } = {}) 
   const walls = board.walls || [];
   let cur = { pieces: board.pieces, pos: board.pos, walls };
   let accepted = 0;
+  const hasIce = board.pieces.some((p) => p.kind === 'ice');
   for (let t = 0; t < tries && accepted < changes; t++) {
     const cand = mutate(cur, rng, pLong);
     if (!cand) continue;
     const an = analyze(cand.pieces, cand.pos, 600000, walls);
-    if (an && maxDistance(an) >= target) {
+    if (an && (!hasIce || an.dist.size === an.list.length) && maxDistance(an) >= target) {
       cur = cand;
       accepted++;
     }
@@ -67,7 +76,7 @@ export function buildLevel(board, { rating, adj = 0, brave = false, rng = Math.r
   const byDist = new Map();
   for (const k of an.list) {
     const d = an.dist.get(k);
-    if (d < lo || d > hi) continue;
+    if (d === undefined || d < lo || d > hi) continue;
     if (!byDist.has(d)) byDist.set(d, []);
     byDist.get(d).push(k);
   }

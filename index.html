@@ -50,13 +50,50 @@
   </div>
 </div>
 
-<div class="modal" id="travel" role="dialog" aria-modal="true" aria-labelledby="travelTitle"><article class="route-sheet">
- <div class="route-landscape"><img id="travelScene" alt=""><img class="route-portrait" id="travelPortrait" alt=""><div class="route-place"><div class="tag" id="travelTag"></div><h2 id="travelTitle"></h2></div></div>
- <div class="route-content"><p class="route-story" id="travelText"></p><p class="route-hero-line" id="travelHeroLine"></p><div class="route-caption">ELIGE EL CAMINO DE LOS PRÓXIMOS 10 NIVELES</div><div class="route-options" id="routeOptions">
-  <button class="route-option" id="routeNormal"><span class="choice-icon" aria-hidden="true">⌁</span><span class="choice-copy"><strong>Tranquilo</strong><small>Dificultad y puntos habituales</small></span><span class="choice-bonus">Seguir →</span></button>
-  <button class="route-option brave" id="routeBrave"><span class="choice-icon" aria-hidden="true">△</span><span class="choice-copy"><strong>Aventurero</strong><small>Un poco más difícil</small></span><span class="choice-bonus">+10 % puntos →</span></button>
- </div><p class="route-summary" id="routeSummary"></p></div>
-</article></div>
+<div class="modal" id="travel" role="dialog" aria-modal="true" aria-labelledby="travelTitle">
+ <div class="travel-stage">
+  <img class="travel-backdrop" src="backgrounds/guia-elfa-mapa.webp" alt="" draggable="false">
+  <img class="travel-city-tint" id="travelScene" alt="" draggable="false">
+  <img class="travel-elf" src="backgrounds/guia-elfa-mapa.webp" alt="La guía del camino" draggable="false">
+  <div class="travel-vignette" aria-hidden="true"></div>
+  <div class="travel-shell">
+   <div class="travel-top">
+    <div class="travel-meta">
+     <span class="tag" id="travelTag"></span>
+     <span class="travel-cleared" id="routeSummary"></span>
+    </div>
+    <h2 class="travel-heading" id="travelTitle"></h2>
+   </div>
+   <aside class="travel-side" aria-label="Historia crítica de la siguiente ciudad">
+    <div class="travel-lore-box">
+     <div class="travel-lore-head">
+      <span class="travel-seal" id="travelSeal"></span>
+     </div>
+     <ul class="travel-lines" id="travelText"></ul>
+     <div class="travel-companion">
+      <img class="travel-hero-thumb" id="travelPortrait" alt="">
+      <p class="travel-hero-line" id="travelHeroLine"></p>
+     </div>
+    </div>
+   </aside>
+   <div class="travel-bottom">
+    <div class="route-caption">ELIGE TU CAMINO PARA LOS PRÓXIMOS 10 NIVELES</div>
+    <div class="route-options" id="routeOptions">
+     <button class="route-option" id="routeNormal">
+      <span class="choice-icon" aria-hidden="true">⌁</span>
+      <span class="choice-copy"><strong>Camino Tranquilo</strong><small>Dificultad y puntos habituales</small></span>
+      <span class="choice-bonus">Avanzar →</span>
+     </button>
+     <button class="route-option brave" id="routeBrave">
+      <span class="choice-icon" aria-hidden="true">△</span>
+      <span class="choice-copy"><strong>Camino Aventurero</strong><small>Puzles algo más difíciles</small></span>
+      <span class="choice-bonus">+10 % puntos →</span>
+     </button>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
 <div class="modal" id="heroSelect" role="dialog" aria-modal="true" aria-labelledby="heroSelectTitle"><div class="card hero-selector">
  <div class="tag" id="heroPath"></div><h2 id="heroSelectTitle">¿Quién abre el camino?</h2><p class="hero-subtitle">Un compañero. Un poder. Hasta el final.</p>
  <div class="hero-cards" id="heroCards" role="radiogroup" aria-label="Elige un héroe"></div>
@@ -64,7 +101,43 @@
  <p id="heroQuote"></p>
  <div class="hero-selector-actions"><button id="heroCancel">Volver al menú</button><button class="primary" id="heroConfirm">Comenzar la aventura ➜</button></div>
 </div></div>
-<div class="modal" id="rescue" role="dialog" aria-modal="true" aria-labelledby="rescueTitle"><div class="card rescue-card"><img class="rescue-portrait" id="rescueHero" alt="Lía protege la aventura"><span class="rescue-heart" id="rescueIcon" aria-hidden="true"></span><div class="tag" id="rescueTag"></div><h2 id="rescueTitle">La aventura sigue</h2><p id="rescueText"></p><button class="primary" id="rescueContinue">Volver a intentarlo</button></div></div>
+<div class="modal" id="rescue" role="dialog" aria-modal="true" aria-labelledby="rescueTitle"><div class="card rescue-card"><img class="rescue-portrait" id="rescueHero" alt="Lía protege la aventura"><span class="rescue-heart" id="rescueIcon" aria-hidden="true"></span><div class="tag" id="rescueTag"></div><h2 id="rescueTitle">La aventura sigue</h2><p id="rescueText"></p><button class="primary" id="rescueContinue">Activar poder</button></div></div>
+<div class="modal" id="reviveOffer" role="dialog" aria-modal="true" aria-labelledby="reviveTitle">
+ <div class="revive-stage">
+  <img class="revive-backdrop" src="backgrounds/dios-nordico-renacer.webp" alt="" aria-hidden="true">
+  <img class="revive-god" src="backgrounds/dios-nordico-renacer.webp" alt="Dios nórdico del renacer">
+  <div class="revive-vignette" aria-hidden="true"></div>
+  <div class="revive-shell">
+   <header class="revive-top">
+    <div class="tag">ÚLTIMO UMBRAL · SOLO 1 VEZ POR PARTIDA</div>
+    <h2 id="reviveTitle">¿Renacer de las cenizas?</h2>
+    <p class="revive-cryptic">«El dios del fuego concede un aliento al caído, mas cobra un tercio de su gloria.»</p>
+   </header>
+   <aside class="revive-panel">
+    <div class="revive-explain">
+     <p class="revive-rule">Si eliges <strong>Revivir</strong>, repites este tablero desde <b>0 movimientos</b>, pero <b>pierdes el 33 % de tus puntos actuales</b>. Solo puedes usar este poder <b>1 vez</b> en toda la partida.</p>
+     <div class="revive-math">
+      <div><small>TUS PUNTOS</small><b id="reviveNow">0</b></div>
+      <div><small>PIERDES (−33 %)</small><b id="reviveCost" class="is-loss">−0</b></div>
+      <div><small>TE QUEDARÍAN</small><b id="reviveAfter">0</b></div>
+     </div>
+    </div>
+   </aside>
+   <div class="revive-bottom">
+    <div class="revive-actions">
+     <button class="revive-btn is-revive" id="reviveAccept">
+      <span class="choice-icon" aria-hidden="true">🔥</span>
+      <span class="choice-copy"><strong>Revivir (−33 %)</strong><small id="reviveBtnNote">Pierdes 0 pts · Solo 1 vez</small></span>
+     </button>
+     <button class="revive-btn is-end" id="reviveEnd">
+      <span class="choice-icon" aria-hidden="true">✕</span>
+      <span class="choice-copy"><strong>Finalizar</strong><small>Terminar la partida ahora</small></span>
+     </button>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
 <div id="bonusIntro" role="dialog" aria-modal="true" aria-labelledby="entryTitle"><div class="entry-glow"></div><div class="entry-content"><img id="entryHero" class="entry-portrait" alt=""><p id="entryName"></p><div class="entry-icons" id="entryIcons" aria-hidden="true"></div><h2 id="entryTitle"></h2></div><button id="entrySkip">Continuar ➜</button></div>
 
 
@@ -91,6 +164,7 @@
 <div id="lowBanner" aria-live="assertive"><i data-icon="alert"></i><div><b id="lowTitle"></b><span id="lowSub"></span></div></div>
 <div id="rewindFx" aria-hidden="true"><span>↺</span><i></i></div>
 <div id="skipFx" aria-hidden="true"><div class="chev"><b>»</b><b>»</b><b>»</b></div><strong>NIVEL SALTADO</strong><small>Sin puntos · sin racha</small></div>
+<div id="reviveFx" aria-hidden="true"><div class="revive-fx-ring"></div><strong id="reviveFxLabel">¡PODER ACTIVADO!</strong></div>
 <div id="perfect"><div class="rays"></div><div class="glow"></div><b>¡PERFECTO!</b><div class="stars">★ ★ ★</div><span id="perfectSub"></span></div>
 
 <!-- Menú -->
@@ -98,7 +172,7 @@
   <div class="card">
     <div class="tag">LAS CRÓNICAS DE LA LLAVE ROJA</div>
     <h1 class="logo"><svg class="brand-key" viewBox="0 0 30 38" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><circle cx="15" cy="9" r="6"/><path d="M15 15v19h7m-7-6h5"/></svg>SLIDE &amp; SLAY</h1>
-    <p class="tagline">Tri cerró el camino. Tú decides cómo abrirlo.</p>
+    <p class="tagline">Tri selló diez reinos. La llave roja aún busca paso.</p>
     <button class="primary cont" id="bContinue" style="display:none"></button>
     <div class="tag" style="margin-top:10px">ELIGE LA DIFICULTAD</div>
     <p class="modeinfo" id="modeInfo"></p>
@@ -194,17 +268,33 @@
 <div id="crowd"></div>
 
 <!-- Fin de partida -->
-<div class="modal" id="over">
-  <div class="card">
-    <div class="ending-panel"><img class="ending-portrait" id="overPortrait" alt=""></div><p class="ending-lore" id="overLore"></p><div class="ending-thanks" id="overThanks"></div><div class="tag" id="overTag">PARTIDA TERMINADA</div>
-    <h2 id="overTitle">¡Te pasaste!</h2>
-    <p id="overTxt"></p>
-    <div class="big" id="overScore">0</div>
-    <div class="tag">PUNTOS</div>
-    <div id="overRec"></div>
-    <div class="stats"><div><small>NIVEL ALCANZADO</small><b id="overLvl">1</b></div><div><small>RÉCORD</small><b id="overBest">0</b></div></div>
-    <div class="stack"><button class="primary" id="bAgain">↻ Jugar este camino otra vez</button><button id="bToMenu">Elegir otro camino</button></div>
+<div class="modal" id="over" role="dialog" aria-modal="true" aria-labelledby="overTitle">
+ <div class="over-stage">
+  <img class="over-backdrop" id="overBg" alt="" aria-hidden="true">
+  <img class="over-hero" id="overPortrait" alt="">
+  <div class="over-vignette" aria-hidden="true"></div>
+  <div class="over-shell">
+   <header class="over-top">
+    <div class="tag" id="overTag">PARTIDA TERMINADA</div>
+    <h2 id="overTitle">Sin turnos</h2>
+    <p class="over-msg" id="overTxt"></p>
+   </header>
+   <section class="over-summary">
+    <div class="over-score-box">
+     <small>PUNTOS</small>
+     <div class="big" id="overScore">0</div>
+     <div id="overRec"></div>
+    </div>
+    <div class="over-stats">
+     <div><small>NIVEL</small><b id="overLvl">1</b></div>
+     <div><small>RÉCORD</small><b id="overBest">0</b></div>
+    </div>
+   </section>
+   <div class="over-bottom">
+    <button class="over-home-btn" id="bToMenu">← Volver al inicio</button>
+   </div>
   </div>
+ </div>
 </div>
 <script type="module" src="/src/main.js"></script>
 </body>

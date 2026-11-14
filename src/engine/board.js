@@ -9,6 +9,8 @@
  *   candado – pieza {kind:'gate', plate:[fila,col]}: solo se mueve mientras OTRA pieza cubre la placa.
  *             La placa nunca está en la fila/columna del candado (así mover el candado no cambia la placa).
  *   pesada  – pieza {kind:'heavy'}: solo avanza una casilla por movimiento.
+ *   hielo   – pieza {kind:'ice'}: al deslizarla en un sentido no frena hasta chocar con otro bloque, muro o borde.
+ *             (Su grafo puede ser dirigido; el solver calcula distancias exactas por aristas invertidas.)
  */
 export const N = 6;
 export const EXIT_ROW = 2;
@@ -54,12 +56,15 @@ export const gateOpen = (pieces, i, g) => {
 };
 
 /**
- * Texto compacto de un tablero: "h2.2.0 v3.1.2g0.4 h2.5.1p #3.3" =
- *   pieza: orientación, largo, fila/columna fija, posición; «g<fila>.<col>» = candado con esa placa; «p» = pesada;
- *   «#<fila>.<col>» = muro.
+ * Texto compacto de un tablero: "h2.2.0 v3.1.2g0.4 h2.5.1p v2.4.0i #3.3" =
+ *   pieza: orientación, largo, fila/columna fija, posición; «g<fila>.<col>» = candado con esa placa;
+ *   «p» = pesada; «i» = hielo; «#<fila>.<col>» = muro.
  */
 export function encodeBoard(pieces, pos, walls = []) {
-  const parts = pieces.map((p, i) => `${p.o}${p.len}.${p.fix}.${pos[i]}${p.kind === 'gate' ? `g${p.plate[0]}.${p.plate[1]}` : p.kind === 'heavy' ? 'p' : ''}`);
+  const parts = pieces.map((p, i) => {
+    const suffix = p.kind === 'gate' ? `g${p.plate[0]}.${p.plate[1]}` : p.kind === 'heavy' ? 'p' : p.kind === 'ice' ? 'i' : '';
+    return `${p.o}${p.len}.${p.fix}.${pos[i]}${suffix}`;
+  });
   for (const [r, c] of walls) parts.push(`#${r}.${c}`);
   return parts.join(' ');
 }
@@ -73,11 +78,12 @@ export function decodeBoard(text) {
       walls.push([r, c]);
       continue;
     }
-    const m = /^([hv])(\d)\.(\d)\.(\d)(?:g(\d)\.(\d)|(p))?$/.exec(tok);
+    const m = /^([hv])(\d)\.(\d)\.(\d)(?:g(\d)\.(\d)|([pi]))?$/.exec(tok);
     if (!m) throw new Error(`Pieza ilegible: ${tok}`);
     const piece = { o: m[1], len: Number(m[2]), fix: Number(m[3]) };
     if (m[5] !== undefined) { piece.kind = 'gate'; piece.plate = [Number(m[5]), Number(m[6])]; }
-    else if (m[7]) piece.kind = 'heavy';
+    else if (m[7] === 'p') piece.kind = 'heavy';
+    else if (m[7] === 'i') piece.kind = 'ice';
     pieces.push(piece);
     pos.push(Number(m[4]));
   }
@@ -210,11 +216,13 @@ export const DRAG_MIN = 0.3;
 
 /**
  * Casilla en la que se suelta una pieza arrastrada `delta` casillas desde x0, limitada a [lo, hi].
- * Un arrastre de al menos DRAG_MIN casillas siempre avanza (como mínimo una) hacia donde se tiró.
+ * Un arrastre de al menos DRAG_MIN casillas siempre avanza (como mínimo una) hacia donde se tiró;
+ * si la pieza es de hielo (`kind === 'ice'`), patina hasta el tope (lo o hi) en esa dirección.
  */
-export function snapDrag(x0, lo, hi, delta) {
+export function snapDrag(x0, lo, hi, delta, kind) {
   const clamp = (v) => Math.max(lo, Math.min(hi, v));
   const cur = clamp(x0 + delta);
   if (Math.abs(cur - x0) < DRAG_MIN) return x0;
+  if (kind === 'ice') return delta > 0 ? hi : lo;
   return clamp(delta > 0 ? Math.max(x0 + 1, Math.round(cur)) : Math.min(x0 - 1, Math.round(cur)));
 }

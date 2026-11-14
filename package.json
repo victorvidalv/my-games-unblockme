@@ -9,6 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:full": "FULL=1 vitest run",
     "lint": "eslint .",
     "levels": "node scripts/generate-levels.mjs",
     "levels:decorate": "node scripts/decorate-levels.mjs",

@@ -16,14 +16,11 @@ function applyEffects(id) {
   recLine();
   if (id === 'hint') {
     updateHeroHud();
-  } else if (id === 'moves') {
+  } else if (itemById(id)?.moves) {
     $('lim').textContent = S.G.limit;
     updateHud();
     playBuyEffect();
-    $('msg').textContent = `${itemById('moves').name}: ahora el límite es ${S.G.limit}.`;
-  } else if (id === 'revive') {
-    updateHeroHud();
-    $('msg').textContent = `Revivir guardado (${S.run.revive}): si pierdes, repites este tablero.`;
+    $('msg').textContent = `${itemById(id).name}: ahora el límite es ${S.G.limit}.`;
   } else if (id === 'redo') {
     playRewindEffect();
     layout();
@@ -54,16 +51,16 @@ export async function confirmBuy(id) {
 const SAY = {
   greet: ['¡Pasen, pasen! Todo tiene precio… y el mío es justo.', 'Mmm… huelo puntos en tu bolsillo.', 'Ayudas, atajos y milagros. ¡Todo a su precio!'],
   hint: 'Una pista: el mejor movimiento, susurrado por mí. Barato… para lo que vale.',
+  moves3: '¿Falta poco? Tres turnos más para salir del apuro.',
   moves: '¿Sin turnos? Cinco más. Eso no se regala, amigo.',
   redo: 'Rebobino el tablero. Mi tiempo vale oro.',
-  revive: 'Volver de entre los caídos… cuesta la mitad de tu fortuna. Es lo justo.',
   skip: '¿Saltar un nivel? Es un lujo. Y los lujos se pagan.',
   poor: ['¿Eso es todo lo que tienes? Vuelve con más monedas.', 'Sin monedas no hay milagros.', 'Mi bolsa está llena; la tuya… no tanto.'],
   bought: ['¡Un placer hacer negocios!', '¡Excelente compra! No hay devoluciones.', '¡Cling, cling! Eso suena bien.'],
   decline: ['Piénsalo… los precios no bajan.', 'Tú decides. El oro no huye.'],
   nothing: ['Aún no has movido nada. ¿Qué voy a rebobinar?'],
 };
-const SHORT = { revive: 'Si pierdes, repites el tablero · 50 % de tus puntos', hint: 'Te enseña el mejor movimiento', moves: '+5 al límite de este tablero', redo: 'Empieza de cero con 0 movimientos', skip: 'Pasa de nivel sin puntos ni racha' };
+const SHORT = { hint: 'Te enseña el mejor movimiento', moves3: '+3 al límite de este tablero', moves: '+5 al límite de este tablero', redo: 'Empieza de cero con 0 movimientos', skip: 'Pasa de nivel sin puntos ni racha' };
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 function say(text, mood) {
@@ -126,7 +123,7 @@ export function openShop() {
       return;
     }
     render();
-    if (id === 'redo' || id === 'moves') setTimeout(close, 650);   // un instante para ver a Don Dublón contento
+    if (id === 'redo' || itemById(id)?.moves) setTimeout(close, 650);   // un instante para ver a Don Dublón contento
   };
   $('shopClose').focus();
 }

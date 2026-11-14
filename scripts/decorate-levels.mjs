@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { decodeBoard, encodeBoard } from '../src/engine/board.js';
 import { decorateBoard, FAMILIES } from '../src/engine/decorate.js';
+import { minReach } from '../src/engine/difficulty.js';
 import { hash32 } from '../src/engine/rng.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -21,12 +22,20 @@ const OUT = resolve(ROOT, 'src/data/special.json');
 
 if (!isMainThread) {
   const { jobs, ratings, bases } = workerData;
+  const pickWallFallback = (rating, slot) => {
+    for (let r = Math.min(rating - 1, bases.walls.length - 1); r >= 69; r--) {
+      const pool = bases.walls[r];
+      if (pool?.length) return pool[hash32(rating, slot, r) % pool.length];
+    }
+    return null;
+  };
   for (const { rating, slot, family } of jobs) {
     const base = FAMILIES[family].base;
-    const text = base ? bases[base]?.[rating - 1]?.[slot] : ratings[rating - 1][slot];
+    const text = base ? (bases[base]?.[rating - 1]?.[slot] || pickWallFallback(rating, slot)) : ratings[rating - 1][slot];
     if (!text) { parentPort.postMessage({ rating, slot, family, text: null }); continue; }
     const board = decodeBoard(text);
-    const d = decorateBoard(board, family, hash32(rating, slot, family.length, 0xdec0));
+    const minOpt = base && !bases[base]?.[rating - 1]?.[slot] ? minReach(rating) - 2 : 0;
+    const d = decorateBoard(board, family, hash32(rating, slot, family.length, 0xdec0), { minOpt });
     parentPort.postMessage({ rating, slot, family, text: d ? encodeBoard(d.pieces, d.pos, d.walls) : null });
   }
   process.exit(0);

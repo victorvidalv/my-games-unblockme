@@ -1,51 +1,39 @@
-import { baseScore } from '../engine/scoring.js';
 import { snapshotRescue } from './heroes.js';
 
 /**
  * Tienda: se paga con los puntos de la aventura (restan de tu puntaje, así que cuestan de verdad).
- * La pista cuesta siempre 900 puntos. Los demás precios se miden en «niveles GANADOS»:
- * un nivel vale lo que suele darte un nivel bien jugado
- * (LEVEL_VALUE × los puntos base: un nivel perfecto con algo de racha), no solo los puntos base.
- * Por eso sube a medida que avanzas y siempre equivale al mismo esfuerzo.
- *   Pista            900 puntos fijos
- *   Rehacer tablero  2 niveles
- *   +5 turnos        8 niveles  ← evita que termine la aventura
- *   Saltar nivel    10 niveles
- * Los precios no suben al comprar ni dependen de cómo juegues y son caros a propósito:
- * pagar duele en el puntaje y obliga a elegir bien cuándo gastar.
+ * Precios fijos:
+ *   Pista             500 puntos
+ *   Rehacer tablero 1.500 puntos
+ *   +3 turnos       3.000 puntos
+ *   +5 turnos       4.500 puntos
+ *   Saltar nivel    6.000 puntos
  */
+export const EXTRA_MOVES_3 = 3;
 export const EXTRA_MOVES = 5;
-/** Revivir: cuesta la mitad de tus puntos actuales (¡duele!) y como máximo 2 por partida. */
-export const REVIVE_SHARE = 0.5;
-export const MAX_REVIVES = 2;
-/** Lo que vale «un nivel» en la tienda, en múltiplos de los puntos base: perfecto (+20 %) con racha (×1.3). */
-export const LEVEL_VALUE = 1.5;
+/** Revivir al caer (fuera de tienda): cuesta 33 % de tus puntos actuales y solo 1 vez por partida. */
+export const REVIVE_SHARE = 0.33;
+export const MAX_REVIVES = 1;
 
 export const SHOP_ITEMS = [
-  { id: 'hint', icon: 'hint', name: 'Pista', price: 900, detail: 'Una pista que te enseña el mejor movimiento.' },
-  { id: 'moves', icon: 'hourglass', name: `+${EXTRA_MOVES} turnos`, levels: 8, detail: `Sube ${EXTRA_MOVES} movimientos el límite de este tablero para no perder.` },
-  { id: 'redo', icon: 'rewind', name: 'Rehacer tablero', levels: 2, detail: 'Empieza este tablero de cero con 0 movimientos (conservas los turnos comprados).' },
-  { id: 'skip', icon: 'skip', name: 'Saltar nivel', levels: 10, detail: 'Pasa al siguiente nivel sin puntos y sin racha.' },
-  { id: 'revive', icon: 'flame', name: 'Revivir', share: REVIVE_SHARE, detail: `Si pierdes, repites ese tablero. Cuesta el ${Math.round(REVIVE_SHARE * 100)} % de tus puntos; máximo ${MAX_REVIVES} por partida.` },
+  { id: 'hint', icon: 'hint', name: 'Pista', price: 500, detail: 'Una pista que te enseña el mejor movimiento.' },
+  { id: 'moves3', icon: 'hourglass', name: `+${EXTRA_MOVES_3} turnos`, moves: EXTRA_MOVES_3, price: 3000, detail: `Sube ${EXTRA_MOVES_3} movimientos el límite de este tablero para no perder.` },
+  { id: 'moves', icon: 'hourglass', name: `+${EXTRA_MOVES} turnos`, moves: EXTRA_MOVES, price: 4500, detail: `Sube ${EXTRA_MOVES} movimientos el límite de este tablero para no perder.` },
+  { id: 'redo', icon: 'rewind', name: 'Rehacer tablero', price: 1500, detail: 'Empieza este tablero de cero con 0 movimientos (conservas los turnos comprados).' },
+  { id: 'skip', icon: 'skip', name: 'Saltar nivel', price: 6000, detail: 'Pasa al siguiente nivel sin puntos y sin racha.' },
 ];
 
 export const itemById = (id) => SHOP_ITEMS.find((i) => i.id === id);
 
-/** Precio en puntos de un objeto a la dificultad `rating` (el revivir depende de tus puntos actuales `score`). */
-export const priceOf = (id, rating, score = 0) => {
-  const item = itemById(id);
-  if (item.share) return Math.round(score * item.share);
-  return item.price ?? Math.round(item.levels * LEVEL_VALUE * baseScore(rating));
-};
+/** Precio en puntos de un objeto de la tienda. */
+export const priceOf = (id) => itemById(id).price;
 
 /** ¿Se puede usar el objeto ahora mismo? (reason = por qué no) */
 export function availability(id, { run, G }) {
   if (!run || !G || G.done) return { ok: false, reason: 'No hay un tablero en juego.' };
   if (run.mode === 'p') return { ok: false, reason: 'En Práctica todo es gratis.' };
   if (id === 'redo' && !G.moves) return { ok: false, reason: 'Aún no has movido nada.' };
-  if (id === 'revive' && (run.revivesBought || 0) >= MAX_REVIVES) return { ok: false, reason: `Ya compraste tus ${MAX_REVIVES} revivir de esta partida.` };
-  const price = priceOf(id, G.rate, run.score || 0);
-  if (id === 'revive' && price <= 0) return { ok: false, reason: 'No tienes puntos que pagar.', price };
+  const price = priceOf(id);
   if ((run.score || 0) < price) return { ok: false, reason: 'No te alcanzan los puntos.', price };
   return { ok: true, price };
 }
@@ -59,14 +47,11 @@ export function buy(id, { run, G }) {
   if (!a.ok) return a;
   run.score -= a.price;
   run.spent = (run.spent || 0) + a.price;
+  const item = itemById(id);
   if (id === 'hint') run.hints = (run.hints || 0) + 1;
-  else if (id === 'moves') {
-    G.limit += EXTRA_MOVES;
-    G.bought = (G.bought || 0) + EXTRA_MOVES; // turnos comprados: se muestran congelados y se «derriten» al usarse
-  }
-  else if (id === 'revive') {
-    run.revive = (run.revive || 0) + 1;           // cargas guardadas: se gastan solas al perder
-    run.revivesBought = (run.revivesBought || 0) + 1;
+  else if (item?.moves) {
+    G.limit += item.moves;
+    G.bought = (G.bought || 0) + item.moves; // turnos comprados: se muestran congelados y se «derriten» al usarse
   }
   else if (id === 'redo') {
     G.pos = G.start.slice();
@@ -76,10 +61,27 @@ export function buy(id, { run, G }) {
   return { ok: true, price: a.price };
 }
 
-/** ¿Tienes un revivir guardado? */
+/** Costo en puntos (33 %) de revivir tras perder con `score` puntos actuales. */
+export const reviveCost = (score = 0) => Math.round(Math.max(0, score || 0) * REVIVE_SHARE);
+
+/** ¿Puede revivir pagando el 33 % de sus puntos actuales? (una sola vez por aventura, nunca en Práctica). */
+export const canPaidRevive = (run, mode = run?.mode) =>
+  !!run && mode !== 'p' && (run.revivesBought || 0) < MAX_REVIVES && reviveCost(run.score) > 0;
+
+/** Cobra el 33 % de los puntos actuales y marca el único revivir de la partida. */
+export function payRevive(run) {
+  if (!canPaidRevive(run)) return { ok: false, cost: 0 };
+  const cost = reviveCost(run.score);
+  run.score -= cost;
+  run.spent = (run.spent || 0) + cost;
+  run.revivesBought = (run.revivesBought || 0) + 1;
+  return { ok: true, cost };
+}
+
+/** ¿Tienes un revivir guardado? (compatibilidad con partidas guardadas antiguas). */
 export const hasRevive = (run) => (run?.revive || 0) > 0;
 
-/** Gasta un revivir y guarda el tablero para repetirlo desde el principio (como la segunda vida de Lía). */
+/** Gasta un revivir guardado y prepara el tablero para repetirlo desde el principio. */
 export function useRevive(run, G) {
   run.revive = Math.max(0, (run.revive || 0) - 1);
   run.rescue = { ...snapshotRescue(G), kind: 'revive' };

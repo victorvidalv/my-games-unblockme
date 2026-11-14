@@ -80,16 +80,16 @@ describe('equilibrio de los poderes de héroe (simulación)', () => {
 
 describe('revivir comprado (simulación)', () => {
   it('ayuda más a quien más pierde y le duele más al que más puntos tiene', () => {
-    const none = averageRuns({ hero: 'none', start: 50, skill: 0.4, runs: RUNS });
-    const rev = averageRuns({ hero: 'none', start: 50, skill: 0.4, runs: RUNS, revive: 'city' });
-    expect(rev.cleared).toBeGreaterThan(none.cleared + 5);            // un jugador flojo llega bastante más lejos
-    const goodNone = averageRuns({ hero: 'none', start: 75, skill: 0.92, runs: RUNS });
-    const goodRev = averageRuns({ hero: 'none', start: 75, skill: 0.92, runs: RUNS, revive: 'city' });
+    const none = averageRuns({ hero: 'none', start: 50, skill: 0.55, runs: RUNS });
+    const rev = averageRuns({ hero: 'none', start: 50, skill: 0.55, runs: RUNS, revive: 'city' });
+    expect(rev.cleared).toBeGreaterThan(none.cleared + 5);            // un jugador que llega a las ciudades medias aprovecha bien el revivir
+    const goodNone = averageRuns({ hero: 'none', start: 75, skill: 1, runs: RUNS });
+    const goodRev = averageRuns({ hero: 'none', start: 75, skill: 1, runs: RUNS, revive: 'city' });
     expect(goodRev.score).toBeLessThan(goodNone.score * 0.95);        // al jugador perfecto le cuesta puntos sin darle nada
   });
-  it('máximo 2 por partida y cada uno cuesta el 50 % de los puntos del momento', () => {
-    expect(MAX_REVIVES).toBe(2);
-    expect(REVIVE_SHARE).toBe(0.5);
+  it('máximo 1 por partida y cuesta el 33 % de los puntos del momento', () => {
+    expect(MAX_REVIVES).toBe(1);
+    expect(REVIVE_SHARE).toBe(0.33);
     for (let seed = 1; seed <= 50; seed++) {
       const r = simulateRun({ hero: 'none', start: 1, skill: 0.7, seed, revive: 'city' });
       expect(r.revivesBought).toBeLessThanOrEqual(MAX_REVIVES);
