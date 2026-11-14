@@ -143,3 +143,17 @@
 .link.open{stroke:#7dffb0;stroke-dasharray:none;stroke-width:3.5;filter:drop-shadow(0 0 6px #7dffb0)}
 .plate.on{z-index:4}
 .plate.on i{background:none;box-shadow:0 0 14px #ffd24acc,inset 0 0 10px #ffd24aaa}
+
+/* Hielo: camino completo que recorrerá la pieza hasta el tope (tenue al tocarla, brillante en el sentido del arrastre) */
+.ice-trail{position:absolute;pointer-events:none;border-radius:12px;opacity:.55;transition:opacity .12s;
+  background:linear-gradient(#8ee3fc55,#8ee3fc55);box-shadow:inset 0 0 0 2px #baf1ffdd,0 0 0 0 #0000;
+  display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ice-trail.on{opacity:1;box-shadow:inset 0 0 0 2.5px #e9fcff,0 0 14px #5fd3ff99;background:linear-gradient(#8ee3fc66,#43aad466)}
+.ice-trail b{position:absolute;inset:0;background:repeating-linear-gradient(90deg,#e9fcffcc 0 6px,#0000 6px 26px);
+  -webkit-mask:linear-gradient(90deg,#000,#0000);mask:linear-gradient(90deg,#000,#0000);opacity:.55}
+.ice-trail.v b{background:repeating-linear-gradient(180deg,#e9fcffcc 0 6px,#0000 6px 26px);-webkit-mask:linear-gradient(180deg,#000,#0000);mask:linear-gradient(180deg,#000,#0000)}
+.ice-trail.h.back b{-webkit-mask:linear-gradient(270deg,#000,#0000);mask:linear-gradient(270deg,#000,#0000)}
+.ice-trail.v.back b{-webkit-mask:linear-gradient(0deg,#000,#0000);mask:linear-gradient(0deg,#000,#0000)}
+.ice-trail::after{content:'';position:absolute;width:10px;height:10px;border-radius:50%;background:#e9fcff;box-shadow:0 0 8px #8ee3fc}
+.ice-trail.h.fwd::after{right:7px}.ice-trail.h.back::after{left:7px}.ice-trail.v.fwd::after{bottom:7px}.ice-trail.v.back::after{top:7px}
+@media(prefers-reduced-motion:reduce){.ice-trail{transition:none}}

@@ -101,6 +101,24 @@ export function syncSpecials(animate=true){
 export const layout=()=>{if(!S.G)return;S.G.els.forEach((_,i)=>place(i));placeStatic();syncSpecials(false);updateLinks()};
 
 
+
+/** Hielo: dibuja el camino completo que recorrerá en cada sentido (hasta el tope); el del sentido del arrastre se resalta. */
+function iceTrail(p,x0,lo,hi,s,before){
+  const mk=(from,to,dir)=>{
+    if(to<=from) return null;                       // sin recorrido por ese lado
+    const t=document.createElement('div');t.className='ice-trail '+p.o+' '+dir;t.setAttribute('aria-hidden','true');
+    const a=from*s,len=(to-from)*s;
+    t.style[p.o==='h'?'left':'top']=a+'px';t.style[p.o==='h'?'top':'left']=p.fix*s+'px';
+    t.style[p.o==='h'?'width':'height']=len+'px';t.style[p.o==='h'?'height':'width']=s+'px';
+    t.innerHTML='<b></b>';boardEl.insertBefore(t,before);return t;
+  };
+  const back=mk(lo,x0,'back'),fwd=mk(x0+p.len,hi+p.len,'fwd');
+  return {
+    aim(delta){back?.classList.toggle('on',delta<=-.05);fwd?.classList.toggle('on',delta>=.05)},
+    clear(ms=0){const go=()=>{back?.remove();fwd?.remove()};ms?setTimeout(go,ms):go()},
+  };
+}
+
 let activeDrag=null;                           // arrastre en curso: solo puede haber uno (evita dos dedos a la vez)
 function attach(el,i){
   el.addEventListener('pointerdown',e=>{
@@ -113,10 +131,11 @@ function attach(el,i){
       $('msg').textContent='Está atrapada. Cubre la placa ▣ con otra pieza para abrirla.';return;
     }
     el.classList.remove('hint');el.classList.add('drag');let cur=x0,lastCell=x0,delta=0;
+    const trail=p.kind==='ice'?iceTrail(p,x0,lo,hi,s,el):null;
     const move=ev=>{
       if(ev.pointerId!==e.pointerId) return;
       delta=((p.o==='h'?ev.clientX:ev.clientY)-start)/s;cur=Math.max(lo,Math.min(hi,x0+delta));
-      el.style[p.o==='h'?'left':'top']=cur*s+'px';
+      el.style[p.o==='h'?'left':'top']=cur*s+'px';trail?.aim(delta);
       const c=Math.round(cur);if(c!==lastCell){lastCell=c;tone(300+c*25,.04,'triangle',.05);vib(4)}
     };
     let ended=false;
@@ -127,6 +146,7 @@ function attach(el,i){
       el.classList.remove('drag');
       const x=commit&&S.G&&!S.G.done?snapDrag(x0,lo,hi,delta,p.kind):x0;
       if(x!==x0){S.G.hist.push(S.G.pos.slice());S.G.pos[i]=x;S.G.moves++;(p.kind==='heavy'?sfx.heavyMove:p.kind==='gate'?sfx.gateMove:p.kind==='ice'?sfx.iceMove:sfx.move)();$('bUndo').disabled=false;if(p.kind==='ice')flashEl(el,'sliding',220)}
+      trail?.clear(x!==x0?380:0);
       if(S.G&&S.G.els[i]===el){place(i);syncSpecials();updateLinks()}
       if(x!==x0) afterMove();
     };
